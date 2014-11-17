@@ -9,23 +9,23 @@ from include.constants import *
 class CbSubscriber:
     def __init__(self):
         self.ip = urllib2.urlopen('http://ip.42.pl/raw').read()
-        # self.subscribe()
+        self.subscribe()
 
     def subscribe(self):
         subscriber_dict = {
-            "SSSSSSSentities": [
+            "entities": [
                 {
                     "type": "Room",
                     "isPattern": "false",
                     "id": "Room1"
                 }
             ],
-            "SSSSSSSattributes": [
+            "attributes": [
                 "temperature"
             ],
-            "SSSSSSSreference": "http://{}:{}/firos".format(self.ip, SERVER["PORT"]),
-            "SSSSSSSduration": "P1M",
-            "SSSSSSSnotifyConditions": [
+            "reference": "http://{}:{}/firos".format(self.ip, SERVER["PORT"]),
+            "duration": "P1M",
+            "notifyConditions": [
                 {
                     "type": "ONCHANGE",
                     "condValues": [
@@ -33,7 +33,7 @@ class CbSubscriber:
                     ]
                 }
             ],
-            "SSSSSSSthrottling": "PT5S"
+            "throttling": "PT5S"
         }
         print "Connecting to context broker..."
         url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
@@ -42,9 +42,27 @@ class CbSubscriber:
         response = urllib2.urlopen(request)
         response_body = json.loads(response.read())
         response.close()
-        if response_body["subscribeError"] is not None:
-            rospy.logerr("Error Subscribing to context broker:")
+        if "subscribeError" in response_body:
+            rospy.logerr("Error Subscribing to Context Broker:")
             rospy.logerr(response_body["subscribeError"]["errorCode"]["details"])
             os.kill(os.getpid(), signal.SIGINT)
         else:
-            print "Connected to Context Broker"
+            self.subscriptionId = response_body["subscribeResponse"]["subscriptionId"]
+            print "Connected to Context Broker with id {}".format(self.subscriptionId)
+
+    def disconnect(self):
+        print "\nDisconnecting Context Broker subscription {}".format(self.subscriptionId)
+        disconnect_dict = {
+            "subscriptionId": self.subscriptionId
+        }
+        url = "http://{}:{}/{}/unsubscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+        disconnect_json = json.dumps(disconnect_dict)
+        request = urllib2.Request(url, disconnect_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+        response = urllib2.urlopen(request)
+        response_body = json.loads(response.read())
+        response.close()
+        if int(response_body["statusCode"]["code"]) >= 400:
+            rospy.logerr("Error Disconnecting from Context Broker (subscription: {}):".format(self.subscriptionId))
+            rospy.logerr(response_body["statusCode"]["reasonPhrase"])
+        else:
+            print "Disconnected from Context Broker"

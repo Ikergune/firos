@@ -22,7 +22,8 @@ from include.contextbroker.cbSubscriber import *
 if __name__ == '__main__':
     # Initialize the node and name it.
     rospy.init_node('firos')
-    rospy.loginfo("Starting Firos...")
+    print "\nStarting Firos..."
+    print "\nPress Ctrl+C to Exit\n"
 
     if sys.argv[1:]:
         port = int(sys.argv[1])
@@ -32,10 +33,11 @@ if __name__ == '__main__':
 
     def signal_handler(signal, frame):
         print('\nExiting from the application')
+        sub.disconnect()
         server.close()
+        print('\nExit')
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
-    print('Press Ctrl+C to Exit')
 
     sub = CbSubscriber()
 

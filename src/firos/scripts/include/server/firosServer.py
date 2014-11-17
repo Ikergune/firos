@@ -17,7 +17,7 @@ class FirosServer:
 
     def start(self):
         sa = self.httpd.socket.getsockname()
-        print "Serving HTTP on", sa[0], "port", sa[1], "..."
+        print "\nServing HTTP on", sa[0], "port", sa[1], "..."
         while not self.stopped:
             self.httpd.handle_request()
 
