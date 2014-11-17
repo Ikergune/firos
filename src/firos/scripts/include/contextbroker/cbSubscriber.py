@@ -22,7 +22,7 @@ class CbSubscriber:
                 }
             ],
             "attributes": [
-                "temperature"
+                "cmd_vel"
             ],
             "reference": "http://{}:{}/firos".format(self.ip, SERVER["PORT"]),
             "duration": "P1M",
@@ -30,11 +30,11 @@ class CbSubscriber:
                 {
                     "type": "ONCHANGE",
                     "condValues": [
-                        "presssure"
+                        "cmd_vel"
                     ]
                 }
             ],
-            "throttling": "PT5S"
+            "throttling": "PT1S"
         }
         print "Connecting to context broker..."
         url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])

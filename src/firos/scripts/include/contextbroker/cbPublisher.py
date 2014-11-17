@@ -1,5 +1,6 @@
 import json
 import urllib2
+import time
 
 CONTEXTBROKER = {
     "ADDRESS" : "130.206.83.196",
@@ -21,21 +22,24 @@ class CbPublisher:
         data = {
             "contextElements": [
                 {
+                    "id": contex_id,
                     "type": datatype,
                     "isPattern": "false",
-                    "id": contex_id,
                     "attributes": attributes
                 }
             ],
             "updateAction": "APPEND"
         }
+
         url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         data_json = json.dumps(data)
+        print data_json
         request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
         response = urllib2.urlopen(request)
         response_body = json.loads(response.read())
         print response_body
         response.close()
+
         if "errorCode" in response_body:
             rospy.logerr("Error sending data to Context Broker:")
             rospy.logerr(response_body["errorCode"]["details"])
@@ -46,4 +50,6 @@ class CbPublisher:
 if __name__ == '__main__':
     # Initialize the node and name it.
     print "Enviando"
-    CbPublisher.publish("Room1", "Room",[CbPublisher.createAttribute("cmd_vel", "integer", 25)])
+    ts = time.time()
+    print ts
+    CbPublisher.publish("Room1", "Room",[CbPublisher.createAttribute("cmd_vel", "integer", ts)])
