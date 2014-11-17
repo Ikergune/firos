@@ -22,6 +22,7 @@ from include.contextbroker.cbSubscriber import *
 if __name__ == '__main__':
     # Initialize the node and name it.
     rospy.init_node('firos')
+
     print "\nStarting Firos..."
     print "\nPress Ctrl+C to Exit\n"
 

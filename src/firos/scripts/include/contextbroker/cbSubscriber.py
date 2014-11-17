@@ -10,6 +10,7 @@ class CbSubscriber:
     def __init__(self):
         self.ip = urllib2.urlopen('http://ip.42.pl/raw').read()
         self.subscribe()
+        # self.disconnect()
 
     def subscribe(self):
         subscriber_dict = {
