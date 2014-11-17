@@ -1,6 +1,6 @@
 from BaseHTTPServer import HTTPServer
 
-from contextbroker.cbHandler import CbHandler
+from include.server.requestHandler import RequestHandler
 
 class FirosServer:
     def __init__(self, address="127.0.0.1", port=8000):
@@ -12,8 +12,8 @@ class FirosServer:
 
         server_address = (self.address, self.port)
 
-        CbHandler.protocol_version = Protocol
-        self.httpd = HTTPServer(server_address, CbHandler)
+        RequestHandler.protocol_version = Protocol
+        self.httpd = HTTPServer(server_address, RequestHandler)
 
     def start(self):
         sa = self.httpd.socket.getsockname()

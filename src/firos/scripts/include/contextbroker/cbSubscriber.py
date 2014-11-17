@@ -35,6 +35,7 @@ class CbSubscriber:
             ],
             "SSSSSSSthrottling": "PT5S"
         }
+        print "Connecting to context broker..."
         url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         subscriber_json = json.dumps(subscriber_dict)
         request = urllib2.Request(url, subscriber_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
@@ -45,3 +46,5 @@ class CbSubscriber:
             rospy.logerr("Error Subscribing to context broker:")
             rospy.logerr(response_body["subscribeError"]["errorCode"]["details"])
             os.kill(os.getpid(), signal.SIGINT)
+        else:
+            print "Connected to Context Broker"

@@ -1,14 +1,21 @@
 #!/usr/bin/env python
 
+
+# ROSPY LOGS
+# logdebug
+# logerr
+# logfatal
+# loginfo
+# logout
+# logwarn
+
 # Import required Python code.
 import sys
 import rospy
 import signal
 
-import json
-
 from include.constants import *
-from include.server import FirosServer
+from include.server.firosServer import FirosServer
 from include.contextbroker.cbSubscriber import *
 
 # Main function.
@@ -24,7 +31,7 @@ if __name__ == '__main__':
     server = FirosServer(SERVER["ADDRESS"], port)
 
     def signal_handler(signal, frame):
-        print('Exiting from the application')
+        print('\nExiting from the application')
         server.close()
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
