@@ -4,24 +4,43 @@ import rospy
 
 from include import confManager
 from include.contextbroker.cbPublisher import CbPublisher
+from std_msgs import msg as MsgTypes
 
 TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topics")
 ROBOT_TOPICS = {}
+robot_data   = {}
+
+################################################################################################
+################################################################################################
+################################################################################################
+############################     ANADIR SOPORTE A CLASES PRIMITIVAS     ########################
+################################################################################################
+################################################################################################
+################################################################################################
+
 
 def loadMsgHandlers():
     robot_data = confManager.getRobots()
-    for robot in robot_data:
-        robotName = str(robot['name'])
+    for robotName in robot_data:
+        robotName = str(robotName)
+        robot = robot_data[robotName]
         ROBOT_TOPICS[robotName] = {}
         for topic in robot['topics']:
             topicName = str(topic['name'])
-            module = _loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
-            ROBOT_TOPICS[robotName][topicName] = getattr(module, topicName)
-            rospy.Subscriber('topic', ROBOT_TOPICS[robotName][topicName], _callback)
+            if type(topic['msg']) is dict:
+                module = _loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
+                ROBOT_TOPICS[robotName][topicName] = getattr(module, topicName)
+            else:
+                ROBOT_TOPICS[robotName][topicName] = getattr(MsgTypes, topic['msg'])
+            rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName], _callback, {"robot": robotName, "topic": topicName, "type": str(topic['msg'])})
             # Not needed, the server is listening
             # rospy.spin()
 
-    print ROBOT_TOPICS
+    # print ROBOT_TOPICS
+    # print robot_data
+    # print "MsgTypes.String"
+    # print MsgTypes.String
+    # print ROBOT_TOPICS[robotName][topicName]
 
 class TopicHandler:
     @staticmethod
@@ -43,10 +62,15 @@ def _loadFromFile(filepath):
 
     return py_mod
 
-def _callback(data):
+def _callback(data, args):
     # Simply print out values in our custom message.
-    robot, topic = getattr(data, "_type").split("/")
-    rospy.loginfo(rospy.get_name() + " I heard %s", data.message)
-    rospy.loginfo(rospy.get_name() + " a + b = %d", data.a + data.b)
+    robot = str(args['robot'])
+    topic = str(args['topic'])
+    attributes = []
+    if "type" in args:
+        attributes.append(CbPublisher.createAttribute("uniqueattr", args['type'], data))
+    else:
+        for index, name in data.__slots__:
+            attributes.append(CbPublisher.createAttribute(name, data._slot_types[index], getattr(data, name)))
     # Robot is needed, datatype and attributes (check data, it might be an instance of the class)
-    # CbPublisher.publish(robot, topic, [])
+    # CbPublisher.publish(robot, topic, attributes)

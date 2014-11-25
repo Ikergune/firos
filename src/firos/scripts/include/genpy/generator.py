@@ -975,11 +975,13 @@ class Generator(object):
             if e.errno != 17: # file exists
                 raise
 
-        for robot in data:
+        for robotName in data:
             try:
+                robot = data[robotName]
                 for topic in robot['topics']:
-                    full_type = str(robot['name']) + '/' + str(topic['name'])
-                    self.generate(msg_context, full_type, topic, outdir, search_path) #actual generation
+                    full_type = str(robotName) + '/' + str(topic['name'])
+                    if type(topic['msg']) is dict:
+                        self.generate(msg_context, full_type, topic, outdir, search_path) #actual generation
             except Exception as e:
                 if not isinstance(e, MsgGenerationException) and not isinstance(e, genmsg.msgs.InvalidMsgSpec):
                     traceback.print_exc()
