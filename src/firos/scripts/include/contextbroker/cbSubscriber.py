@@ -65,5 +65,6 @@ class CbSubscriber:
         if int(response_body["statusCode"]["code"]) >= 400:
             rospy.logerr("Error Disconnecting from Context Broker (subscription: {}):".format(self.subscriptionId))
             rospy.logerr(response_body["statusCode"]["reasonPhrase"])
+            print "\n"
         else:
-            print "Disconnected from Context Broker"
+            print "Disconnected from Context Broker\n"

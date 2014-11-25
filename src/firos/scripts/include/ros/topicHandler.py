@@ -9,6 +9,7 @@ from std_msgs import msg as MsgTypes
 TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topics")
 ROBOT_TOPICS = {}
 robot_data   = {}
+subscribers  = []
 
 def loadMsgHandlers():
     print "Getting configuration data"
@@ -22,12 +23,14 @@ def loadMsgHandlers():
         for topic in robot['topics']:
             topicName = str(topic['name'])
             print "    -" + topicName
+            extra = {"robot": robotName, "topic": topicName}
             if type(topic['msg']) is dict:
                 module = _loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
                 ROBOT_TOPICS[robotName][topicName] = getattr(module, topicName)
             else:
                 ROBOT_TOPICS[robotName][topicName] = getattr(MsgTypes, topic['msg'])
-            rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName], _callback, {"robot": robotName, "topic": topicName, "type": str(topic['msg'])})
+                extra["type"] = str(topic['msg'])
+            subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName], _callback, extra))
     print "Subscribed to topics\n"
     # Not needed, the server is listening
     # rospy.spin()
@@ -47,6 +50,12 @@ class TopicHandler:
             msg = MsgClass()
             for key in data:
                 setattr(msg, key, data[key])
+    @staticmethod
+    def unregisterAll():
+        print "Unsubscribing from topics..."
+        for subscriber in subscribers:
+            subscriber.unregister()
+        print "Unsubscribed from topics\n"
 
 def _loadFromFile(filepath):
     mod_name,file_ext = os.path.splitext(os.path.split(filepath)[-1])

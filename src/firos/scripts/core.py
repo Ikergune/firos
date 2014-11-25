@@ -44,6 +44,7 @@ if __name__ == '__main__':
     def signal_handler(signal, frame):
         print('\nExiting from the application')
         sub.disconnect()
+        TopicHandler.unregisterAll()
         server.close()
         print('\nExit')
         sys.exit(0)
