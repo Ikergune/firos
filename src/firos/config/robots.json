@@ -1,0 +1,38 @@
+[{
+    "name": "turtle1",
+    "topics": [
+        {
+            "name": "pose",
+            "msg": {
+                "x_pose": "int32",
+                "y_pose": "int32"
+            }
+        },
+        {
+            "name": "fly",
+            "msg": {
+                "x_pose": "int32",
+                "y_pose": "int32",
+                "z_pose": "string"
+            }
+        }
+    ]
+},{
+    "name": "talker",
+    "topics": [
+        {
+            "name": "move",
+            "msg": {
+                "x_pose": "int32",
+                "y_pose": "int32"
+            }
+        },
+        {
+            "name": "talk",
+            "msg": {
+                "habla": "int32",
+                "texto": "string"
+            }
+        }
+    ]
+}]

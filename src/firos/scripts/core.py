@@ -18,6 +18,8 @@ from include.constants import *
 from include.server.firosServer import FirosServer
 from include.contextbroker.cbSubscriber import *
 
+from include.ros import topicData
+
 # Main function.
 if __name__ == '__main__':
     # Initialize the node and name it.

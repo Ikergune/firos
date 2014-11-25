@@ -1,0 +1,7 @@
+build
+build/**
+devel
+devel/**
+src/firos/scripts/**.pyc
+src/firos/scripts/**/**.pyc
+src/firos/scripts/**/**/**.pyc
