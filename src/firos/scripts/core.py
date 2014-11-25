@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     launchSetup()
     loadMsgHandlers()
-    TopicHandler.publish("turtle1", "pose", {"x_pose": 52,"y_pose": 33})
+    # TopicHandler.publish("turtle1", "pose", {"x_pose": 52,"y_pose": 33})
 
     print "\nStarting Firos..."
     print "\nPress Ctrl+C to Exit\n"
