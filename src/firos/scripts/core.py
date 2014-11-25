@@ -17,8 +17,7 @@ import signal
 from include.constants import *
 from include.server.firosServer import FirosServer
 from include.contextbroker.cbSubscriber import *
-
-from include.ros import topicData
+from include.ros.topicHandler import TopicHandler
 
 # Main function.
 if __name__ == '__main__':
@@ -28,20 +27,22 @@ if __name__ == '__main__':
     print "\nStarting Firos..."
     print "\nPress Ctrl+C to Exit\n"
 
-    if sys.argv[1:]:
-        port = int(sys.argv[1])
-    else:
-        port = SERVER["PORT"]
-    server = FirosServer(SERVER["ADDRESS"], port)
+    TopicHandler.publish(1,1,1)
 
-    def signal_handler(signal, frame):
-        print('\nExiting from the application')
-        sub.disconnect()
-        server.close()
-        print('\nExit')
-        sys.exit(0)
-    signal.signal(signal.SIGINT, signal_handler)
+    # if sys.argv[1:]:
+    #     port = int(sys.argv[1])
+    # else:
+    #     port = SERVER["PORT"]
+    # server = FirosServer(SERVER["ADDRESS"], port)
 
-    sub = CbSubscriber()
+    # def signal_handler(signal, frame):
+    #     print('\nExiting from the application')
+    #     sub.disconnect()
+    #     server.close()
+    #     print('\nExit')
+    #     sys.exit(0)
+    # signal.signal(signal.SIGINT, signal_handler)
 
-    server.start()
+    # sub = CbSubscriber()
+
+    # server.start()

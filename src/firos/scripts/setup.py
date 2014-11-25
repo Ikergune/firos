@@ -17,6 +17,7 @@ import rospy
 import traceback
 from include.genpy import generator
 from include.genpy import genpy_main
+from include import confManager
 
 # Main function.
 if __name__ == '__main__':
@@ -29,10 +30,8 @@ if __name__ == '__main__':
 
 
     try:
-        current_path = os.path.abspath(__file__)
-        json_path = current_path.replace("scripts/setup.py", "config/robots.json")
-        json_data = json.load(open(json_path))
-        retcode = genpy_main.genmain(json_data, generator.MsgGenerator())
+        robots = confManager.getRobots()
+        retcode = genpy_main.genmain(robots, generator.MsgGenerator())
         print "\nSuccesfully generated\n"
         sys.exit(retcode or 0)
     except Exception as e:
