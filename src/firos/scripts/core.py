@@ -28,27 +28,29 @@ if __name__ == '__main__':
     rospy.init_node('firos')
 
     launchSetup()
+
+    print "\nStarting Firos..."
+    print "---------------------------------\n"
+
     loadMsgHandlers()
     # TopicHandler.publish("turtle1", "pose", {"x_pose": 52,"y_pose": 33})
 
-    print "\nStarting Firos..."
+    if sys.argv[1:]:
+        port = int(sys.argv[1])
+    else:
+        port = SERVER["PORT"]
+    server = FirosServer(SERVER["ADDRESS"], port)
+
+    def signal_handler(signal, frame):
+        print('\nExiting from the application')
+        sub.disconnect()
+        server.close()
+        print('\nExit')
+        sys.exit(0)
+    signal.signal(signal.SIGINT, signal_handler)
+
+    sub = CbSubscriber()
+
     print "\nPress Ctrl+C to Exit\n"
 
-
-    # if sys.argv[1:]:
-    #     port = int(sys.argv[1])
-    # else:
-    #     port = SERVER["PORT"]
-    # server = FirosServer(SERVER["ADDRESS"], port)
-
-    # def signal_handler(signal, frame):
-    #     print('\nExiting from the application')
-    #     sub.disconnect()
-    #     server.close()
-    #     print('\nExit')
-    #     sys.exit(0)
-    # signal.signal(signal.SIGINT, signal_handler)
-
-    # sub = CbSubscriber()
-
-    # server.start()
+    server.start()

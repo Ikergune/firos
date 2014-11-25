@@ -2,12 +2,7 @@ import json
 import urllib2
 import time
 
-
-CONTEXTBROKER = {
-    "ADDRESS" : "130.206.83.196",
-    "PORT"    : 1026,
-    "PROTOCOL": "NGSI10"
-}
+from include.constants import CONTEXTBROKER
 
 class CbPublisher:
     @staticmethod
@@ -46,11 +41,3 @@ class CbPublisher:
             rospy.logerr(response_body["errorCode"]["details"])
         else:
             print "Success sending"
-
-#Main code, for testing the publishing in context broker. Launch with python cbPublisher.py
-if __name__ == '__main__':
-    # Initialize the node and name it.
-    print "Enviando"
-    ts = time.time()
-    print ts
-    CbPublisher.publish("Room1", "Room",[CbPublisher.createAttribute("cmd_vel", "integer", ts)])

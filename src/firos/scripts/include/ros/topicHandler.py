@@ -10,31 +10,27 @@ TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topi
 ROBOT_TOPICS = {}
 robot_data   = {}
 
-################################################################################################
-################################################################################################
-################################################################################################
-############################     ANADIR SOPORTE A CLASES PRIMITIVAS     ########################
-################################################################################################
-################################################################################################
-################################################################################################
-
-
 def loadMsgHandlers():
+    print "Getting configuration data"
     robot_data = confManager.getRobots()
+    print "Subscribing to topics:"
     for robotName in robot_data:
         robotName = str(robotName)
         robot = robot_data[robotName]
         ROBOT_TOPICS[robotName] = {}
+        print "  -" + robotName
         for topic in robot['topics']:
             topicName = str(topic['name'])
+            print "    -" + topicName
             if type(topic['msg']) is dict:
                 module = _loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
                 ROBOT_TOPICS[robotName][topicName] = getattr(module, topicName)
             else:
                 ROBOT_TOPICS[robotName][topicName] = getattr(MsgTypes, topic['msg'])
             rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName], _callback, {"robot": robotName, "topic": topicName, "type": str(topic['msg'])})
-            # Not needed, the server is listening
-            # rospy.spin()
+    print "Subscribed to topics\n"
+    # Not needed, the server is listening
+    # rospy.spin()
 
     # print ROBOT_TOPICS
     # print robot_data
@@ -45,11 +41,12 @@ def loadMsgHandlers():
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
-        MsgClass = ROBOT_TOPICS[robot][topic]
-        # pub = rospy.Publisher(topic, MsgClass)
-        msg = MsgClass()
-        for key in data:
-            setattr(msg, key, data[key])
+        if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
+            MsgClass = ROBOT_TOPICS[robot][topic]
+            # pub = rospy.Publisher(topic, MsgClass)
+            msg = MsgClass()
+            for key in data:
+                setattr(msg, key, data[key])
 
 def _loadFromFile(filepath):
     mod_name,file_ext = os.path.splitext(os.path.split(filepath)[-1])

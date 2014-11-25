@@ -23,6 +23,7 @@ def launchSetup(main=False):
     retcode = 0
 
     print "\nStarting Firos setup..."
+    print "---------------------------------\n"
     print "\nGenerating Message Description Files\n"
 
 

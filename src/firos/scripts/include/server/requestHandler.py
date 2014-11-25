@@ -3,9 +3,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        print "Empieza"
         path = urlparse("http://localhost" + self.path).path
-        print path
         if path in MAPPER["GET"]:
             MAPPER["GET"][path](self)
         else:
@@ -16,9 +14,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return
 
     def do_POST(self):
-        print "Empieza"
         path = urlparse("http://localhost" + self.path).path
-        print path
         if path in MAPPER["GET"]:
             MAPPER["GET"][path](self)
         else:
