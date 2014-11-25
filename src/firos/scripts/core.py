@@ -14,20 +14,26 @@ import sys
 import rospy
 import signal
 
+from setup import launchSetup
+
 from include.constants import *
 from include.server.firosServer import FirosServer
 from include.contextbroker.cbSubscriber import *
-from include.ros.topicHandler import TopicHandler
+
+from include.ros.topicHandler import TopicHandler, loadMsgHandlers
 
 # Main function.
 if __name__ == '__main__':
     # Initialize the node and name it.
     rospy.init_node('firos')
 
+    launchSetup()
+    loadMsgHandlers()
+    TopicHandler.publish("turtle1", "pose", {"x_pose": 52,"y_pose": 33})
+
     print "\nStarting Firos..."
     print "\nPress Ctrl+C to Exit\n"
 
-    TopicHandler.publish(1,1,1)
 
     # if sys.argv[1:]:
     #     port = int(sys.argv[1])
