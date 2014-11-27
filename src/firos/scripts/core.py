@@ -18,7 +18,7 @@ from setup import launchSetup
 
 from include.constants import *
 from include.server.firosServer import FirosServer
-from include.contextbroker.cbSubscriber import *
+
 
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers
 
@@ -33,7 +33,6 @@ if __name__ == '__main__':
     print "---------------------------------\n"
 
     loadMsgHandlers()
-    # TopicHandler.publish("turtle1", "pose", {"x_pose": 52,"y_pose": 33})
 
     if sys.argv[1:]:
         port = int(sys.argv[1])
@@ -43,14 +42,11 @@ if __name__ == '__main__':
 
     def signal_handler(signal, frame):
         print('\nExiting from the application')
-        sub.disconnect()
         TopicHandler.unregisterAll()
         server.close()
         print('\nExit')
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
-
-    sub = CbSubscriber()
 
     print "\nPress Ctrl+C to Exit\n"
 

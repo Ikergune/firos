@@ -3,8 +3,14 @@ import imp
 import rospy
 
 from include import confManager
-from include.contextbroker.cbPublisher import CbPublisher
 from std_msgs import msg as MsgTypes
+
+# PubSub Handlers
+from include.pubsub.pubSubFactory import PublisherFactory, SubscriberFactory
+
+CloudSubscriber = SubscriberFactory.create()
+CloudPublisher = PublisherFactory.create()
+
 
 TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topics")
 ROBOT_TOPICS = {}
@@ -31,15 +37,8 @@ def loadMsgHandlers():
                 ROBOT_TOPICS[robotName][topicName] = getattr(MsgTypes, topic['msg'])
                 extra["type"] = str(topic['msg'])
             subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName], _callback, extra))
+        CloudSubscriber.subscribe(robotName, "Robot", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to topics\n"
-    # Not needed, the server is listening
-    # rospy.spin()
-
-    # print ROBOT_TOPICS
-    # print robot_data
-    # print "MsgTypes.String"
-    # print MsgTypes.String
-    # print ROBOT_TOPICS[robotName][topicName]
 
 class TopicHandler:
     @staticmethod
@@ -52,6 +51,7 @@ class TopicHandler:
                 setattr(msg, key, data[key])
     @staticmethod
     def unregisterAll():
+        CloudSubscriber.disconnect()
         print "Unsubscribing from topics..."
         for subscriber in subscribers:
             subscriber.unregister()
@@ -69,14 +69,14 @@ def _loadFromFile(filepath):
     return py_mod
 
 def _callback(data, args):
-    # Simply print out values in our custom message.
     robot = str(args['robot'])
     topic = str(args['topic'])
-    attributes = []
+    datatype = "NotYet"
+    contextType = "ROBOT"
+    content = []
     if "type" in args:
-        attributes.append(CbPublisher.createAttribute("uniqueattr", args['type'], data))
+        content.append(Publisher.createContent(topic, datatype, data, True))
     else:
         for index, name in data.__slots__:
-            attributes.append(CbPublisher.createAttribute(name, data._slot_types[index], getattr(data, name)))
-    # Robot is needed, datatype and attributes (check data, it might be an instance of the class)
-    # CbPublisher.publish(robot, topic, attributes)
+            content.append(Publisher.createContent(topic, datatype, data))
+    Publisher.publish(robot, contextType, content)

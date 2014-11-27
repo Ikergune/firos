@@ -3,17 +3,26 @@ import urllib2
 import time
 
 from include.constants import CONTEXTBROKER
+from include.pubsub.iPubSub import Ipublisher
 
-class CbPublisher:
-    @staticmethod
-    def createAttribute(name, datatype, value):
-        return {
-            "name": name,
-            "type": datatype,
-            "value": value
-        }
+class CbPublisher(Ipublisher):
+    def createContent(topic, datatype, data, isPrimitive=False):
+        if isPrimitive:
+            return {
+                "name": topic,
+                "type": datatype,
+                "value": data
+            }
+        else:
+            values = {}
+            for name in data.__slots__:
+                values[name] = getattr(data, name)
+            return {
+                "name": topic,
+                "type": datatype,
+                "value": values
+            }
 
-    @staticmethod
     def publish(contex_id, datatype, attributes=[]):
         data = {
             "contextElements": [
