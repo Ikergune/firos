@@ -1,4 +1,5 @@
 import json
+import rospy
 import urllib2
 import time
 
@@ -6,24 +7,14 @@ from include.constants import CONTEXTBROKER
 from include.pubsub.iPubSub import Ipublisher
 
 class CbPublisher(Ipublisher):
-    def createContent(topic, datatype, data, isPrimitive=False):
-        if isPrimitive:
-            return {
-                "name": topic,
-                "type": datatype,
-                "value": data
-            }
-        else:
-            values = {}
-            for name in data.__slots__:
-                values[name] = getattr(data, name)
-            return {
-                "name": topic,
-                "type": datatype,
-                "value": values
-            }
+    def createContent(self, topic, datatype, data):
+        return {
+            "name": topic,
+            "type": datatype,
+            "value": data
+        }
 
-    def publish(contex_id, datatype, attributes=[]):
+    def publish(self, contex_id, datatype, attributes=[]):
         data = {
             "contextElements": [
                 {

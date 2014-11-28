@@ -26,6 +26,7 @@ class CbSubscriber(Isubscriber):
             rospy.logerr(response_body["subscribeError"]["errorCode"]["details"])
             os.kill(os.getpid(), signal.SIGINT)
         else:
+            print response_body
             self.subscriptionIds.append(response_body["subscribeResponse"]["subscriptionId"])
             print "Connected to Context Broker with id {}".format(self.subscriptionIds[-1])
 
@@ -49,7 +50,7 @@ class CbSubscriber(Isubscriber):
                 print "Disconnected subscription {} from Context Broker ".format(subscriptionId)
         print "\n"
 
-    def _generateSubscription(self, namespace, data_type="Robot", topics=[]):
+    def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[]):
         return {
             "entities": [
                 {
@@ -58,7 +59,7 @@ class CbSubscriber(Isubscriber):
                     "id": namespace
                 }
             ],
-            "attributes": topics,
+            # "attributes": topics,
             "reference": "http://{}:{}/firos".format(IP, SERVER["PORT"]),
             "duration": "P1M",
             "notifyConditions": [
@@ -67,5 +68,5 @@ class CbSubscriber(Isubscriber):
                     "condValues": topics
                 }
             ],
-            "throttling": "PT1S"
+            "throttling": THROTTLING
         }

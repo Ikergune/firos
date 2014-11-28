@@ -1,9 +1,9 @@
 import os
-import imp
 import rospy
 
 from include import confManager
-from std_msgs import msg as MsgTypes
+from include.libLoader import LibLoader
+from include.ros.rosutils import ros2Obj, obj2Ros
 
 # PubSub Handlers
 from include.pubsub.pubSubFactory import PublisherFactory, SubscriberFactory
@@ -31,24 +31,35 @@ def loadMsgHandlers():
             print "    -" + topicName
             extra = {"robot": robotName, "topic": topicName}
             if type(topic['msg']) is dict:
-                module = _loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
+                module = LibLoader.loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
                 ROBOT_TOPICS[robotName][topicName] = getattr(module, topicName)
             else:
-                ROBOT_TOPICS[robotName][topicName] = getattr(MsgTypes, topic['msg'])
+                ROBOT_TOPICS[robotName][topicName] = LibLoader.loadFromSystem(topic['msg'])
                 extra["type"] = str(topic['msg'])
             subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName], _callback, extra))
-        CloudSubscriber.subscribe(robotName, "Robot", ROBOT_TOPICS[robotName].keys())
+        CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to topics\n"
+    print ROBOT_TOPICS
 
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
         if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
             MsgClass = ROBOT_TOPICS[robot][topic]
-            # pub = rospy.Publisher(topic, MsgClass)
+            print robot + "/" + topic
+            publicator = rospy.Publisher("/" + robot + "/" + topic, MsgClass, queue_size=10)
+            # print MsgClass
             msg = MsgClass()
-            for key in data:
-                setattr(msg, key, data[key])
+            obj2Ros(data, msg)
+            # if type(data) is dict:
+            #     msg = MsgClass()
+            #     for key in data:
+            #         setattr(msg, key, data[key])
+            # else:
+            #     msg = data
+            publicator.publish(msg)
+            print robot, topic, msg
+
     @staticmethod
     def unregisterAll():
         CloudSubscriber.disconnect()
@@ -57,26 +68,16 @@ class TopicHandler:
             subscriber.unregister()
         print "Unsubscribed from topics\n"
 
-def _loadFromFile(filepath):
-    mod_name,file_ext = os.path.splitext(os.path.split(filepath)[-1])
-
-    if file_ext.lower() == '.py':
-        py_mod = imp.load_source(mod_name, filepath)
-
-    elif file_ext.lower() == '.pyc':
-        py_mod = imp.load_compiled(mod_name, filepath)
-
-    return py_mod
-
 def _callback(data, args):
     robot = str(args['robot'])
     topic = str(args['topic'])
     datatype = "NotYet"
-    contextType = "ROBOT"
+    contextType = DEFAULT_CONTEXT_TYPE
     content = []
-    if "type" in args:
-        content.append(Publisher.createContent(topic, datatype, data, True))
-    else:
-        for index, name in data.__slots__:
-            content.append(Publisher.createContent(topic, datatype, data))
+    content.append(Publisher.createContent(topic, datatype,ros2Obj(data)))
+    # if "type" in args:
+    #     content.append(Publisher.createContent(topic, datatype, data, True))
+    # else:
+    #     for index, name in data.__slots__:
+    #         content.append(Publisher.createContent(topic, datatype, data))
     Publisher.publish(robot, contextType, content)

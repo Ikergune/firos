@@ -22,6 +22,10 @@ from include.server.firosServer import FirosServer
 
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers
 
+from std_msgs.msg import String
+from geometry_msgs.msg import Twist
+from include.ros.rosutils import *
+
 # Main function.
 if __name__ == '__main__':
     # Initialize the node and name it.
@@ -31,6 +35,29 @@ if __name__ == '__main__':
 
     print "\nStarting Firos..."
     print "---------------------------------\n"
+
+    # print ros2Obj(String())
+    # print ros2Obj(Twist())
+    # print ros2Obj(cmd_vel())
+
+    # print "AAAAAAAAAAAAAAAAAAAAAAAA"
+    # string_data = "hola Mundo"
+    # # string_data = {'x_pose': 1, 'y_pose': 2}
+    # twist_data = {'linear': {'y': 2.2, 'x': 1.1, 'z': 3.3}, 'angular': {'y': 5.5, 'x': 4.4, 'z': 6.6}}
+    # vel_data = {'x_pose': 1, 'y_pose': 2}
+
+    # strInst = String()
+    # twInst = Twist()
+    # velInst = cmd_vel()
+
+    # obj2Ros(string_data, strInst)
+    # obj2Ros(twist_data, twInst)
+    # obj2Ros(vel_data, velInst)
+
+    # print ros2Obj(strInst)
+    # print ros2Obj(twInst)
+    # print ros2Obj(velInst)
+
 
     loadMsgHandlers()
 

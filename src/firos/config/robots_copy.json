@@ -1,0 +1,55 @@
+{
+    "turtle1": {
+        "topics": [
+            {
+                "name": "pose",
+                "msg": {
+                    "x_pose": "int32",
+                    "y_pose": "int32"
+                }
+            },
+            {
+                "name": "fly",
+                "msg": {
+                    "x_pose": "int32",
+                    "y_pose": "int32",
+                    "z_pose": "string"
+                }
+            }
+        ]
+    },
+    "talker": {
+        "topics": [
+            {
+                "name": "move",
+                "msg": {
+                    "x_pose": "int32",
+                    "y_pose": "int32"
+                }
+            },
+            {
+                "name": "talk",
+                "msg": {
+                    "habla": "int32",
+                    "texto": "string"
+                }
+            }
+        ]
+    },
+    "talker2": {
+        "topics": [
+            {
+                "name": "move",
+                "msg": {
+                    "z_pose": "int32",
+                    "x_pose": "int32",
+                    "y_pose": "int32"
+                }
+            },
+            {
+                "name": "talk",
+                "msg": "String"
+            }
+        ]
+    }
+}
