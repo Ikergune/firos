@@ -28,8 +28,6 @@ from include.ros.rosutils import *
 
 # Main function.
 if __name__ == '__main__':
-    # Initialize the node and name it.
-    rospy.init_node('firos')
 
     launchSetup()
 
@@ -75,6 +73,10 @@ if __name__ == '__main__':
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
-    print "\nPress Ctrl+C to Exit\n"
+    # Initialize the node and name it.
+    print "Initializing ROS node: " + NODE_NAME
+    rospy.init_node(NODE_NAME)
+    print "Initialized"
 
+    print "\nPress Ctrl+C to Exit\n"
     server.start()

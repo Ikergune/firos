@@ -47,7 +47,7 @@ class TopicHandler:
         if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
             MsgClass = ROBOT_TOPICS[robot][topic]
             print robot + "/" + topic
-            publicator = rospy.Publisher("/" + robot + "/" + topic, MsgClass, queue_size=10)
+            publicator = rospy.Publisher(robot + "/" + topic, MsgClass, queue_size=10)
             # print MsgClass
             msg = MsgClass()
             obj2Ros(data, msg)

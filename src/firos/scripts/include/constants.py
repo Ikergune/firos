@@ -1,3 +1,5 @@
+NODE_NAME = "firos"
+
 SERVER = {
     "ADDRESS" : "0.0.0.0",
     "PORT"    : 10100

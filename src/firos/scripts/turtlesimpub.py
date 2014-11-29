@@ -15,13 +15,23 @@ import sys
 import rospy
 
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 
 # Main function.
 if __name__ == '__main__':
     # Initialize the node and name it.
-    rospy.init_node('turtlepub')
-    publicator = rospy.Publisher("/turtle1/cmd_vel", Twist, queue_size=10)
-    tw = Twist()
-    tw.linear.x = 5.5
-    publicator.publish(tw)
+    # rospy.init_node('turtlepub')
+    # publicator = rospy.Publisher("turtle1/cmd_vel", String, queue_size=1)
+    # rospy.init_node('talker', anonymous=True)
 
+
+    publicator = rospy.Publisher("turtle1/cmd_vel", Twist, queue_size=1)
+    rospy.init_node('talker', anonymous=True)
+    # print "ANTES"
+    # rospy.sleep(1)
+    # print "Despues"
+
+    tw = Twist()
+    tw.linear.x = 1.5
+    # publicator.publish("HOLA")
+    publicator.publish(tw)
