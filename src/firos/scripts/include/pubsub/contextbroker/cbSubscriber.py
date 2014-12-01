@@ -126,8 +126,7 @@ class CbSubscriber(Isubscriber):
 
     def _refreshSubscriptions(self, threadName, delay):
         # Seconds to days
-        # total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 *60 * 24
-        total_delay = SUBSCRIPTION_REFRESH_DELAY
+        total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 *60 * 24
         while True:
             time.sleep(total_delay)
             self.refreshSubscriptions()

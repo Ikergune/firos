@@ -59,8 +59,14 @@ def onTopic(request):
             robot = context['contextElement']
             robotName = robot['id']
             for topic in robot['attributes']:
-                value = CloudSubscriber.parseData(topic['value'])
-                TopicHandler.publish(robotName, topic['name'], value)
+                if topic["name"] == "COMMAND":
+                    commands = topic["value"]
+                    robot['attributes'].remove(topic)
+                    break
+            for topic in robot['attributes']:
+                if topic["name"] in commands:
+                    value = CloudSubscriber.parseData(topic['value'])
+                    TopicHandler.publish(robotName, topic['name'], value)
 
     request.send_response(200)
     request.send_header('Content-type','text/plain')

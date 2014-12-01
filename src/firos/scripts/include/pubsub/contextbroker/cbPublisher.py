@@ -16,6 +16,14 @@ class CbPublisher(Ipublisher):
         }
 
     def publish(self, contex_id, datatype, attributes=[]):
+        commands = []
+        for attribute in attributes:
+            commands.append(attribute["name"])
+        attributes.insert(0, {
+            "name": "COMMAND",
+            "type": "COMMAND",
+            "value": commands
+        })
         data = {
             "contextElements": [
                 {
