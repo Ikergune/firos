@@ -16,7 +16,6 @@ class CbSubscriber(Isubscriber):
     refresh_thread = None
 
     def subscribe(self, namespace, data_type, topics):
-        subscriber_dict = self._generateSubscription(namespace, data_type, topics)
         print "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics)
         subscription = {
             "namespace" : namespace,
@@ -24,11 +23,8 @@ class CbSubscriber(Isubscriber):
             "topics" : topics
         }
         url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
-        subscriber_json = json.dumps(subscriber_dict)
-        request = urllib2.Request(url, subscriber_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-        response = urllib2.urlopen(request)
-        response_body = json.loads(response.read())
-        response.close()
+        subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
+        response_body = self._sendRequest(url, subscriber_json)
         if "subscribeError" in response_body:
             print "Error Subscribing to Context Broker:"
             print response_body["subscribeError"]["errorCode"]["details"]
@@ -44,21 +40,20 @@ class CbSubscriber(Isubscriber):
         for subscription in self.subscriptions:
             subscriptionId = subscription["id"]
             print "\nDisconnecting Context Broker subscription {}".format(subscriptionId)
-            disconnect_dict = {
-                "subscriptionId": subscriptionId
-            }
             url = "http://{}:{}/{}/unsubscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
-            disconnect_json = json.dumps(disconnect_dict)
-            request = urllib2.Request(url, disconnect_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-            response = urllib2.urlopen(request)
-            response_body = json.loads(response.read())
-            response.close()
+            disconnect_json = json.dumps({
+                "subscriptionId": subscriptionId
+            })
+            response_body = self._sendRequest(url, disconnect_json)
             if int(response_body["statusCode"]["code"]) >= 400:
                 print "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId)
                 print response_body["statusCode"]["reasonPhrase"]
                 print "\n"
             else:
                 print "Disconnected subscription {} from Context Broker ".format(subscriptionId)
+
+            print "Deleting entity"
+            self._deleteEntity(subscription["namespace"], subscription["data_type"])
         print "\n"
 
     def refreshSubscriptions(self):
@@ -68,11 +63,7 @@ class CbSubscriber(Isubscriber):
             subscriber_dict.pop("reference", None)
             url = "http://{}:{}/{}/contextSubscriptions/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"], subscription["id"])
             subscriber_json = json.dumps(subscriber_dict)
-            request = urllib2.Request(url, subscriber_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-            request.get_method = lambda: 'PUT'
-            response = urllib2.urlopen(request)
-            response_body = json.loads(response.read())
-            response.close()
+            response_body = self._sendRequest(url, subscriber_json, 'PUT')
             if "subscribeError" in response_body:
                 print "Error Refreshing subscription"
                 print response_body["subscribeError"]["errorCode"]["details"]
@@ -84,6 +75,30 @@ class CbSubscriber(Isubscriber):
 
     def parseData(self, data):
         return json.loads(data.replace("'", '"'))
+
+    def _deleteEntity(self, namespace, data_type):
+        print "DELETING: ", namespace, data_type
+        operation_json = json.dumps({
+            "contextElements": [
+                {
+                    "type": data_type,
+                    "isPattern": "false",
+                    "id": namespace
+                }
+            ],
+            "updateAction": "DELETE"
+        })
+        url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+        response_body = self._sendRequest(url, operation_json)
+        if "errorCode" in response_body:
+            print "Error deleting entity"
+            print response_body["errorCode"]["details"]
+        elif "orionError" in response_body:
+            print "Error deleting entity"
+            print response_body["orionError"]["details"]
+        else:
+            print "Deleted entity " + namespace
+
 
     def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[], subscriptionId=None):
         data = {
@@ -111,8 +126,18 @@ class CbSubscriber(Isubscriber):
 
     def _refreshSubscriptions(self, threadName, delay):
         # Seconds to days
-        total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 *60 * 24
+        # total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 *60 * 24
+        total_delay = SUBSCRIPTION_REFRESH_DELAY
         while True:
             time.sleep(total_delay)
             self.refreshSubscriptions()
+
+    def _sendRequest(self, url, data, method=None):
+        request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+        if method is not None:
+            request.get_method = lambda: method
+        response = urllib2.urlopen(request)
+        response_body = json.loads(response.read())
+        response.close()
+        return response_body
 

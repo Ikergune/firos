@@ -57,10 +57,10 @@ class TopicHandler:
     @staticmethod
     def unregisterAll():
         CloudSubscriber.disconnect()
-        print "Unsubscribing from topics..."
+        print "Unsubscribing topics..."
         for subscriber in subscribers:
             subscriber.unregister()
-        print "Unsubscribed from topics\n"
+        print "Unsubscribed topics\n"
 
 def _callback(data, args):
     robot = str(args['robot'])
