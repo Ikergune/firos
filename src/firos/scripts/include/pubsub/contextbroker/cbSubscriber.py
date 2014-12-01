@@ -50,6 +50,9 @@ class CbSubscriber(Isubscriber):
                 print "Disconnected subscription {} from Context Broker ".format(subscriptionId)
         print "\n"
 
+    def parseData(self, data):
+        return json.loads(data.replace("'", '"'))
+
     def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[]):
         return {
             "entities": [

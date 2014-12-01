@@ -1,7 +1,6 @@
 import json
 import rospy
 import urllib2
-import time
 
 from include.constants import CONTEXTBROKER
 from include.pubsub.iPubSub import Ipublisher
@@ -11,7 +10,7 @@ class CbPublisher(Ipublisher):
         return {
             "name": topic,
             "type": datatype,
-            "value": data
+            "value": json.dumps(data).replace('"', "'")
         }
 
     def publish(self, contex_id, datatype, attributes=[]):

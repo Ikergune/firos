@@ -12,5 +12,8 @@ class Isubscriber:
     def disconnect(self):
         raise Exception('Method not implemented')
 
+    def parseData(self):
+        raise Exception('Method not implemented')
+
     def _generateSubscription(self, namespace, data_type="Robot", topics=[]):
         raise Exception('Method not implemented')

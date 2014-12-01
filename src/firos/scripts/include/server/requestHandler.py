@@ -4,6 +4,9 @@ from urlparse import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler
 
 from include.ros.topicHandler import TopicHandler
+from include.pubsub.pubSubFactory import SubscriberFactory
+
+CloudSubscriber = SubscriberFactory.create()
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -37,7 +40,7 @@ def postParams(request):
         return cgi.parse_qs(request.rfile.read(length), keep_blank_values=1)
     elif ctype == 'application/json':
         json_data = request.rfile.read()
-        # print json_data
+        print json_data
         return json.loads(json_data)
     else:
         return {}
@@ -51,12 +54,14 @@ def onTopic(request):
     print "Context Broker Notification"
     contexts = postParams(request)
     contexts = contexts['contextResponses']
+    print contexts
     for context in contexts:
         if context['statusCode']['code'] == "200":
             robot = context['contextElement']
             robotName = robot['id']
             for topic in robot['attributes']:
-                TopicHandler.publish(robotName, topic['name'],topic['value'])
+                value = CloudSubscriber.parseData(topic['value'])
+                TopicHandler.publish(robotName, topic['name'], value)
 
     request.send_response(200)
     request.send_header('Content-type','text/html')

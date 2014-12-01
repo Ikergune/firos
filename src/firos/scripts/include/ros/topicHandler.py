@@ -2,6 +2,7 @@ import os
 import rospy
 
 from include import confManager
+from include.constants import DEFAULT_QUEUE_SIZE
 from include.libLoader import LibLoader
 from include.ros.rosutils import ros2Obj, obj2Ros
 
@@ -30,13 +31,15 @@ def loadMsgHandlers():
             topicName = str(topic['name'])
             print "    -" + topicName
             extra = {"robot": robotName, "topic": topicName}
+            ROBOT_TOPICS[robotName][topicName] = {}
             if type(topic['msg']) is dict:
                 module = LibLoader.loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
-                ROBOT_TOPICS[robotName][topicName] = getattr(module, topicName)
+                ROBOT_TOPICS[robotName][topicName]["class"] = getattr(module, topicName)
             else:
-                ROBOT_TOPICS[robotName][topicName] = LibLoader.loadFromSystem(topic['msg'])
+                ROBOT_TOPICS[robotName][topicName]["class"] = LibLoader.loadFromSystem(topic['msg'])
                 extra["type"] = str(topic['msg'])
-            subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName], _callback, extra))
+                ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
+            subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to topics\n"
     print ROBOT_TOPICS
@@ -44,20 +47,22 @@ def loadMsgHandlers():
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
+        print "PUBLISHING___________________________________________________________________-"
         if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
-            MsgClass = ROBOT_TOPICS[robot][topic]
-            print robot + "/" + topic
-            publicator = rospy.Publisher(robot + "/" + topic, MsgClass, queue_size=10)
-            # print MsgClass
-            msg = MsgClass()
+            instance = ROBOT_TOPICS[robot][topic]
+            msg = instance["class"]()
+            print msg
+            print data
             obj2Ros(data, msg)
-            # if type(data) is dict:
-            #     msg = MsgClass()
-            #     for key in data:
-            #         setattr(msg, key, data[key])
-            # else:
-            #     msg = data
-            publicator.publish(msg)
+            print msg
+            instance["publisher"].publish(msg)
+            # MsgClass = ROBOT_TOPICS[robot][topic]
+            # print robot + "/" + topic
+            # publicator = rospy.Publisher(robot + "/" + topic, MsgClass, queue_size=10)
+            # print MsgClass
+            # msg = MsgClass()
+            # obj2Ros(data, msg)
+            # publicator.publish(msg)
             print robot, topic, msg
 
     @staticmethod

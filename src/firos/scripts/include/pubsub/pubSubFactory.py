@@ -13,6 +13,13 @@ class PublisherFactory:
         else:
             return Ipublisher()
 
+    @staticmethod
+    def getClass():
+        if PUBSUB_TYPE is "ContextBroker":
+            return CbPublisher
+        else:
+            return Ipublisher
+
 class SubscriberFactory:
     @staticmethod
     def create():
@@ -20,3 +27,10 @@ class SubscriberFactory:
             return CbSubscriber()
         else:
             return Isubscriber()
+
+    @staticmethod
+    def getClass():
+        if PUBSUB_TYPE is "ContextBroker":
+            return CbSubscriber
+        else:
+            return Isubscriber
