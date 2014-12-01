@@ -41,8 +41,7 @@ def loadMsgHandlers():
                 ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
             subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
-    print "Subscribed to topics\n"
-    # CloudSubscriber.refreshSubscriptions()
+    print "Subscribed to " + robotName  + "'s' topics\n"
     # print ROBOT_TOPICS
 
 class TopicHandler:

@@ -1,22 +1,23 @@
 import os
 import json
+import time
 import rospy
+import thread
 import signal
 import urllib2
 
 from include.constants import *
 from include.pubsub.iPubSub import Isubscriber
 
-import time
-
 IP = urllib2.urlopen('http://ip.42.pl/raw').read()
 
 class CbSubscriber(Isubscriber):
     subscriptions = []
+    refresh_thread = None
 
     def subscribe(self, namespace, data_type, topics):
         subscriber_dict = self._generateSubscription(namespace, data_type, topics)
-        print "Subscribing on context broker to " + data_type + " " + namespace + "..."
+        print "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics)
         subscription = {
             "namespace" : namespace,
             "data_type" : data_type,
@@ -36,6 +37,8 @@ class CbSubscriber(Isubscriber):
             subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
             self.subscriptions.append(subscription)
             print "Connected to Context Broker with id {}".format(subscription["id"])
+        if self.refresh_thread is None:
+            self.refresh_thread = thread.start_new_thread( self._refreshSubscriptions, ("CBSub-Refresh", 2, ) )
 
     def disconnect(self):
         for subscription in self.subscriptions:
@@ -93,7 +96,7 @@ class CbSubscriber(Isubscriber):
             ],
             # "attributes": topics,
             "reference": "http://{}:{}/firos".format(IP, SERVER["PORT"]),
-            "duration": "P1M",
+            "duration": SUBSCRIPTION_LENGTH,
             "notifyConditions": [
                 {
                     "type": "ONCHANGE",
@@ -105,4 +108,11 @@ class CbSubscriber(Isubscriber):
         if subscriptionId is not None:
             data["subscriptionId"] = str(subscriptionId)
         return data
+
+    def _refreshSubscriptions(self, threadName, delay):
+        # Seconds to days
+        total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 *60 * 24
+        while True:
+            time.sleep(total_delay)
+            self.refreshSubscriptions()
 
