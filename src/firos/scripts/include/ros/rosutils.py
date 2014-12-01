@@ -12,7 +12,6 @@ def ros2Obj(msgInstance):
 
 
 def obj2Ros(obj, msgInstance):
-    print type(obj)
     if hasattr(msgInstance, '__slots__'):
         if len(msgInstance.__slots__) is 1 and msgInstance.__slots__[0] is "data":
             if type(obj) is dict:

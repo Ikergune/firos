@@ -1,4 +1,5 @@
 import json
+import time
 import rospy
 import urllib2
 
@@ -7,6 +8,7 @@ from include.pubsub.iPubSub import Ipublisher
 
 class CbPublisher(Ipublisher):
     def createContent(self, topic, datatype, data):
+        data["firosstamp"] = time.time()
         return {
             "name": topic,
             "type": datatype,
@@ -28,11 +30,9 @@ class CbPublisher(Ipublisher):
 
         url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         data_json = json.dumps(data)
-        print data_json
         request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
         response = urllib2.urlopen(request)
         response_body = json.loads(response.read())
-        print response_body
         response.close()
 
         if "errorCode" in response_body:

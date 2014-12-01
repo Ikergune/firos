@@ -40,7 +40,7 @@ def postParams(request):
         return cgi.parse_qs(request.rfile.read(length), keep_blank_values=1)
     elif ctype == 'application/json':
         json_data = request.rfile.read()
-        print json_data
+        # print json_data
         return json.loads(json_data)
     else:
         return {}
@@ -54,7 +54,6 @@ def onTopic(request):
     print "Context Broker Notification"
     contexts = postParams(request)
     contexts = contexts['contextResponses']
-    print contexts
     for context in contexts:
         if context['statusCode']['code'] == "200":
             robot = context['contextElement']
@@ -64,9 +63,9 @@ def onTopic(request):
                 TopicHandler.publish(robotName, topic['name'], value)
 
     request.send_response(200)
-    request.send_header('Content-type','text/html')
+    request.send_header('Content-type','text/plain')
     request.end_headers()
-    request.wfile.write("FIROS")
+    request.wfile.write("Received by firos")
 
 MAPPER = {
     "GET": {

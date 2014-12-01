@@ -42,28 +42,17 @@ def loadMsgHandlers():
             subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to topics\n"
-    print ROBOT_TOPICS
+    # print ROBOT_TOPICS
 
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
-        print "PUBLISHING___________________________________________________________________-"
         if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
             instance = ROBOT_TOPICS[robot][topic]
             msg = instance["class"]()
-            print msg
-            print data
             obj2Ros(data, msg)
-            print msg
             instance["publisher"].publish(msg)
-            # MsgClass = ROBOT_TOPICS[robot][topic]
-            # print robot + "/" + topic
-            # publicator = rospy.Publisher(robot + "/" + topic, MsgClass, queue_size=10)
-            # print MsgClass
-            # msg = MsgClass()
-            # obj2Ros(data, msg)
-            # publicator.publish(msg)
-            print robot, topic, msg
+            # print robot, topic, msg
 
     @staticmethod
     def unregisterAll():
@@ -80,9 +69,4 @@ def _callback(data, args):
     contextType = DEFAULT_CONTEXT_TYPE
     content = []
     content.append(Publisher.createContent(topic, datatype,ros2Obj(data)))
-    # if "type" in args:
-    #     content.append(Publisher.createContent(topic, datatype, data, True))
-    # else:
-    #     for index, name in data.__slots__:
-    #         content.append(Publisher.createContent(topic, datatype, data))
     Publisher.publish(robot, contextType, content)

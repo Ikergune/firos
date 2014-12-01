@@ -26,7 +26,6 @@ class CbSubscriber(Isubscriber):
             rospy.logerr(response_body["subscribeError"]["errorCode"]["details"])
             os.kill(os.getpid(), signal.SIGINT)
         else:
-            print response_body
             self.subscriptionIds.append(response_body["subscribeResponse"]["subscriptionId"])
             print "Connected to Context Broker with id {}".format(self.subscriptionIds[-1])
 
