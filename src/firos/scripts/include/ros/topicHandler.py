@@ -42,6 +42,7 @@ def loadMsgHandlers():
             subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to topics\n"
+    # CloudSubscriber.refreshSubscriptions()
     # print ROBOT_TOPICS
 
 class TopicHandler:

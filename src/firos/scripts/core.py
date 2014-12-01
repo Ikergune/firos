@@ -29,13 +29,6 @@ from include.ros.rosutils import *
 # Main function.
 if __name__ == '__main__':
 
-    launchSetup()
-
-    print "\nStarting Firos..."
-    print "---------------------------------\n"
-
-    loadMsgHandlers()
-
     if sys.argv[1:]:
         port = int(sys.argv[1])
     else:
@@ -49,6 +42,13 @@ if __name__ == '__main__':
         print('\nExit')
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
+
+    launchSetup()
+
+    print "\nStarting Firos..."
+    print "---------------------------------\n"
+
+    loadMsgHandlers()
 
     # Initialize the node and name it.
     print "Initializing ROS node: " + NODE_NAME

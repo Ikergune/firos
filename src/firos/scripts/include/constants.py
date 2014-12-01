@@ -8,7 +8,7 @@ SERVER = {
 # Context type constants
 
 CONTEXTBROKER = {
-    "ADDRESS" : "130.206.83.196",
+    "ADDRESS" : "130.206.127.115",
     "PORT"    : 1026,
     "PROTOCOL": "NGSI10"
 }

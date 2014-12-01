@@ -7,14 +7,21 @@ import urllib2
 from include.constants import *
 from include.pubsub.iPubSub import Isubscriber
 
+import time
+
 IP = urllib2.urlopen('http://ip.42.pl/raw').read()
 
 class CbSubscriber(Isubscriber):
-    subscriptionIds = []
+    subscriptions = []
 
     def subscribe(self, namespace, data_type, topics):
         subscriber_dict = self._generateSubscription(namespace, data_type, topics)
         print "Subscribing on context broker to " + data_type + " " + namespace + "..."
+        subscription = {
+            "namespace" : namespace,
+            "data_type" : data_type,
+            "topics" : topics
+        }
         url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         subscriber_json = json.dumps(subscriber_dict)
         request = urllib2.Request(url, subscriber_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
@@ -22,15 +29,17 @@ class CbSubscriber(Isubscriber):
         response_body = json.loads(response.read())
         response.close()
         if "subscribeError" in response_body:
-            rospy.logerr("Error Subscribing to Context Broker:")
-            rospy.logerr(response_body["subscribeError"]["errorCode"]["details"])
+            print "Error Subscribing to Context Broker:"
+            print response_body["subscribeError"]["errorCode"]["details"]
             os.kill(os.getpid(), signal.SIGINT)
         else:
-            self.subscriptionIds.append(response_body["subscribeResponse"]["subscriptionId"])
-            print "Connected to Context Broker with id {}".format(self.subscriptionIds[-1])
+            subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
+            self.subscriptions.append(subscription)
+            print "Connected to Context Broker with id {}".format(subscription["id"])
 
     def disconnect(self):
-        for subscriptionId in self.subscriptionIds:
+        for subscription in self.subscriptions:
+            subscriptionId = subscription["id"]
             print "\nDisconnecting Context Broker subscription {}".format(subscriptionId)
             disconnect_dict = {
                 "subscriptionId": subscriptionId
@@ -42,18 +51,39 @@ class CbSubscriber(Isubscriber):
             response_body = json.loads(response.read())
             response.close()
             if int(response_body["statusCode"]["code"]) >= 400:
-                rospy.logerr("Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId))
-                rospy.logerr(response_body["statusCode"]["reasonPhrase"])
+                print "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId)
+                print response_body["statusCode"]["reasonPhrase"]
                 print "\n"
             else:
                 print "Disconnected subscription {} from Context Broker ".format(subscriptionId)
         print "\n"
 
+    def refreshSubscriptions(self):
+        for subscription in self.subscriptions:
+            subscriber_dict = self._generateSubscription(subscription["namespace"], subscription["data_type"], subscription["topics"], subscription["id"])
+            subscriber_dict.pop("entities", None)
+            subscriber_dict.pop("reference", None)
+            url = "http://{}:{}/{}/contextSubscriptions/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"], subscription["id"])
+            subscriber_json = json.dumps(subscriber_dict)
+            request = urllib2.Request(url, subscriber_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+            request.get_method = lambda: 'PUT'
+            response = urllib2.urlopen(request)
+            response_body = json.loads(response.read())
+            response.close()
+            if "subscribeError" in response_body:
+                print "Error Refreshing subscription"
+                print response_body["subscribeError"]["errorCode"]["details"]
+            elif "orionError" in response_body:
+                print "Error Refreshing subscription"
+                print response_body["orionError"]["details"]
+            else:
+                print "Refreshed Connection to Context Broker with id {}".format(subscription["id"])
+
     def parseData(self, data):
         return json.loads(data.replace("'", '"'))
 
-    def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[]):
-        return {
+    def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[], subscriptionId=None):
+        data = {
             "entities": [
                 {
                     "type": data_type,
@@ -72,3 +102,7 @@ class CbSubscriber(Isubscriber):
             ],
             "throttling": THROTTLING
         }
+        if subscriptionId is not None:
+            data["subscriptionId"] = str(subscriptionId)
+        return data
+
