@@ -19,7 +19,8 @@ def obj2Ros(obj, msgInstance):
             msgInstance.data = obj
         else:
             for key in msgInstance.__slots__:
-                setattr(msgInstance, key, obj2Ros(obj[key], getattr(msgInstance, key)))
+                if key in obj:
+                    setattr(msgInstance, key, obj2Ros(obj[key], getattr(msgInstance, key)))
     else:
         if type(obj) is dict:
             raise Exception("Not a primitive")

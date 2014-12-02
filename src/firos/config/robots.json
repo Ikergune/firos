@@ -1,12 +1,12 @@
 {
-    "robot2": {
+    "robot1": {
         "topics": [
             {
                 "name": "cmd_vel_mux/input/teleop",
                 "msg": "geometry_msgs.msg.Twist"
             },{
-                "name": "move_base/goal",
-                "msg": "move_base_msgs.msg.MoveBaseActionGoal"
+                "name": "move_base_simple/goal",
+                "msg": "geometry_msgs.msg.PoseStamped"
             }
         ]
     }
