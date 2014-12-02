@@ -2,54 +2,35 @@
     "turtle1": {
         "topics": [
             {
+                "name": "cmd_vel",
+                "msg": "geometry_msgs.msg.Twist"
+            },{
+                "name": "talk",
+                "msg": "std_msgs.msg.String"
+            },{
                 "name": "pose",
                 "msg": {
                     "x_pose": "int32",
                     "y_pose": "int32"
                 }
-            },
-            {
-                "name": "fly",
-                "msg": {
-                    "x_pose": "int32",
-                    "y_pose": "int32",
-                    "z_pose": "string"
-                }
             }
         ]
-    },
-    "talker": {
+    },"turtle2": {
         "topics": [
             {
-                "name": "move",
+                "name": "cmd_vel",
+                "msg": "geometry_msgs.msg.Twist"
+            },{
+                "name": "talk",
+                "msg": "std_msgs.msg.String"
+            },{
+                "name": "pose",
                 "msg": {
                     "x_pose": "int32",
                     "y_pose": "int32"
                 }
-            },
-            {
-                "name": "talk",
-                "msg": {
-                    "habla": "int32",
-                    "texto": "string"
-                }
-            }
-        ]
-    },
-    "talker2": {
-        "topics": [
-            {
-                "name": "move",
-                "msg": {
-                    "z_pose": "int32",
-                    "x_pose": "int32",
-                    "y_pose": "int32"
-                }
-            },
-            {
-                "name": "talk",
-                "msg": "String"
             }
         ]
     }
+
 }

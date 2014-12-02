@@ -9,6 +9,8 @@ from include.ros.rosutils import ros2Obj, obj2Ros
 # PubSub Handlers
 from include.pubsub.pubSubFactory import PublisherFactory, SubscriberFactory
 
+# from move_base_msgs.msg import MoveBaseActionGoal
+
 CloudSubscriber = SubscriberFactory.create()
 CloudPublisher = PublisherFactory.create()
 
@@ -40,6 +42,7 @@ def loadMsgHandlers():
                 extra["type"] = str(topic['msg'])
                 ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
             subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
+        print "\n"
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to " + robotName  + "'s' topics\n"
     # print ROBOT_TOPICS

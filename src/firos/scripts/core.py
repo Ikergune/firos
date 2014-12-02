@@ -20,11 +20,8 @@ from include.constants import *
 from include.server.firosServer import FirosServer
 
 
+import include.ros.dependencies
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers
-
-from std_msgs.msg import String
-from geometry_msgs.msg import Twist
-from include.ros.rosutils import *
 
 # Main function.
 if __name__ == '__main__':
