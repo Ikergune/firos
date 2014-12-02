@@ -1,5 +1,6 @@
 import os
 import imp
+import pkgutil
 
 class LibLoader:
     @staticmethod
@@ -20,3 +21,21 @@ class LibLoader:
         for name in modules:
             module = getattr(module, name)
         return module
+
+def generateRosDependencies():
+    directories = os.environ["ROS_PACKAGE_PATH"].split(":")
+    imports = """unloaded = 0\n"""
+    print directories
+    for directory in directories:
+        if os.path.isdir(directory):
+            for folder in os.listdir(directory):
+                if "msg" in folder:
+                    imports += """try:\n    import {}.msg\nexcept Exception:\n    unloaded += 1\n""".format(folder)
+    imports += "print unloaded"
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ros", "dependencies", "generated.py")
+    f=open(path,'w')
+    f.write(imports)
+    f.close()
+
+    # outdir = current_path.replace("genpy", "ros/" + outdir)
+    # print imports

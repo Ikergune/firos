@@ -9,5 +9,15 @@
                 "msg": "geometry_msgs.msg.PoseStamped"
             }
         ]
+    },"robot2": {
+        "topics": [
+            {
+                "name": "cmd_vel_mux/input/teleop",
+                "msg": "geometry_msgs.msg.Twist"
+            },{
+                "name": "move_base_simple/goal",
+                "msg": "geometry_msgs.msg.PoseStamped"
+            }
+        ]
     }
 }
