@@ -3,32 +3,38 @@
         "topics": [
             {
                 "name": "cmd_vel",
-                "msg": "geometry_msgs.msg.Twist"
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
             },{
                 "name": "talk",
-                "msg": "std_msgs.msg.String"
+                "msg": "std_msgs.msg.String",
+                "type": "publisher"
             },{
                 "name": "pose",
                 "msg": {
                     "x_pose": "int32",
                     "y_pose": "int32"
-                }
+                },
+                "type": "publisher"
             }
         ]
     },"turtle2": {
         "topics": [
             {
                 "name": "cmd_vel",
-                "msg": "geometry_msgs.msg.Twist"
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
             },{
                 "name": "talk",
-                "msg": "std_msgs.msg.String"
+                "msg": "std_msgs.msg.String",
+                "type": "publisher"
             },{
                 "name": "pose",
                 "msg": {
                     "x_pose": "int32",
                     "y_pose": "int32"
-                }
+                },
+                "type": "publisher"
             }
         ]
     },
@@ -36,20 +42,24 @@
         "topics": [
             {
                 "name": "cmd_vel_mux/input/teleop",
-                "msg": "geometry_msgs.msg.Twist"
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
             },{
                 "name": "move_base_simple/goal",
-                "msg": "geometry_msgs.msg.PoseStamped"
+                "msg": "geometry_msgs.msg.PoseStamped",
+                "type": "publisher"
             }
         ]
     },"robot2": {
         "topics": [
             {
                 "name": "cmd_vel_mux/input/teleop",
-                "msg": "geometry_msgs.msg.Twist"
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
             },{
                 "name": "move_base_simple/goal",
-                "msg": "geometry_msgs.msg.PoseStamped"
+                "msg": "geometry_msgs.msg.PoseStamped",
+                "type": "publisher"
             }
         ]
     }

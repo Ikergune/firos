@@ -1,25 +1,15 @@
 {
-    "myrobot": {
-        "topics": [
-            {
-                "name": "topic",
-                "msg": "std_msgs.msg.String"
-            }
-        ]
-    },"turtle1": {
+    "turtle1": {
         "topics": [
             {
                 "name": "cmd_vel",
-                "msg": "geometry_msgs.msg.Twist"
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+
             },{
-                "name": "talk",
-                "msg": "std_msgs.msg.String"
-            },{
-                "name": "pose",
-                "msg": {
-                    "x_pose": "int32",
-                    "y_pose": "int32"
-                }
+                "name": "result",
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "subscriber"
             }
         ]
     }

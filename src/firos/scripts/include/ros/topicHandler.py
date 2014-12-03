@@ -23,7 +23,7 @@ subscribers  = []
 def loadMsgHandlers():
     print "Getting configuration data"
     robot_data = confManager.getRobots()
-    print "Subscribing to topics:"
+    print "Generating topic handlers:"
     for robotName in robot_data:
         robotName = str(robotName)
         robot = robot_data[robotName]
@@ -40,14 +40,15 @@ def loadMsgHandlers():
             else:
                 ROBOT_TOPICS[robotName][topicName]["class"] = LibLoader.loadFromSystem(topic['msg'])
                 extra["type"] = str(topic['msg'])
+            if topic["type"].lower() == "publisher":
                 ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
-            subscribers.append(rospy.Subscriber(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
-            print "LAST SUBSCRIBER____________________________________________________________"
-            print subscribers[-1]
+            elif topic["type"].lower() == "subscriber":
+                subscribers.append(rospy.Subscriber(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
         print "\n"
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to " + robotName  + "'s' topics\n"
-    # print ROBOT_TOPICS
+    print subscribers
+    print ROBOT_TOPICS
 
 class TopicHandler:
     @staticmethod
