@@ -35,29 +35,29 @@ if __name__ == '__main__':
 
     # print CloudPublisher.createContent("cmd_vel", "NotYet", {"linear": {"x": 5.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})
     # CloudPublisher.publish("robot2", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel_mux/input/teleop", "NotYet", {"linear": {"x": -0.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
-    # CloudPublisher.publish("turtle1", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel", "NotYet", {"linear": {"x": -1.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
+    CloudPublisher.publish("turtle1", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel", "NotYet", {"linear": {"x": -1.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
     # text = String()
     # text.data = "Hello topic"
     # CloudPublisher.publish("myrobot", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("topic", "NotYet", ros2Obj(text))])
 
 
-    CloudPublisher.publish(initial_pos, DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("move_base_simple/goal", "NotYet", {
-        "header": {
-            "seq": 0,
-            "stamp": "now",
-            "frame_id": "map"
-        },
-        "pose": {
-            "position": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "orientation": {
-                "w": 1.0
-            }
-        }
-    })])
+    # CloudPublisher.publish(initial_pos, DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("move_base_simple/goal", "NotYet", {
+    #     "header": {
+    #         "seq": 0,
+    #         "stamp": "now",
+    #         "frame_id": "map"
+    #     },
+    #     "pose": {
+    #         "position": {
+    #             "x": 0.0,
+    #             "y": 0.0,
+    #             "z": 0.0
+    #         },
+    #         "orientation": {
+    #             "w": 1.0
+    #         }
+    #     }
+    # })])
 
     # if wait:
     #     time.sleep(1.5)

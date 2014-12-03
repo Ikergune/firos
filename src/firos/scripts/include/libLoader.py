@@ -28,8 +28,6 @@ def generateRosDependencies():
     for directory in directories:
         if os.path.isdir(directory):
             for folder in os.listdir(directory):
-                if folder == "rocon_msgs":
-                    print folder, directory
                 if "msg" in folder:
                     imports += """try:\n    import {}.msg\nexcept Exception:\n    unloaded += 1\n    libs.append('{}')\n""".format(folder,folder)
     imports += "print str(unloaded) + ' libraries not loaded: ' + str(libs)"

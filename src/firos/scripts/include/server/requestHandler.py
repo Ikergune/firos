@@ -8,6 +8,8 @@ from include.pubsub.pubSubFactory import SubscriberFactory
 
 CloudSubscriber = SubscriberFactory.create()
 
+TOPIC_TIMESTAMPS = {}
+
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse("http://localhost" + self.path).path
@@ -58,6 +60,8 @@ def onTopic(request):
         if context['statusCode']['code'] == "200":
             robot = context['contextElement']
             robotName = robot['id']
+            if robotName not in TOPIC_TIMESTAMPS:
+                TOPIC_TIMESTAMPS[robotName] = {}
             for topic in robot['attributes']:
                 if topic["name"] == "COMMAND":
                     commands = topic["value"]
@@ -66,7 +70,9 @@ def onTopic(request):
             for topic in robot['attributes']:
                 if topic["name"] in commands:
                     value = CloudSubscriber.parseData(topic['value'])
-                    TopicHandler.publish(robotName, topic['name'], value)
+                    if topic["name"] not in TOPIC_TIMESTAMPS[robotName] or TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]:
+                        TopicHandler.publish(robotName, topic['name'], value)
+                    TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
 
     request.send_response(200)
     request.send_header('Content-type','text/plain')
