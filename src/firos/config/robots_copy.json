@@ -16,6 +16,10 @@
                     "y_pose": "int32"
                 },
                 "type": "publisher"
+            },{
+                "name": "result",
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "subscriber"
             }
         ]
     },"turtle2": {

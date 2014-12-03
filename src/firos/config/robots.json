@@ -1,15 +1,14 @@
 {
-    "turtle1": {
+    "robot2": {
         "topics": [
             {
-                "name": "cmd_vel",
+                "name": "cmd_vel_mux/input/teleop",
                 "msg": "geometry_msgs.msg.Twist",
                 "type": "publisher"
-
             },{
-                "name": "result",
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "subscriber"
+                "name": "move_base_simple/goal",
+                "msg": "geometry_msgs.msg.PoseStamped",
+                "type": "publisher"
             }
         ]
     }

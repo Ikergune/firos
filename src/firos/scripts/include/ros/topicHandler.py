@@ -46,9 +46,9 @@ def loadMsgHandlers():
                 subscribers.append(rospy.Subscriber(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
         print "\n"
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
-    print "Subscribed to " + robotName  + "'s' topics\n"
-    print subscribers
-    print ROBOT_TOPICS
+        print "Subscribed to " + robotName  + "'s' topics\n"
+    # print subscribers
+    # print ROBOT_TOPICS
 
 class TopicHandler:
     @staticmethod
@@ -71,10 +71,9 @@ class TopicHandler:
 def _callback(data, args):
     robot = str(args['robot'])
     topic = str(args['topic'])
-    print data
-    print args
+    print "Data received from " + robot + "in topic " + topic
     datatype = "NotYet"
     contextType = DEFAULT_CONTEXT_TYPE
     content = []
-    # content.append(Publisher.createContent(topic, datatype,ros2Obj(data)))
-    # CloudPublisher.publish(robot, contextType, content)
+    content.append(CloudPublisher.createContent(topic, datatype,ros2Obj(data)))
+    CloudPublisher.publish(robot, contextType, content)
