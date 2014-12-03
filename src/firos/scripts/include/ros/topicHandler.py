@@ -2,7 +2,7 @@ import os
 import rospy
 
 from include import confManager
-from include.constants import DEFAULT_QUEUE_SIZE
+from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE
 from include.libLoader import LibLoader
 from include.ros.rosutils import ros2Obj, obj2Ros
 
@@ -41,7 +41,9 @@ def loadMsgHandlers():
                 ROBOT_TOPICS[robotName][topicName]["class"] = LibLoader.loadFromSystem(topic['msg'])
                 extra["type"] = str(topic['msg'])
                 ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
-            subscribers.append(rospy.Subscriber(topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
+            subscribers.append(rospy.Subscriber(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
+            print "LAST SUBSCRIBER____________________________________________________________"
+            print subscribers[-1]
         print "\n"
         CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
     print "Subscribed to " + robotName  + "'s' topics\n"
@@ -68,8 +70,10 @@ class TopicHandler:
 def _callback(data, args):
     robot = str(args['robot'])
     topic = str(args['topic'])
+    print data
+    print args
     datatype = "NotYet"
     contextType = DEFAULT_CONTEXT_TYPE
     content = []
-    content.append(Publisher.createContent(topic, datatype,ros2Obj(data)))
-    Publisher.publish(robot, contextType, content)
+    # content.append(Publisher.createContent(topic, datatype,ros2Obj(data)))
+    # CloudPublisher.publish(robot, contextType, content)

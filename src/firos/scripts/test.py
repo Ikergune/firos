@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
     # print CloudPublisher.createContent("cmd_vel", "NotYet", {"linear": {"x": 5.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})
     # CloudPublisher.publish("robot2", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel_mux/input/teleop", "NotYet", {"linear": {"x": -0.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
+    CloudPublisher.publish("turtle1", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel", "NotYet", {"linear": {"x": -0.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
     text = String()
     text.data = "Hello topic"
     CloudPublisher.publish("myrobot", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("topic", "NotYet", ros2Obj(text))])
