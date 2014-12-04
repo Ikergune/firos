@@ -1,6 +1,7 @@
+import re
 import cgi
 import json
-from urlparse import urlparse
+from urlparse import urlparse, parse_qs
 from BaseHTTPServer import BaseHTTPRequestHandler
 
 from include.ros.topicHandler import TopicHandler
@@ -13,8 +14,10 @@ TOPIC_TIMESTAMPS = {}
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse("http://localhost" + self.path).path
-        if path in MAPPER["GET"]:
-            MAPPER["GET"][path](self)
+        action = getAction(path, "GET")
+        print getParams(self)
+        if action is not None:
+            action(self)
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -24,14 +27,19 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse("http://localhost" + self.path).path
-        if path in MAPPER["POST"]:
-            MAPPER["POST"][path](self)
+        action = getAction(path, "POST")
+        if action is not None:
+            action(self)
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
             self.wfile.write("GENERIC PAGE")
         return
+
+def getParams(request):
+    url = urlparse("http://localhost" + request.path)
+    return parse_qs(url.query)
 
 def postParams(request):
     ctype, pdict = cgi.parse_header(request.headers.getheader('content-type'))
@@ -46,6 +54,13 @@ def postParams(request):
         return json.loads(json_data)
     else:
         return {}
+
+def getAction(path, method):
+    for route in MAPPER[method]:
+        if re.search(route['regexp'], path):
+            return route["action"]
+    return None
+
 
 
 ###############################################################################
@@ -80,13 +95,8 @@ def onTopic(request):
     request.wfile.write("Received by firos")
 
 MAPPER = {
-    "GET": {
-    },
-    "POST": {
-        "/firos": onTopic
-    },
-    "PUT": {
-    },
-    "DELETE": {
-    },
+    "GET": [],
+    "POST": [{"regexp": "^/firos", "action": onTopic}],
+    "PUT": [],
+    "DELETE": [],
 }
