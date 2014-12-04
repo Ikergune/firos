@@ -15,9 +15,8 @@ class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse("http://localhost" + self.path).path
         action = getAction(path, "GET")
-        print getParams(self)
         if action is not None:
-            action(self)
+            action["action"](self, action)
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -29,7 +28,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         path = urlparse("http://localhost" + self.path).path
         action = getAction(path, "POST")
         if action is not None:
-            action(self)
+            action["action"](self, action)
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -37,9 +36,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write("GENERIC PAGE")
         return
 
+def pathParams(request, regexp):
+    return list(re.match(regexp, urlparse("http://localhost" + request.path).path).groups())
+
 def getParams(request):
-    url = urlparse("http://localhost" + request.path)
-    return parse_qs(url.query)
+    return parse_qs(urlparse("http://localhost" + request.path).query)
 
 def postParams(request):
     ctype, pdict = cgi.parse_header(request.headers.getheader('content-type'))
@@ -58,7 +59,7 @@ def postParams(request):
 def getAction(path, method):
     for route in MAPPER[method]:
         if re.search(route['regexp'], path):
-            return route["action"]
+            return route
     return None
 
 
@@ -67,7 +68,7 @@ def getAction(path, method):
 #############################   Request Mapping   #############################
 ###############################################################################
 
-def onTopic(request):
+def onTopic(request, action):
     print "Context Broker Notification"
     contexts = postParams(request)
     contexts = contexts['contextResponses']
@@ -94,9 +95,13 @@ def onTopic(request):
     request.end_headers()
     request.wfile.write("Received by firos")
 
+# URL structure
+# ^/firos/(\w+)/update/*$
+# ^/TEXT/whatever_is_inside/TEXT/+$
+
 MAPPER = {
     "GET": [],
-    "POST": [{"regexp": "^/firos", "action": onTopic}],
+    "POST": [{"regexp": "^/firos/*$", "action": onTopic}],
     "PUT": [],
     "DELETE": [],
 }
