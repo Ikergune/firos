@@ -18,3 +18,15 @@ def obj2Ros(obj, msgInstance):
             raise Exception("Not a primitive")
         msgInstance = obj
     return msgInstance
+
+def ros2Definition(msgInstance):
+    obj = {}
+    index = 0
+    for key in msgInstance.__slots__:
+        attr = getattr(msgInstance, key)
+        if hasattr(attr, '__slots__'):
+            obj[key] = ros2Definition(attr)
+        else:
+            obj[key] = msgInstance._slot_types[index]
+        index += 1
+    return obj
