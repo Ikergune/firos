@@ -4,7 +4,9 @@ import json
 from urlparse import urlparse, parse_qs
 from BaseHTTPServer import BaseHTTPRequestHandler
 
-from include.ros.topicHandler import TopicHandler
+from include.confManager import getRobots
+from include.ros.rosutils import ros2Definition
+from include.ros.topicHandler import TopicHandler, ROBOT_TOPICS
 from include.pubsub.pubSubFactory import SubscriberFactory
 
 CloudSubscriber = SubscriberFactory.create()
@@ -89,18 +91,49 @@ def onTopic(request, action):
                     if topic["name"] not in TOPIC_TIMESTAMPS[robotName] or TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]:
                         TopicHandler.publish(robotName, topic['name'], value)
                     TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
-
     request.send_response(200)
     request.send_header('Content-type','text/plain')
     request.end_headers()
     request.wfile.write("Received by firos")
+
+def onRobots(request, action):
+    robots = getRobots()
+    data = []
+    for robot_name in robots.keys():
+        robot_data = {"name": robot_name, "topics": []}
+        robot = robots[robot_name]
+        index = 0
+        for topic in robot["topics"]:
+            topic_data = {"name": topic["name"]}
+            if topic["msg"] is dict:
+                topic_data["type"] = "Custom"
+                topic_data["structure"] = topic["msg"]
+            else:
+                topic_data["type"] = topic["msg"]
+                topic_data["structure"] = ros2Definition(ROBOT_TOPICS[robot_name][topic["name"]]["class"]())
+            robot_data["topics"].append(topic_data)
+            index += 1
+        data.append(robot_data)
+    request.send_response(200)
+    request.send_header('Content-type','application/json')
+    request.end_headers()
+    request.wfile.write(json.dumps(data))
+
+def onRobotData(request, action):
+    robot_name = pathParams(request, action["regexp"])[0]
+    # Add call to Context Broker
+    request.send_response(200)
+    request.send_header('Content-type','text/plain')
+    request.end_headers()
+    request.wfile.write("The robot name is: " + robot_name)
+
 
 # URL structure
 # ^/firos/(\w+)/update/*$
 # ^/TEXT/whatever_is_inside/TEXT/+$
 
 MAPPER = {
-    "GET": [],
+    "GET": [{"regexp": "^/robots/*$", "action": onRobots}, {"regexp": "^/robot/(\w+)/*$", "action": onRobotData}],
     "POST": [{"regexp": "^/firos/*$", "action": onTopic}],
     "PUT": [],
     "DELETE": [],
