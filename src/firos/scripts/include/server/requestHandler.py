@@ -7,9 +7,10 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 from include.confManager import getRobots
 from include.ros.rosutils import ros2Definition
 from include.ros.topicHandler import TopicHandler, ROBOT_TOPICS
-from include.pubsub.pubSubFactory import SubscriberFactory
+from include.pubsub.pubSubFactory import SubscriberFactory, QueryBuilderFactory
 
 CloudSubscriber = SubscriberFactory.create()
+CloudQueryBulder = QueryBuilderFactory.create()
 
 TOPIC_TIMESTAMPS = {}
 
@@ -105,7 +106,7 @@ def onRobots(request, action):
         index = 0
         for topic in robot["topics"]:
             topic_data = {"name": topic["name"]}
-            if topic["msg"] is dict:
+            if type(topic["msg"]) is dict:
                 topic_data["type"] = "Custom"
                 topic_data["structure"] = topic["msg"]
             else:
@@ -121,11 +122,25 @@ def onRobots(request, action):
 
 def onRobotData(request, action):
     robot_name = pathParams(request, action["regexp"])[0]
-    # Add call to Context Broker
-    request.send_response(200)
-    request.send_header('Content-type','text/plain')
+    # data = CloudQueryBulder.findById(".*", "ROBOT", True)
+    data = CloudQueryBulder.findById(robot_name, "ROBOT", True)
+    if "errorCode" in data:
+        request.send_response(int(data["errorCode"]["code"]))
+    else:
+        request.send_response(200)
+        robot_list = []
+        for context in data["contextResponses"]:
+            for attribute in context["contextElement"]["attributes"]:
+                if attribute["name"] != "COMMAND":
+                    attribute["value"] = json.loads(attribute["value"].replace("'", '"'))
+            context["contextElement"].pop("isPattern", None)
+            robot_list.append(context["contextElement"])
+        data = robot_list
+
+    request.send_header('Content-type','application/json')
+
     request.end_headers()
-    request.wfile.write("The robot name is: " + robot_name)
+    request.wfile.write(json.dumps(data))
 
 
 # URL structure

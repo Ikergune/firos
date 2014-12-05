@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # CloudPublisher.publish("talker2", DEFAULT_CONTEXT_TYPE, [{"name": "talk", "type": "NotYet", "value": "Hola mundo!!!" + str(time.time())}])
 
     # print CloudPublisher.createContent("cmd_vel", "NotYet", {"linear": {"x": 5.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})
-    # CloudPublisher.publish("robot2", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel_mux/input/teleop", "NotYet", {"linear": {"x": -0.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
+    CloudPublisher.publish("robot2", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel_mux/input/teleop", "NotYet", {"linear": {"x": -0.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
     CloudPublisher.publish("turtle1", DEFAULT_CONTEXT_TYPE, [CloudPublisher.createContent("cmd_vel", "NotYet", {"linear": {"x": -1.5, "y": 0.0, "z": 0.0},"angular": {"x": 0.0, "y": 0.0, "z": 0.0}})])
     # text = String()
     # text.data = "Hello topic"

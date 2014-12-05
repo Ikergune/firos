@@ -17,3 +17,7 @@ class Isubscriber:
 
     def _generateSubscription(self, namespace, data_type="Robot", topics=[]):
         raise Exception('Method not implemented')
+
+class IqueryBuilder:
+    def findById(self, id):
+        raise Exception('Method not implemented')
