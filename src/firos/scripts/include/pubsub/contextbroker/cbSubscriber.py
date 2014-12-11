@@ -24,6 +24,7 @@ class CbSubscriber(Isubscriber):
         }
         url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
+        # print subscriber_json
         response_body = self._sendRequest(url, subscriber_json)
         if "subscribeError" in response_body:
             print "Error Subscribing to Context Broker:"

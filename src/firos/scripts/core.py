@@ -30,6 +30,10 @@ from include.ros.topicHandler import TopicHandler, loadMsgHandlers
 # Main function.
 if __name__ == '__main__':
 
+    print "Initializing ROS node: " + NODE_NAME
+    rospy.init_node(NODE_NAME)
+    print "Initialized"
+
     if sys.argv[1:]:
         port = int(sys.argv[1])
     else:
@@ -52,9 +56,9 @@ if __name__ == '__main__':
     loadMsgHandlers()
 
     # Initialize the node and name it.
-    print "Initializing ROS node: " + NODE_NAME
-    rospy.init_node(NODE_NAME)
-    print "Initialized"
+    # print "Initializing ROS node: " + NODE_NAME
+    # rospy.init_node(NODE_NAME)
+    # print "Initialized"
 
     print "\nPress Ctrl+C to Exit\n"
     server.start()

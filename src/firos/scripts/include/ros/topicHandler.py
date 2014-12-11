@@ -57,7 +57,8 @@ class TopicHandler:
             instance = ROBOT_TOPICS[robot][topic]
             msg = instance["class"]()
             obj2Ros(data, msg)
-            instance["publisher"].publish(msg)
+            if "publisher" in instance:
+                instance["publisher"].publish(msg)
             # print robot, topic, msg
 
     @staticmethod

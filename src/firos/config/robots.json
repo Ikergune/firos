@@ -21,7 +21,7 @@
             },{
                 "name": "talk",
                 "msg": "std_msgs.msg.String",
-                "type": "publisher"
+                "type": "subscriber"
             },{
                 "name": "pose",
                 "msg": {
