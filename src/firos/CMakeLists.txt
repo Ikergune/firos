@@ -11,15 +11,15 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-add_message_files(
-  FILES
-  topicData.msg
-)
+#add_message_files(
+#  FILES
+#  topicData.msg
+#)
 
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+#generate_messages(
+#  DEPENDENCIES
+#  std_msgs
+#)
 
 
 ## System dependencies are found with CMake's conventions

@@ -117,6 +117,7 @@ def onRobots(request, action):
         data.append(robot_data)
     request.send_response(200)
     request.send_header('Content-type','application/json')
+    setCors(request);
     request.end_headers()
     request.wfile.write(json.dumps(data))
 
@@ -138,6 +139,7 @@ def onRobotData(request, action):
         data = robot_list
 
     request.send_header('Content-type','application/json')
+    setCors(request);
 
     request.end_headers()
     request.wfile.write(json.dumps(data))
@@ -153,3 +155,10 @@ MAPPER = {
     "PUT": [],
     "DELETE": [],
 }
+
+def setCors(request):
+    request.send_header("Access-Control-Allow-Credentials", True);
+    request.send_header("Access-Control-Allow-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time");
+    request.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
+    request.send_header("Access-Control-Expose-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time");
+    request.send_header("Access-Control-Allow-Origin", "*");
