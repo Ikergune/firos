@@ -1,13 +1,14 @@
 {
-    "robot2": {
+    "robot1":{
         "topics": [
             {
                 "name": "cmd_vel_mux/input/teleop",
                 "msg": "geometry_msgs.msg.Twist",
                 "type": "publisher"
-            },{
-                "name": "move_base_simple/goal",
-                "msg": "geometry_msgs.msg.PoseStamped",
+            },
+            {
+                "name": "action",
+                "msg": "std_msgs.msg.String",
                 "type": "publisher"
             }
         ]
@@ -21,7 +22,7 @@
             },{
                 "name": "talk",
                 "msg": "std_msgs.msg.String",
-                "type": "subscriber"
+                "type": "publisher"
             },{
                 "name": "pose",
                 "msg": {
