@@ -1,0 +1,3 @@
+[submodule "src/firos/scripts/include/genpy"]
+	path = src/firos/scripts/include/genpy
+	url = https://github.com/haas85/genpy.git
