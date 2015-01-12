@@ -935,8 +935,9 @@ class Generator(object):
         self.spec_loader_fn = spec_loader_fn
         self.generator_fn = generator_fn
 
-    def generate(self, msg_context, full_type, topic_data, outdir, search_path):
+    def firos_generate(self, msg_context, full_type, topic_data, outdir, search_path):
         # generate message files for request/response
+        print("FIROS GENERATOR")
         formatted_msg = ""
         for data in topic_data['msg']:
             formatted_msg += str(topic_data['msg'][data]) + " " + str(data) + "\n"
@@ -944,6 +945,7 @@ class Generator(object):
         spec = self.spec_loader_fn(msg_context, formatted_msg, full_type)
         file_name = full_type.replace("/", "")
         outfile = os.path.join(outdir, file_name + ".py")
+        print(outfile)
 
         print("Generating message definition for " + full_type)
 
@@ -953,7 +955,22 @@ class Generator(object):
             f.close()
         return outfile
 
-    def generate_messages(self, package, data, outdir, search_path):
+    def generate(self, msg_context, full_type, f, outdir, search_path):
+        try:
+            # you can't just check first... race condition
+            os.makedirs(outdir)
+        except OSError as e:
+            if e.errno != 17: # file exists
+                raise
+        # generate message files for request/response
+        spec = self.spec_loader_fn(msg_context, f, full_type)
+        outfile = compute_outfile_name(outdir, os.path.basename(f), self.ext)
+        with open(outfile, 'w') as f:
+            for l in self.generator_fn(msg_context, spec, search_path):
+                f.write(l+'\n')
+        return outfile
+
+    def generate_firos_messages(self, package, data, outdir, search_path):
         """
         :returns: return code, ``int``
         """
@@ -981,11 +998,34 @@ class Generator(object):
                 for topic in robot['topics']:
                     full_type = str(robotName) + '/' + str(topic['name'])
                     if type(topic['msg']) is dict:
-                        self.generate(msg_context, full_type, topic, outdir, search_path) #actual generation
+                        self.firos_generate(msg_context, full_type, topic, outdir, search_path) #actual generation
             except Exception as e:
                 if not isinstance(e, MsgGenerationException) and not isinstance(e, genmsg.msgs.InvalidMsgSpec):
                     traceback.print_exc()
                 print("\nERROR: Unable to generate %s for package '%s': %s\n"%(self.what, package, e), file=sys.stderr)
+                retcode = 1 #flag error
+        return retcode
+
+    def generate_messages(self, package, package_files, outdir, search_path):
+        """
+        :returns: return code, ``int``
+        """
+        if not genmsg.is_legal_resource_base_name(package):
+            raise MsgGenerationException("\nERROR: package name '%s' is illegal and cannot be used in message generation.\nPlease see http://ros.org/wiki/Names"%(package))
+
+        # package/src/package/msg for messages, packages/src/package/srv for services
+        msg_context = MsgContext.create_default()
+        retcode = 0
+        for f in package_files:
+            try:
+                f = os.path.abspath(f)
+                infile_name = os.path.basename(f)
+                full_type = genmsg.gentools.compute_full_type_name(package, infile_name);
+                outfile = self.generate(msg_context, full_type, f, outdir, search_path) #actual generation
+            except Exception as e:
+                if not isinstance(e, MsgGenerationException) and not isinstance(e, genmsg.msgs.InvalidMsgSpec):
+                    traceback.print_exc()
+                print("\nERROR: Unable to generate %s for package '%s': while processing '%s': %s\n"%(self.what, package, f, e), file=sys.stderr)
                 retcode = 1 #flag error
         return retcode
 
@@ -1002,13 +1042,8 @@ class MsgGenerator(Generator):
     package. See genutil.Generator. In order to generator code for a
     single .msg file, see msg_generator.
     """
-    def __init__(self):
-        # Change file for load_msg_from_string, the msg_context and the name the same
-        # change the path for the content
+    def __init__(self, loader=genmsg.msg_loader.load_msg_from_file):
         super(MsgGenerator, self).__init__('messages', genmsg.EXT_MSG,
-                                           genmsg.msg_loader.load_msg_from_string,
+                                           loader,
                                            msg_generator)
-        # super(MsgGenerator, self).__init__('messages', genmsg.EXT_MSG,
-        #                                    genmsg.msg_loader.load_msg_from_file,
-        #                                    msg_generator)
 

@@ -15,8 +15,9 @@ import sys
 import json
 import rospy
 import traceback
+import genmsg.msg_loader
 from include.genpy import generator
-from include.genpy import genpy_main
+from include.genpy import genpy_firos
 from include import confManager
 
 def launchSetup(main=False):
@@ -29,7 +30,7 @@ def launchSetup(main=False):
 
     try:
         robots = confManager.getRobots()
-        retcode = genpy_main.genmain(robots, generator.MsgGenerator())
+        retcode = genpy_firos.genmain(robots, generator.MsgGenerator(genmsg.msg_loader.load_msg_from_string))
         print "\nSuccesfully generated\n"
         if main:
             sys.exit(retcode or 0)
