@@ -15,8 +15,8 @@ import sys
 import rospy
 import traceback
 import genmsg.msg_loader
-from include.genpy.src.genpy import generator
-from include.genpy.src.genpy import genpy_firos
+from include.genpy import generator
+from include.genpy import genpy_firos
 from include import confManager
 
 def launchSetup(main=False):
