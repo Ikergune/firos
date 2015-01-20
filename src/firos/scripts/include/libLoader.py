@@ -14,6 +14,12 @@ class LibLoader:
             py_mod = imp.load_compiled(mod_name, filepath)
 
         return py_mod
+
+    @staticmethod
+    def load3rdParty(filepath, className):
+        module = LibLoader.loadFromFile(filepath)
+        return getattr(module, className)
+
     @staticmethod
     def loadFromSystem(lib):
         modules = lib.split(".")

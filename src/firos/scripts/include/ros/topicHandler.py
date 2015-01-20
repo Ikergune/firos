@@ -6,6 +6,8 @@ from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE
 from include.libLoader import LibLoader
 from include.ros.rosutils import ros2Obj, obj2Ros
 
+from include.ros.dependencies.third_party import *
+
 # PubSub Handlers
 from include.pubsub.pubSubFactory import PublisherFactory, SubscriberFactory
 
@@ -38,7 +40,12 @@ def loadMsgHandlers():
                 module = LibLoader.loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
                 ROBOT_TOPICS[robotName][topicName]["class"] = getattr(module, topicName)
             else:
-                ROBOT_TOPICS[robotName][topicName]["class"] = LibLoader.loadFromSystem(topic['msg'])
+                _final_name = topic['msg'].split('.')[-1]
+                if _final_name in globals():
+                    ROBOT_TOPICS[robotName][topicName]["class"] = globals()[_final_name]
+                else:
+                    ROBOT_TOPICS[robotName][topicName]["class"] = LibLoader.loadFromSystem(topic['msg'])
+                print ROBOT_TOPICS[robotName][topicName]["class"]
                 extra["type"] = str(topic['msg'])
             if topic["type"].lower() == "publisher":
                 ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
