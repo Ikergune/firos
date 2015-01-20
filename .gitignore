@@ -6,3 +6,4 @@ src/firos/scripts/**.pyc
 src/firos/scripts/**/**.pyc
 src/firos/scripts/**/**/**.pyc
 src/firos/scripts/include/ros/topics
+src/firos/scripts/include/ros/dependencies
