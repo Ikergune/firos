@@ -45,7 +45,6 @@ def loadMsgHandlers():
                     ROBOT_TOPICS[robotName][topicName]["class"] = globals()[_final_name]
                 else:
                     ROBOT_TOPICS[robotName][topicName]["class"] = LibLoader.loadFromSystem(topic['msg'])
-                print ROBOT_TOPICS[robotName][topicName]["class"]
                 extra["type"] = str(topic['msg'])
             if topic["type"].lower() == "publisher":
                 ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
