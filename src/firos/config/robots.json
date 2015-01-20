@@ -1,5 +1,5 @@
 {
-    "robot2":{
+    "robot1":{
         "topics": [
             {
                 "name": "cmd_vel_mux/input/teleop",
@@ -9,6 +9,20 @@
             {
                 "name": "action",
                 "msg": "std_msgs.msg.String",
+                "type": "publisher"
+            },
+            {
+                "name": "move_base/goal",
+                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
+                "type": "publisher"
+            }
+        ]
+    },
+    "robot2":{
+        "topics": [
+            {
+                "name": "cmd_vel_mux/input/teleop",
+                "msg": "geometry_msgs.msg.Twist",
                 "type": "publisher"
             },
             {
