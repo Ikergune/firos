@@ -72,7 +72,6 @@ def getAction(path, method):
 ###############################################################################
 
 def onTopic(request, action):
-    print "Context Broker Notification"
     contexts = postParams(request)
     contexts = contexts['contextResponses']
     for context in contexts:
