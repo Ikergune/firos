@@ -13,33 +13,35 @@ IP = urllib2.urlopen('http://ip.42.pl/raw').read()
 # IP = "10.8.0.6"
 
 class CbSubscriber(Isubscriber):
-    subscriptions = []
+    subscriptions = {}
     refresh_thread = None
 
     def subscribe(self, namespace, data_type, topics):
-        print "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics)
-        subscription = {
-            "namespace" : namespace,
-            "data_type" : data_type,
-            "topics" : topics
-        }
-        url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
-        subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
-        # print subscriber_json
-        response_body = self._sendRequest(url, subscriber_json)
-        if "subscribeError" in response_body:
-            print "Error Subscribing to Context Broker:"
-            print response_body["subscribeError"]["errorCode"]["details"]
-            os.kill(os.getpid(), signal.SIGINT)
-        else:
-            subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
-            self.subscriptions.append(subscription)
-            print "Connected to Context Broker with id {}".format(subscription["id"])
-        if self.refresh_thread is None:
-            self.refresh_thread = thread.start_new_thread( self._refreshSubscriptions, ("CBSub-Refresh", 2, ) )
+        if namespace not in subscriptions:
+            print "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics)
+            subscription = {
+                "namespace" : namespace,
+                "data_type" : data_type,
+                "topics" : topics
+            }
+            url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+            subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
+            # print subscriber_json
+            response_body = self._sendRequest(url, subscriber_json)
+            if "subscribeError" in response_body:
+                print "Error Subscribing to Context Broker:"
+                print response_body["subscribeError"]["errorCode"]["details"]
+                os.kill(os.getpid(), signal.SIGINT)
+            else:
+                subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
+                self.subscriptions[namespace] = subscription
+                print "Connected to Context Broker with id {}".format(subscription["id"])
+            if self.refresh_thread is None:
+                self.refresh_thread = thread.start_new_thread( self._refreshSubscriptions, ("CBSub-Refresh", 2, ) )
 
-    def disconnect(self):
-        for subscription in self.subscriptions:
+    def disconnect(self, namespace, delete=False):
+        if namespace in self.subscriptions:
+            subscription = self.subscriptions[namespace]
             subscriptionId = subscription["id"]
             print "\nDisconnecting Context Broker subscription {}".format(subscriptionId)
             url = "http://{}:{}/{}/unsubscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
@@ -56,10 +58,16 @@ class CbSubscriber(Isubscriber):
 
             print "Deleting entity"
             self.deleteEntity(subscription["namespace"], subscription["data_type"])
-        print "\n"
+            print "\n"
+            if delete:
+                del self.subscriptions[namespace]
+
+    def disconnectAll(self):
+        for subscription in self.subscriptions:
+            self.disconnect(subscription)
 
     def refreshSubscriptions(self):
-        for subscription in self.subscriptions:
+        for subscription in self.subscriptions.values():
             subscriber_dict = self._generateSubscription(subscription["namespace"], subscription["data_type"], subscription["topics"], subscription["id"])
             subscriber_dict.pop("entities", None)
             subscriber_dict.pop("reference", None)

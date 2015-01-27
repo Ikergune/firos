@@ -21,7 +21,6 @@ TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topi
 ROBOT_TOPICS = {}
 robot_data   = {}
 subscribers  = []
-disconnected_robots = []
 
 def loadMsgHandlers():
     print "Getting configuration data"
@@ -60,17 +59,16 @@ def loadMsgHandlers():
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
-        if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot] and robot not in disconnected_robots:
+        if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
             instance = ROBOT_TOPICS[robot][topic]
             msg = instance["class"]()
             obj2Ros(data, msg)
             if "publisher" in instance:
                 instance["publisher"].publish(msg)
-            # print robot, topic, msg
 
     @staticmethod
     def unregisterAll():
-        CloudSubscriber.disconnect()
+        CloudSubscriber.disconnectAll()
         print "Unsubscribing topics..."
         for subscriber in subscribers:
             subscriber.unregister()
@@ -89,11 +87,10 @@ def _callback(data, args):
 def _robotDisconnection(data):
     robot_name = data.data
     print("Disconnected robot: " + robot_name)
-    disconnected_robots.append(robot_name)
     CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
+    CloudSubscriber.disconnect(robot_name, True)
 
 def _robotConnection(data):
     robot_name = data.data
     print("Connected robot: " + robot_name)
-    index = disconnected_robots.index(robot_name)
-    del disconnected_robots[index]
+    CloudSubscriber.subscribe(robot_name, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robot_name].keys())

@@ -12,6 +12,9 @@ class Isubscriber:
     def disconnect(self):
         raise Exception('Method not implemented')
 
+    def disconnectAll(self):
+        raise Exception('Method not implemented')
+
     def deleteEntity(self, namespace, data_type):
         raise Exception('Method not implemented')
 
