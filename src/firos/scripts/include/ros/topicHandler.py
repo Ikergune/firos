@@ -11,7 +11,7 @@ from include.ros.dependencies.third_party import *
 # PubSub Handlers
 from include.pubsub.pubSubFactory import PublisherFactory, SubscriberFactory
 
-# from move_base_msgs.msg import MoveBaseActionGoal
+import std_msgs.msg
 
 CloudSubscriber = SubscriberFactory.create()
 CloudPublisher = PublisherFactory.create()
@@ -21,6 +21,7 @@ TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topi
 ROBOT_TOPICS = {}
 robot_data   = {}
 subscribers  = []
+disconnected_robots = []
 
 def loadMsgHandlers():
     print "Getting configuration data"
@@ -51,15 +52,15 @@ def loadMsgHandlers():
             elif topic["type"].lower() == "subscriber":
                 subscribers.append(rospy.Subscriber(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
         print "\n"
-        CloudSubscriber.subscribe(robotName, "ROBOT", ROBOT_TOPICS[robotName].keys())
+        CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName].keys())
         print "Subscribed to " + robotName  + "'s topics\n"
-    # print subscribers
-    # print ROBOT_TOPICS
+    subscribers.append(rospy.Subscriber("disconnect", std_msgs.msg.String, _robotDisconnection))
+    subscribers.append(rospy.Subscriber("connect", std_msgs.msg.String, _robotConnection))
 
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
-        if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
+        if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot] and robot not in disconnected_robots:
             instance = ROBOT_TOPICS[robot][topic]
             msg = instance["class"]()
             obj2Ros(data, msg)
@@ -84,3 +85,15 @@ def _callback(data, args):
     content = []
     content.append(CloudPublisher.createContent(topic, datatype,ros2Obj(data)))
     CloudPublisher.publish(robot, contextType, content)
+
+def _robotDisconnection(data):
+    robot_name = data.data
+    print("Disconnected robot: " + robot_name)
+    disconnected_robots.append(robot_name)
+    CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
+
+def _robotConnection(data):
+    robot_name = data.data
+    print("Connected robot: " + robot_name)
+    index = disconnected_robots.index(robot_name)
+    del disconnected_robots[index]
