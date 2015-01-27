@@ -10,6 +10,7 @@ from include.constants import *
 from include.pubsub.iPubSub import Isubscriber
 
 IP = urllib2.urlopen('http://ip.42.pl/raw').read()
+# IP = "10.8.0.6"
 
 class CbSubscriber(Isubscriber):
     subscriptions = []
@@ -54,7 +55,7 @@ class CbSubscriber(Isubscriber):
                 print "Disconnected subscription {} from Context Broker ".format(subscriptionId)
 
             print "Deleting entity"
-            self._deleteEntity(subscription["namespace"], subscription["data_type"])
+            self.deleteEntity(subscription["namespace"], subscription["data_type"])
         print "\n"
 
     def refreshSubscriptions(self):
@@ -77,7 +78,7 @@ class CbSubscriber(Isubscriber):
     def parseData(self, data):
         return json.loads(data.replace("'", '"'))
 
-    def _deleteEntity(self, namespace, data_type):
+    def deleteEntity(self, namespace, data_type):
         print "DELETING: ", namespace, data_type
         operation_json = json.dumps({
             "contextElements": [
