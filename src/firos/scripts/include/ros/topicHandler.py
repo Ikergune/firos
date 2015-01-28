@@ -29,29 +29,37 @@ def loadMsgHandlers():
     for robotName in robot_data:
         robotName = str(robotName)
         robot = robot_data[robotName]
-        ROBOT_TOPICS[robotName] = {}
+        ROBOT_TOPICS[robotName] = {
+            "publisher": {},
+            "subscriber": {}
+        }
         print "  -" + robotName
         for topic in robot['topics']:
             topicName = str(topic['name'])
             print "    -" + topicName
             extra = {"robot": robotName, "topic": topicName}
-            ROBOT_TOPICS[robotName][topicName] = {}
             if type(topic['msg']) is dict:
                 module = LibLoader.loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
-                ROBOT_TOPICS[robotName][topicName]["class"] = getattr(module, topicName)
+                theclass = getattr(module, topicName)
             else:
                 _final_name = topic['msg'].split('.')[-1]
                 if _final_name in globals():
-                    ROBOT_TOPICS[robotName][topicName]["class"] = globals()[_final_name]
+                    theclass = globals()[_final_name]
                 else:
-                    ROBOT_TOPICS[robotName][topicName]["class"] = LibLoader.loadFromSystem(topic['msg'])
+                    theclass = LibLoader.loadFromSystem(topic['msg'])
                 extra["type"] = str(topic['msg'])
             if topic["type"].lower() == "publisher":
-                ROBOT_TOPICS[robotName][topicName]["publisher"] = rospy.Publisher(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], queue_size=DEFAULT_QUEUE_SIZE)
+                ROBOT_TOPICS[robotName]["publisher"][topicName] = {
+                    "class": theclass,
+                    "publisher": rospy.Publisher(robotName + "/" + topicName, theclass, queue_size=DEFAULT_QUEUE_SIZE)
+                }
             elif topic["type"].lower() == "subscriber":
-                subscribers.append(rospy.Subscriber(robotName + "/" + topicName, ROBOT_TOPICS[robotName][topicName]["class"], _callback, extra))
+                ROBOT_TOPICS[robotName]["subscriber"][topicName] = {
+                    "class": theclass,
+                }
+                subscribers.append(rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra))
         print "\n"
-        CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName].keys())
+        CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName]["publisher"].keys())
         print "Subscribed to " + robotName  + "'s topics\n"
     subscribers.append(rospy.Subscriber("disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber("connect", std_msgs.msg.String, _robotConnection))
@@ -59,8 +67,8 @@ def loadMsgHandlers():
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
-        if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]:
-            instance = ROBOT_TOPICS[robot][topic]
+        if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]["publisher"]:
+            instance = ROBOT_TOPICS[robot]["publisher"][topic]
             msg = instance["class"]()
             obj2Ros(data, msg)
             if "publisher" in instance:
@@ -93,4 +101,4 @@ def _robotDisconnection(data):
 def _robotConnection(data):
     robot_name = data.data
     print("Connected robot: " + robot_name)
-    CloudSubscriber.subscribe(robot_name, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robot_name].keys())
+    CloudSubscriber.subscribe(robot_name, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName]["publisher"].keys())
