@@ -7,6 +7,7 @@ import urllib2
 
 from include.constants import *
 from include.pubsub.iPubSub import Isubscriber
+from include.pubsub.contextbroker.ngsi9 import registerContext, deleteAllContexts
 
 IP = urllib2.urlopen('http://ip.42.pl/raw').read()
 # IP = "10.8.0.6"
@@ -17,6 +18,7 @@ class CbSubscriber(Isubscriber):
 
     def subscribe(self, namespace, data_type, robot):
         if namespace not in self.subscriptions:
+            registerContext(namespace, data_type, robot)
             topics = robot["publisher"].keys()
             print "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics)
             subscription = {
@@ -63,6 +65,7 @@ class CbSubscriber(Isubscriber):
                 del self.subscriptions[namespace]
 
     def disconnectAll(self):
+        deleteAllContexts()
         for subscription in self.subscriptions:
             self.disconnect(subscription)
 
