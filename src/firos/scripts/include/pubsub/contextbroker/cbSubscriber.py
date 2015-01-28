@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import rospy
 import thread
 import signal
 import urllib2
@@ -16,8 +15,9 @@ class CbSubscriber(Isubscriber):
     subscriptions = {}
     refresh_thread = None
 
-    def subscribe(self, namespace, data_type, topics):
-        if namespace not in subscriptions:
+    def subscribe(self, namespace, data_type, robot):
+        if namespace not in self.subscriptions:
+            topics = robot["publisher"].keys()
             print "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics)
             subscription = {
                 "namespace" : namespace,

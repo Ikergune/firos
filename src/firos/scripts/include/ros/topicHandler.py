@@ -59,7 +59,7 @@ def loadMsgHandlers():
                 }
                 subscribers.append(rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra))
         print "\n"
-        CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName]["publisher"].keys())
+        CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
         print "Subscribed to " + robotName  + "'s topics\n"
     subscribers.append(rospy.Subscriber("disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber("connect", std_msgs.msg.String, _robotConnection))

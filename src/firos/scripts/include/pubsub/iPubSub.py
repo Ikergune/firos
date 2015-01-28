@@ -6,7 +6,7 @@ class Ipublisher:
         raise Exception('Method not implemented')
 
 class Isubscriber:
-    def subscribe(self, namespace, data_type, topics):
+    def subscribe(self, namespace, data_type, robot):
         raise Exception('Method not implemented')
 
     def disconnect(self):
