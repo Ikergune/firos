@@ -7,7 +7,7 @@ import urllib2
 
 from include.constants import *
 from include.pubsub.iPubSub import Isubscriber
-from include.pubsub.contextbroker.ngsi9 import registerContext, deleteAllContexts
+from include.pubsub.contextbroker.ngsi9 import registerContext, deleteContext, deleteAllContexts, refreshAllContexts
 
 IP = urllib2.urlopen('http://ip.42.pl/raw').read()
 # IP = "10.8.0.6"
@@ -28,7 +28,6 @@ class CbSubscriber(Isubscriber):
             }
             url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
             subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
-            # print subscriber_json
             response_body = self._sendRequest(url, subscriber_json)
             if "subscribeError" in response_body:
                 print "Error Subscribing to Context Broker:"
@@ -43,6 +42,7 @@ class CbSubscriber(Isubscriber):
 
     def disconnect(self, namespace, delete=False):
         if namespace in self.subscriptions:
+            deleteContext(namespace, True)
             subscription = self.subscriptions[namespace]
             subscriptionId = subscription["id"]
             print "\nDisconnecting Context Broker subscription {}".format(subscriptionId)
@@ -70,6 +70,7 @@ class CbSubscriber(Isubscriber):
             self.disconnect(subscription)
 
     def refreshSubscriptions(self):
+        refreshAllContexts()
         for subscription in self.subscriptions.values():
             subscriber_dict = self._generateSubscription(subscription["namespace"], subscription["data_type"], subscription["topics"], subscription["id"])
             subscriber_dict.pop("entities", None)

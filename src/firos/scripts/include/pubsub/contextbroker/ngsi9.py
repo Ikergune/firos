@@ -1,3 +1,4 @@
+import copy
 import json
 import urllib2
 
@@ -25,7 +26,10 @@ def registerContext(entity_id, data_type, robot,  isPattern=False):
     }
     response = _sendRequest(url, json.dumps(data))
     if "registrationId" in response:
-        contexts[entity_id] = response["registrationId"]
+        contexts[entity_id] = {
+            "data": data,
+            "registrationId": response["registrationId"]
+        }
     print response
 
 def deleteAllContexts():
@@ -41,11 +45,21 @@ def deleteContext(entity_id, delete=False):
             }
         ],
         "duration": "P0D",
-        "registrationId": contexts[entity_id]
+        "registrationId": contexts[entity_id]["registrationId"]
     }
     response = _sendRequest(url, json.dumps(data))
     if delete:
         del contexts[entity_id]
+
+def refreshAllContexts():
+    for key in contexts:
+        refreshContext(key)
+
+def refreshContext(entity_id):
+    url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+    data = copy.deepcopy(contexts[entity_id]["data"])
+    data["registrationId"] = contexts[entity_id]["registrationId"]
+    response = _sendRequest(url, json.dumps(data))
 
 def topics2NGSI9(robot):
     return iterateTopics(robot["publisher"], "publisher") + iterateTopics(robot["subscriber"], "subscriber")
