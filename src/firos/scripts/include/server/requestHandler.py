@@ -102,7 +102,7 @@ def onRobots(request, action):
     for robot_name in robots.keys():
         robot_data = {"name": robot_name, "topics": []}
         robot = robots[robot_name]
-        index = 0
+        print robot
         for topic in robot["topics"]:
             topic_data = {"name": topic["name"]}
             if type(topic["msg"]) is dict:
@@ -110,9 +110,8 @@ def onRobots(request, action):
                 topic_data["structure"] = topic["msg"]
             else:
                 topic_data["type"] = topic["msg"]
-                topic_data["structure"] = ros2Definition(ROBOT_TOPICS[robot_name][topic["name"]]["class"]())
+                topic_data["structure"] = ros2Definition(ROBOT_TOPICS[robot_name][topic["type"]][topic["name"]]["class"]())
             robot_data["topics"].append(topic_data)
-            index += 1
         data.append(robot_data)
     request.send_response(200)
     request.send_header('Content-type','application/json')
