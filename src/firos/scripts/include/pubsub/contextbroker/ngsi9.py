@@ -30,7 +30,6 @@ def registerContext(entity_id, data_type, robot,  isPattern=False):
             "data": data,
             "registrationId": response["registrationId"]
         }
-    print response
 
 def deleteAllContexts():
     for key in contexts:
@@ -81,7 +80,6 @@ def _sendRequest(url, data, method=None):
         request.get_method = lambda: method
     response = urllib2.urlopen(request)
     data = response.read()
-    print data
     response_body = json.loads(data)
     response.close()
     return response_body
