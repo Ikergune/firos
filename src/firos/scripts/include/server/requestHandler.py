@@ -104,7 +104,10 @@ def onRobots(request, action):
         robot = robots[robot_name]
         print robot
         for topic in robot["topics"]:
-            topic_data = {"name": topic["name"]}
+            topic_data = {
+                "name": topic["name"],
+                "pubsub": topic["type"]
+            }
             if type(topic["msg"]) is dict:
                 topic_data["type"] = "Custom"
                 topic_data["structure"] = topic["msg"]
