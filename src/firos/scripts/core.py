@@ -16,7 +16,7 @@ import rospy
 import signal
 
 from include.libLoader import generateRosDependencies
-generateRosDependencies()
+# generateRosDependencies()
 
 from setup import launchSetup
 
