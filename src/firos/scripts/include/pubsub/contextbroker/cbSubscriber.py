@@ -88,7 +88,7 @@ class CbSubscriber(Isubscriber):
                 print "Refreshed Connection to Context Broker with id {}".format(subscription["id"])
 
     def parseData(self, data):
-        return json.loads(data.replace("'", '"'))
+        return json.loads(data.replace("%27", '"'))
 
     def deleteEntity(self, namespace, data_type):
         print "DELETING: ", namespace, data_type

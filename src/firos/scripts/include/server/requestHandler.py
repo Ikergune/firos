@@ -53,8 +53,7 @@ def postParams(request):
         length = int(request.headers.getheader('content-length'))
         return cgi.parse_qs(request.rfile.read(length), keep_blank_values=1)
     elif ctype == 'application/json':
-        json_data = request.rfile.read()
-        # print json_data
+        json_data = request.rfile.read(int(request.headers['Content-Length']))
         return json.loads(json_data)
     else:
         return {}
@@ -102,7 +101,6 @@ def onRobots(request, action):
     for robot_name in robots.keys():
         robot_data = {"name": robot_name, "topics": []}
         robot = robots[robot_name]
-        print robot
         for topic in robot["topics"]:
             topic_data = {
                 "name": topic["name"],
