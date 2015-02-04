@@ -1,6 +1,9 @@
 import os
+import re
 import imp
 import pkgutil
+
+regex = re.compile(ur'^(.*)(\b.msg\b)(.*)$')
 
 class LibLoader:
     @staticmethod
@@ -22,10 +25,15 @@ class LibLoader:
 
     @staticmethod
     def loadFromSystem(lib):
-        modules = lib.split(".")
-        module = __import__(modules.pop(0))
-        for name in modules:
-            module = getattr(module, name)
+        module = None
+        matches = re.search(regex, lib)
+        if matches is not None:
+            module_name = str(matches.group(1)) + str(matches.group(2))
+            modules = str(matches.group(3)).split(".")
+            modules = modules[1: len(modules)]
+            module = __import__(module_name, globals(), locals(), [module_name.split('.')[-1]])
+            for name in modules:
+                module = getattr(module, name)
         return module
 
 def generateRosDependencies():

@@ -15,16 +15,11 @@ import sys
 import rospy
 import signal
 
-from include.libLoader import generateRosDependencies
-# generateRosDependencies()
-
 from setup import launchSetup
 
 from include.constants import *
 from include.server.firosServer import FirosServer
 
-
-from include.ros.dependencies import generated
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers
 
 # Main function.
