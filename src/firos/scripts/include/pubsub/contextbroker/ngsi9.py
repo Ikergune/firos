@@ -51,11 +51,11 @@ def registerContext(entity_id, data_type, robot,  isPattern=False):
         if entity_id in description_data:
             _descs = ""
             for link in description_data[entity_id]["descriptions"]:
-                _descs =  _descs + "," + link
+                _descs =  _descs + "||" + link
             Publisher.publish(entity_id, data_type, [{
                 "name" : "descriptions",
                 "type" : "DescriptionData",
-                "value" : _descs[1:]
+                "value" : _descs[2:]
             }])
 
 def deleteAllContexts():
