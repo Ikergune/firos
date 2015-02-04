@@ -85,7 +85,6 @@ class TopicHandler:
 def _callback(data, args):
     robot = str(args['robot'])
     topic = str(args['topic'])
-    print "Data received from " + robot + "in topic " + topic
     datatype = "NotYet"
     contextType = DEFAULT_CONTEXT_TYPE
     content = []
