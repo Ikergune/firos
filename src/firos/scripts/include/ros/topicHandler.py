@@ -1,7 +1,6 @@
 import os
 import rospy
 
-from include import confManager
 from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE
 from include.libLoader import LibLoader
 from include.ros.rosutils import ros2Obj, obj2Ros
@@ -22,9 +21,8 @@ ROBOT_TOPICS = {}
 robot_data   = {}
 subscribers  = []
 
-def loadMsgHandlers():
+def loadMsgHandlers(robot_data):
     print "Getting configuration data"
-    robot_data = confManager.getRobots()
     print "Generating topic handlers:"
     for robotName in robot_data:
         robotName = str(robotName)

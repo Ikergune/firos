@@ -10,7 +10,6 @@
 # logwarn
 
 # Import required Python code.
-import os
 import sys
 import rospy
 import signal
@@ -18,6 +17,8 @@ import signal
 from setup import launchSetup
 
 from include.constants import *
+
+from include import confManager
 from include.server.firosServer import FirosServer
 
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     print "\nStarting Firos..."
     print "---------------------------------\n"
 
-    loadMsgHandlers()
+    loadMsgHandlers(confManager.getRobots())
 
     # Initialize the node and name it.
     # print "Initializing ROS node: " + NODE_NAME

@@ -1,4 +1,4 @@
-environment = "local"
+environment = "development"
 
 CONFIGURATIONS = {
     "local": {

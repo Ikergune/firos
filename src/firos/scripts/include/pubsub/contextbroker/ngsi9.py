@@ -1,13 +1,30 @@
+import os
 import copy
 import json
 import urllib2
 
 from include.constants import CONTEXTBROKER, SUBSCRIPTION_LENGTH
 
+# PubSub Handlers
+from include.pubsub.contextbroker.cbPublisher import CbPublisher
+
 contexts = {}
+Publisher = CbPublisher()
+
 
 def registerContext(entity_id, data_type, robot,  isPattern=False):
+    print "REGISTER CONTEXT"
     url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+    attributes = topics2NGSI9(robot)
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    json_path = current_path.replace("scripts/include/pubsub/contextbroker", "config/robotdescriptions.json")
+    description_data = json.load(open(json_path))
+    if entity_id in description_data:
+        attributes.append({
+            "name": "descriptions",
+            "type":"publisher:DescriptionData",
+            "isDomain": "false"
+        })
     data = {
         "contextRegistrations": [
             {
@@ -18,7 +35,7 @@ def registerContext(entity_id, data_type, robot,  isPattern=False):
                         "id": entity_id
                     }
                 ],
-                "attributes": topics2NGSI9(robot),
+                "attributes": attributes,
                 "providingApplication": "http://{}:{}/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
             }
         ],
@@ -30,6 +47,16 @@ def registerContext(entity_id, data_type, robot,  isPattern=False):
             "data": data,
             "registrationId": response["registrationId"]
         }
+
+        if entity_id in description_data:
+            _descs = ""
+            for link in description_data[entity_id]["descriptions"]:
+                _descs =  _descs + "," + link
+            Publisher.publish(entity_id, data_type, [{
+                "name" : "descriptions",
+                "type" : "DescriptionData",
+                "value" : _descs[1:]
+            }])
 
 def deleteAllContexts():
     for key in contexts:
