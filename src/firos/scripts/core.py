@@ -30,6 +30,8 @@ if __name__ == '__main__':
     rospy.init_node(NODE_NAME)
     print "Initialized"
 
+    print ENVIRONMENT
+
     if sys.argv[1:]:
         port = int(sys.argv[1])
     else:

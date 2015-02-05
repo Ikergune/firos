@@ -4,13 +4,17 @@ import time
 import thread
 import signal
 import urllib2
+import netifaces
 
 from include.constants import *
 from include.pubsub.iPubSub import Isubscriber
 from include.pubsub.contextbroker.ngsi9 import registerContext, deleteContext, deleteAllContexts, refreshAllContexts
 
-IP = urllib2.urlopen('http://ip.42.pl/raw').read()
-# IP = "10.8.0.6"
+if INTERFACE == "public":
+    IP = urllib2.urlopen('http://ip.42.pl/raw').read()
+else:
+    netifaces.ifaddresses(INTERFACE)
+    IP = netifaces.ifaddresses(INTERFACE)[2][0]['addr']
 
 class CbSubscriber(Isubscriber):
     subscriptions = {}
