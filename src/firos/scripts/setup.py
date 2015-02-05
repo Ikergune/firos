@@ -28,7 +28,7 @@ def launchSetup(main=False):
 
 
     try:
-        robots = confManager.getRobots()
+        robots = confManager.getRobots(True)
         current_path = os.path.dirname(os.path.abspath(__file__))
         outdir = os.path.join(current_path, "include/ros/")
         retcode = genpy_firos.genmain(robots, generator.MsgGenerator(genmsg.msg_loader.load_msg_from_string), outdir)

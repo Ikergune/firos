@@ -3,6 +3,8 @@ import socket
 import rostopic
 import rosgraph
 
+from include.constants import NODE_NAME
+
 regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
 robots = None
 
@@ -30,9 +32,13 @@ class RosConfigurator:
             })
 
     @staticmethod
-    def systemTopics():
+    def systemTopics(refresh=False):
         global robots
-        if robots is None:
+        if robots is None or refresh:
+            existing_topics = {
+                "publisher": {},
+                "subscriber": {}
+            }
             robots = {}
             master = rosgraph.Master('/rostopic')
             try:
@@ -41,17 +47,39 @@ class RosConfigurator:
 
                 pubs, subs, _ = state
 
+                for t, l in pubs:
+                    existing_topics["publisher"][t] = l
+                for t, l in subs:
+                    existing_topics["subscriber"][t] = l
+
                 # ROS publisher --> firos subscribes to listen data published
                 for t, l in pubs:
-                    _type = RosConfigurator.topic_type(t, topic_types)
-                    RosConfigurator.setRobot(robots, t,_type, "subscriber")
+                    subscribing = _isInFiros(t, existing_topics["subscriber"], l)
+                    publishing = _isInFiros(t, existing_topics["publisher"], l)
+                    if not subscribing and not publishing:
+                        _type = RosConfigurator.topic_type(t, topic_types)
+                        RosConfigurator.setRobot(robots, t,_type, "subscriber")
 
                 # ROS subscriber --> firos publishes data to them
                 for t, l in subs:
-                    _type = RosConfigurator.topic_type(t, topic_types)
-                    RosConfigurator.setRobot(robots, t,_type, "publisher")
+                    subscribing = _isInFiros(t, existing_topics["subscriber"], l)
+                    publishing = _isInFiros(t, existing_topics["publisher"], l)
+                    if not subscribing and not publishing:
+                        _type = RosConfigurator.topic_type(t, topic_types)
+                        RosConfigurator.setRobot(robots, t,_type, "publisher")
 
             except socket.error:
                 raise rostopic.ROSTopicIOException("Unable to communicate with master!")
 
         return robots
+
+def _isInFiros(topic_name, list2Check,nodes):
+    using = False
+    if topic_name not in list2Check:
+        return False
+    for node in list2Check[topic_name]:
+        if node == "/" + NODE_NAME:
+            using = True
+            break
+
+    return using

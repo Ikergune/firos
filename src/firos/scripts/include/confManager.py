@@ -3,9 +3,9 @@ import json
 import traceback
 from include.ros.rosConfigurator import RosConfigurator
 
-def getRobots():
+def getRobots(refresh=False):
     try:
-        return RosConfigurator.systemTopics()
+        return RosConfigurator.systemTopics(refresh)
     except Exception as e:
         traceback.print_exc()
         print("ERROR: ",e)

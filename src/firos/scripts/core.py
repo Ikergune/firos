@@ -50,7 +50,7 @@ if __name__ == '__main__':
     print "\nStarting Firos..."
     print "---------------------------------\n"
 
-    loadMsgHandlers(confManager.getRobots())
+    loadMsgHandlers(confManager.getRobots(True))
 
     # Initialize the node and name it.
     # print "Initializing ROS node: " + NODE_NAME
