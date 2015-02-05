@@ -30,8 +30,6 @@ if __name__ == '__main__':
     rospy.init_node(NODE_NAME)
     print "Initialized"
 
-    print ENVIRONMENT
-
     if sys.argv[1:]:
         port = int(sys.argv[1])
     else:
@@ -52,7 +50,7 @@ if __name__ == '__main__':
     print "\nStarting Firos..."
     print "---------------------------------\n"
 
-    loadMsgHandlers(confManager.getRobots(True))
+    loadMsgHandlers(confManager.getRobots(True, True))
 
     # Initialize the node and name it.
     # print "Initializing ROS node: " + NODE_NAME

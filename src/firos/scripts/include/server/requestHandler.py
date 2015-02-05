@@ -96,7 +96,7 @@ def onTopic(request, action):
     request.wfile.write("Received by firos")
 
 def onRobots(request, action):
-    robots = getRobots(False)
+    robots = getRobots(False, True)
     data = []
     for robot_name in robots.keys():
         robot_data = {"name": robot_name, "topics": []}
