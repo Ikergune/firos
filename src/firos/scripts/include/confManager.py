@@ -2,6 +2,8 @@ import os
 import json
 import copy
 import traceback
+
+from include.logger import Log
 from include.ros.rosConfigurator import RosConfigurator
 
 def getRobots(refresh=False, withJson=True):
@@ -30,7 +32,7 @@ def getRobots(refresh=False, withJson=True):
 
     except Exception as e:
         traceback.print_exc()
-        print("ERROR: ",e)
+        Log("ERROR", e)
         return {}
 
 

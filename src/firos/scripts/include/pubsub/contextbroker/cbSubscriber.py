@@ -7,6 +7,7 @@ import urllib2
 import netifaces
 
 from include.constants import *
+from include.logger import Log
 from include.pubsub.iPubSub import Isubscriber
 from include.pubsub.contextbroker.ngsi9 import registerContext, deleteContext, deleteAllContexts, refreshAllContexts
 
@@ -24,7 +25,7 @@ class CbSubscriber(Isubscriber):
         if namespace not in self.subscriptions:
             registerContext(namespace, data_type, robot)
             topics = robot["publisher"].keys()
-            print "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics)
+            Log("INFO", "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics))
             subscription = {
                 "namespace" : namespace,
                 "data_type" : data_type,
@@ -34,13 +35,13 @@ class CbSubscriber(Isubscriber):
             subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
             response_body = self._sendRequest(url, subscriber_json)
             if "subscribeError" in response_body:
-                print "Error Subscribing to Context Broker:"
-                print response_body["subscribeError"]["errorCode"]["details"]
+                Log("ERROR","Error Subscribing to Context Broker:")
+                Log("ERROR",response_body["subscribeError"]["errorCode"]["details"])
                 os.kill(os.getpid(), signal.SIGINT)
             else:
                 subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
                 self.subscriptions[namespace] = subscription
-                print "Connected to Context Broker with id {}".format(subscription["id"])
+                Log("INFO", "Connected to Context Broker with id {}".format(subscription["id"]))
             if self.refresh_thread is None:
                 self.refresh_thread = thread.start_new_thread( self._refreshSubscriptions, ("CBSub-Refresh", 2, ) )
 
@@ -49,20 +50,20 @@ class CbSubscriber(Isubscriber):
             deleteContext(namespace, True)
             subscription = self.subscriptions[namespace]
             subscriptionId = subscription["id"]
-            print "\nDisconnecting Context Broker subscription {}".format(subscriptionId)
+            Log("INFO", "\nDisconnecting Context Broker subscription {}".format(subscriptionId))
             url = "http://{}:{}/{}/unsubscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
             disconnect_json = json.dumps({
                 "subscriptionId": subscriptionId
             })
             response_body = self._sendRequest(url, disconnect_json)
             if int(response_body["statusCode"]["code"]) >= 400:
-                print "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId)
-                print response_body["statusCode"]["reasonPhrase"]
+                Log("ERROR", "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId))
+                Log("ERROR", response_body["statusCode"]["reasonPhrase"])
                 print "\n"
             else:
-                print "Disconnected subscription {} from Context Broker ".format(subscriptionId)
+                Log("INFO", "Disconnected subscription {} from Context Broker ".format(subscriptionId))
 
-            print "Deleting entity"
+            Log("INFO", "Deleting entity")
             self.deleteEntity(subscription["namespace"], subscription["data_type"])
             print "\n"
             if delete:
@@ -83,19 +84,19 @@ class CbSubscriber(Isubscriber):
             subscriber_json = json.dumps(subscriber_dict)
             response_body = self._sendRequest(url, subscriber_json, 'PUT')
             if "subscribeError" in response_body:
-                print "Error Refreshing subscription"
-                print response_body["subscribeError"]["errorCode"]["details"]
+                Log("ERROR", "Error Refreshing subscription")
+                Log("ERROR", response_body["subscribeError"]["errorCode"]["details"])
             elif "orionError" in response_body:
-                print "Error Refreshing subscription"
-                print response_body["orionError"]["details"]
+                Log("ERROR", "Error Refreshing subscription")
+                Log("ERROR", response_body["orionError"]["details"])
             else:
-                print "Refreshed Connection to Context Broker with id {}".format(subscription["id"])
+                Log("INFO", "Refreshed Connection to Context Broker with id {}".format(subscription["id"]))
 
     def parseData(self, data):
         return json.loads(data.replace("%27", '"'))
 
     def deleteEntity(self, namespace, data_type):
-        print "DELETING: ", namespace, data_type
+        Log("INFO", "DELETING: ", namespace, data_type)
         operation_json = json.dumps({
             "contextElements": [
                 {
@@ -109,13 +110,13 @@ class CbSubscriber(Isubscriber):
         url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         response_body = self._sendRequest(url, operation_json)
         if "errorCode" in response_body:
-            print "Error deleting entity"
-            print response_body["errorCode"]["details"]
+            Log("ERROR", "Error deleting entity")
+            Log("ERROR", response_body["errorCode"]["details"])
         elif "orionError" in response_body:
-            print "Error deleting entity"
-            print response_body["orionError"]["details"]
+            Log("ERROR", "Error deleting entity")
+            Log("ERROR", response_body["orionError"]["details"])
         else:
-            print "Deleted entity " + namespace
+            Log("INFO", "Deleted entity " + namespace)
 
 
     def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[], subscriptionId=None):

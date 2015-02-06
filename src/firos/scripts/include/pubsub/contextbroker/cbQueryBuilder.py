@@ -16,7 +16,6 @@ class CbQueryBuilder(IqueryBuilder):
                 }
             ]
         }
-        print data
         return self._sendRequest(url, json.dumps(data))
 
     def _sendRequest(self, url, data, method=None):
@@ -25,7 +24,5 @@ class CbQueryBuilder(IqueryBuilder):
             request.get_method = lambda: method
         response = urllib2.urlopen(request)
         data = response.read()
-        print data
         response_body = json.loads(data)
         response.close()
-        return response_body

@@ -1,6 +1,8 @@
 import os
 import rospy
 
+
+from include.logger import Log
 from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE
 from include.libLoader import LibLoader
 from include.ros.rosutils import ros2Obj, obj2Ros
@@ -22,8 +24,8 @@ robot_data   = {}
 subscribers  = []
 
 def loadMsgHandlers(robot_data):
-    print "Getting configuration data"
-    print "Generating topic handlers:"
+    Log("INFO", "Getting configuration data")
+    Log("INFO", "Generating topic handlers:")
     for robotName in robot_data:
         robotName = str(robotName)
         robot = robot_data[robotName]
@@ -31,10 +33,10 @@ def loadMsgHandlers(robot_data):
             "publisher": {},
             "subscriber": {}
         }
-        print "  -" + robotName
+        Log("INFO", "  -" + robotName)
         for topic in robot['topics']:
             topicName = str(topic['name'])
-            print "    -" + topicName
+            Log("INFO", "    -" + topicName)
             extra = {"robot": robotName, "topic": topicName}
             if type(topic['msg']) is dict:
                 module = LibLoader.loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
@@ -58,7 +60,7 @@ def loadMsgHandlers(robot_data):
                 subscribers.append(rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra))
         print "\n"
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
-        print "Subscribed to " + robotName  + "'s topics\n"
+        Log("INFO", "Subscribed to " + robotName  + "'s topics\n")
     subscribers.append(rospy.Subscriber("disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber("connect", std_msgs.msg.String, _robotConnection))
 
@@ -75,10 +77,10 @@ class TopicHandler:
     @staticmethod
     def unregisterAll():
         CloudSubscriber.disconnectAll()
-        print "Unsubscribing topics..."
+        Log("INFO", "Unsubscribing topics...")
         for subscriber in subscribers:
             subscriber.unregister()
-        print "Unsubscribed topics\n"
+        Log("INFO", "Unsubscribed topics\n")
 
 def _callback(data, args):
     robot = str(args['robot'])
@@ -91,11 +93,11 @@ def _callback(data, args):
 
 def _robotDisconnection(data):
     robot_name = data.data
-    print("Disconnected robot: " + robot_name)
+    Log("INFO", "Disconnected robot: " + robot_name)
     CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
     CloudSubscriber.disconnect(robot_name, True)
 
 def _robotConnection(data):
     robot_name = data.data
-    print("Connected robot: " + robot_name)
+    Log("INFO", "Connected robot: " + robot_name)
     CloudSubscriber.subscribe(robot_name, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName]["publisher"].keys())

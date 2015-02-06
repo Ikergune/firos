@@ -16,6 +16,7 @@ if not configured:
     configData = setConfiguration()
     INTERFACE = configData["net_interface"] if "net_interface" in configData else "public"
     ENVIRONMENT = configData["environment"] if "environment" in configData else "local"
+    LOGLEVEL = configData["log_level"] if "log_level" in configData else "INFO"
 
 
 environment = ENVIRONMENT
