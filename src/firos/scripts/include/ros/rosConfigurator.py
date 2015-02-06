@@ -1,4 +1,6 @@
+import os
 import re
+import json
 import socket
 import rostopic
 import rosgraph
@@ -18,18 +20,19 @@ class RosConfigurator:
         return 'unknown type'
 
     @staticmethod
-    def setRobot(robots, topic, t_type, pubsub):
+    def setRobot(robots, topic, t_type, pubsub, whiteList):
         matching = re.search(regex, topic)
         robot_topic = matching.group(2)
         if robot_topic != '':
             robot_name = matching.group(1)
-            if robot_name not in robots:
-                robots[robot_name] = {"topics": []}
-            robots[robot_name]["topics"].append({
-                "name": robot_topic,
-                "msg": t_type,
-                "type": pubsub
-            })
+            if (whiteList is not None and robot_name in whiteList and robot_topic in whiteList[robot_name]) or (whiteList is None):
+                if robot_name not in robots:
+                    robots[robot_name] = {"topics": []}
+                robots[robot_name]["topics"].append({
+                    "name": robot_topic,
+                    "msg": t_type,
+                    "type": pubsub
+                })
 
     @staticmethod
     def systemTopics(refresh=False):
@@ -39,6 +42,8 @@ class RosConfigurator:
                 "publisher": {},
                 "subscriber": {}
             }
+            whiteList = _getWhiteList()
+            print whiteList
             robots = {}
             master = rosgraph.Master('/rostopic')
             try:
@@ -58,7 +63,7 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(robots, t,_type, "subscriber")
+                        RosConfigurator.setRobot(robots, t,_type, "subscriber", whiteList)
 
                 # ROS subscriber --> firos publishes data to them
                 for t, l in subs:
@@ -66,7 +71,7 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(robots, t,_type, "publisher")
+                        RosConfigurator.setRobot(robots, t,_type, "publisher", whiteList)
 
             except socket.error:
                 raise rostopic.ROSTopicIOException("Unable to communicate with master!")
@@ -83,3 +88,11 @@ def _isInFiros(topic_name, list2Check,nodes):
             break
 
     return using
+
+def _getWhiteList():
+    try:
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
+        return json.load(open(json_path))
+    except:
+        return None

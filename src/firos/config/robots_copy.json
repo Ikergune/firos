@@ -1,4 +1,76 @@
 {
+    "robot_sim":{
+        "topics": [
+            {
+                "name": "cmd_vel_mux/input/teleop",
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+            },
+            {
+                "name": "move_base/goal",
+                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
+                "type": "publisher"
+            }
+        ]
+    },"move_base":{
+        "topics": [
+            {
+                "name": "goal",
+                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
+                "type": "publisher"
+            }
+        ]
+    },"robot1":{
+        "topics": [
+            {
+                "name": "cmd_vel_mux/input/teleop",
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+            },
+            {
+                "name": "action",
+                "msg": "std_msgs.msg.String",
+                "type": "publisher"
+            },
+            {
+                "name": "move_base/goal",
+                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
+                "type": "publisher"
+            }
+        ]
+    },
+    "robot2":{
+        "topics": [
+            {
+                "name": "cmd_vel_mux/input/teleop",
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+            },
+            {
+                "name": "move_base/goal",
+                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
+                "type": "publisher"
+            }
+        ]
+    },
+    "mobile_base_controller":{
+        "topics": [
+            {
+                "name": "cmd_vel",
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+            }
+        ]
+    },
+    "play_motion": {
+        "topics": [
+            {
+                "name": "goal",
+                "msg": "play_motion_msgs.msg.PlayMotionActionGoal",
+                "type": "publisher"
+            }
+        ]
+    },
     "turtle1": {
         "topics": [
             {
@@ -8,6 +80,10 @@
             },{
                 "name": "talk",
                 "msg": "std_msgs.msg.String",
+                "type": "publisher"
+            },{
+                "name": "goal",
+                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
                 "type": "publisher"
             },{
                 "name": "pose",
@@ -22,50 +98,5 @@
                 "type": "subscriber"
             }
         ]
-    },"turtle2": {
-        "topics": [
-            {
-                "name": "cmd_vel",
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            },{
-                "name": "talk",
-                "msg": "std_msgs.msg.String",
-                "type": "publisher"
-            },{
-                "name": "pose",
-                "msg": {
-                    "x_pose": "int32",
-                    "y_pose": "int32"
-                },
-                "type": "publisher"
-            }
-        ]
-    },
-    "robot1": {
-        "topics": [
-            {
-                "name": "cmd_vel_mux/input/teleop",
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            },{
-                "name": "move_base_simple/goal",
-                "msg": "geometry_msgs.msg.PoseStamped",
-                "type": "publisher"
-            }
-        ]
-    },"robot2": {
-        "topics": [
-            {
-                "name": "cmd_vel_mux/input/teleop",
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            },{
-                "name": "move_base_simple/goal",
-                "msg": "geometry_msgs.msg.PoseStamped",
-                "type": "publisher"
-            }
-        ]
     }
-
 }
