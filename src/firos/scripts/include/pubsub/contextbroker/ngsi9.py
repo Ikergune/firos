@@ -13,7 +13,6 @@ Publisher = CbPublisher()
 
 
 def registerContext(entity_id, data_type, robot,  isPattern=False):
-    print "REGISTER CONTEXT"
     url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
     attributes = topics2NGSI9(robot)
     current_path = os.path.dirname(os.path.abspath(__file__))

@@ -36,7 +36,6 @@ def getRobots(refresh=False, withJson=True):
 
 def getRobotsByJson():
     try:
-        print "ROBOTS FROM JSON"
         current_path = os.path.dirname(os.path.abspath(__file__))
         json_path = current_path.replace("scripts/include", "config/robots.json")
         return json.load(open(json_path))

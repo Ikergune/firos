@@ -43,7 +43,6 @@ class RosConfigurator:
                 "subscriber": {}
             }
             whiteList = _getWhiteList()
-            print whiteList
             robots = {}
             master = rosgraph.Master('/rostopic')
             try:
