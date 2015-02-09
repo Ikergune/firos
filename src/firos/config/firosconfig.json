@@ -1,5 +1,5 @@
 {
     "net_interface": "public",
-    "environment": "local",
+    "environment": "development",
     "log_level": "INFO"
 }
