@@ -38,13 +38,14 @@ class LibLoader:
 
 def generateRosDependencies():
     directories = os.environ["ROS_PACKAGE_PATH"].split(":")
+    imports = """from include.logger import Log\n\n"""
     imports = """unloaded = 0\nlibs=[]\n"""
     for directory in directories:
         if os.path.isdir(directory):
             for folder in os.listdir(directory):
                 if "msg" in folder:
                     imports += """try:\n    import {}.msg\nexcept Exception:\n    unloaded += 1\n    libs.append('{}')\n""".format(folder,folder)
-    imports += "print str(unloaded) + ' libraries not loaded: ' + str(libs)"
+    imports += "Log('WARNING', str(unloaded) + ' libraries not loaded: ' + str(libs))"
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ros", "dependencies", "generated.py")
     f = open(path,'w')
     f.write(imports)

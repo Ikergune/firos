@@ -8,7 +8,8 @@ import rosgraph
 from include.constants import NODE_NAME
 
 regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
-robots = None
+robots = {}
+ROBO_TOPIC_REG = {}
 
 class RosConfigurator:
 
@@ -20,30 +21,43 @@ class RosConfigurator:
         return 'unknown type'
 
     @staticmethod
-    def setRobot(robots, topic, t_type, pubsub, whiteList):
+    def setRobot(_robots, topic, t_type, pubsub, whiteList):
+        global ROBO_TOPIC_REG
+        global robots
         matching = re.search(regex, topic)
         robot_topic = matching.group(2)
         if robot_topic != '':
             robot_name = matching.group(1)
             if (whiteList is not None and robot_name in whiteList and robot_topic in whiteList[robot_name]) or (whiteList is None):
-                if robot_name not in robots:
-                    robots[robot_name] = {"topics": []}
-                robots[robot_name]["topics"].append({
+                if robot_name not in ROBO_TOPIC_REG:
+                    ROBO_TOPIC_REG[robot_name] = {"topics": []}
+                if robot_name not in _robots:
+                    _robots[robot_name] = {"topics": []}
+                _robots[robot_name]["topics"].append({
                     "name": robot_topic,
                     "msg": t_type,
                     "type": pubsub
                 })
+                if robot_name not in robots:
+                    robots[robot_name] = {"topics": []}
+                if robot_topic not in ROBO_TOPIC_REG[robot_name]["topics"]:
+                    ROBO_TOPIC_REG[robot_name]["topics"].append(robot_topic)
+                    robots[robot_name]["topics"].append({
+                        "name": robot_topic,
+                        "msg": t_type,
+                        "type": pubsub
+                    })
 
     @staticmethod
     def systemTopics(refresh=False):
         global robots
-        if robots is None or refresh:
+        if refresh:
             existing_topics = {
                 "publisher": {},
                 "subscriber": {}
             }
             whiteList = _getWhiteList()
-            robots = {}
+            _robots = {}
             master = rosgraph.Master('/rostopic')
             try:
                 state = master.getSystemState()
@@ -62,7 +76,7 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(robots, t,_type, "subscriber", whiteList)
+                        RosConfigurator.setRobot(_robots, t,_type, "subscriber", whiteList)
 
                 # ROS subscriber --> firos publishes data to them
                 for t, l in subs:
@@ -70,12 +84,14 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(robots, t,_type, "publisher", whiteList)
+                        RosConfigurator.setRobot(_robots, t,_type, "publisher", whiteList)
 
             except socket.error:
                 raise rostopic.ROSTopicIOException("Unable to communicate with master!")
 
-        return robots
+            return _robots
+        else:
+            return robots
 
 def _isInFiros(topic_name, list2Check,nodes):
     using = False

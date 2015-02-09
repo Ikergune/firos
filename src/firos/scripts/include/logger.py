@@ -36,14 +36,12 @@ handler = logging.handlers.SysLogHandler(address = '/dev/log')
 _logger.addHandler(handler)
 
 
-
-
 def Log(level, *args):
     if PRIORITIES[level] <= _levelId:
         text = ""
         for arg in args:
             text = text + " " + str(arg)
-        text = text[0:-1]
+        text = text[1:]
         if PRIORITIES[level] <= 2:
             print text
         else:
@@ -54,7 +52,8 @@ def Log(level, *args):
                 _logger.error(text)
             elif level == 'WARNING':
                 _logger.warning(text)
-            elif level == 'DEBUG':
-                print(text)
-            elif level == 'INFO':
-                print(text)
+            # elif level == 'DEBUG':
+            #     print(text)
+            # elif level == 'INFO':
+            #     print(text)
+            print text

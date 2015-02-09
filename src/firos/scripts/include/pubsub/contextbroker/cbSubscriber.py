@@ -59,13 +59,13 @@ class CbSubscriber(Isubscriber):
             if int(response_body["statusCode"]["code"]) >= 400:
                 Log("ERROR", "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId))
                 Log("ERROR", response_body["statusCode"]["reasonPhrase"])
-                print "\n"
+                Log("INFO", "\n")
             else:
                 Log("INFO", "Disconnected subscription {} from Context Broker ".format(subscriptionId))
 
             Log("INFO", "Deleting entity")
             self.deleteEntity(subscription["namespace"], subscription["data_type"])
-            print "\n"
+            Log("INFO", "\n")
             if delete:
                 del self.subscriptions[namespace]
 

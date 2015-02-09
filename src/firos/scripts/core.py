@@ -19,16 +19,17 @@ from setup import launchSetup
 from include.constants import *
 
 from include import confManager
+from include.logger import Log
 from include.server.firosServer import FirosServer
 
-from include.ros.topicHandler import TopicHandler, loadMsgHandlers
+from include.ros.topicHandler import TopicHandler, loadMsgHandlers, connectionListeners
 
 # Main function.
 if __name__ == '__main__':
 
-    print "Initializing ROS node: " + NODE_NAME
+    Log("INFO", "Initializing ROS node: " + NODE_NAME)
     rospy.init_node(NODE_NAME)
-    print "Initialized"
+    Log("INFO", "Initialized")
 
     if sys.argv[1:]:
         port = int(sys.argv[1])
@@ -37,25 +38,26 @@ if __name__ == '__main__':
     server = FirosServer(SERVER["ADDRESS"], port)
 
     def signal_handler(signal, frame):
-        print('\nExiting from the application')
+        Log("INFO",('\nExiting from the application'))
         TopicHandler.unregisterAll()
         server.close()
-        print('\nExit')
+        Log("INFO",('\nExit'))
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
     launchSetup()
 
-    print "\nStarting Firos..."
-    print "---------------------------------\n"
+    Log("INFO", "\nStarting Firos...")
+    Log("INFO", "---------------------------------\n")
 
     loadMsgHandlers(confManager.getRobots(True, True))
+    connectionListeners()
 
     # Initialize the node and name it.
-    # print "Initializing ROS node: " + NODE_NAME
+    # Log("INFO", "Initializing ROS node: " + NODE_NAME)
     # rospy.init_node(NODE_NAME)
-    # print "Initialized"
+    # Log("INFO", "Initialized")
 
-    print "\nPress Ctrl+C to Exit\n"
+    Log("INFO", "\nPress Ctrl+C to Exit\n")
     server.start()

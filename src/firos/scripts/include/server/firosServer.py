@@ -1,5 +1,7 @@
 from BaseHTTPServer import HTTPServer
 
+from include.logger import Log
+
 from include.server.requestHandler import RequestHandler
 
 class FirosServer:
@@ -17,7 +19,7 @@ class FirosServer:
 
     def start(self):
         sa = self.httpd.socket.getsockname()
-        print "\nServing HTTP on", sa[0], "port", sa[1], "..."
+        Log("INFO", "\nServing HTTP on", sa[0], "port", sa[1], "...")
         while not self.stopped:
             self.httpd.handle_request()
 

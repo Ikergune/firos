@@ -5,8 +5,9 @@ import rospy
 from include.logger import Log
 from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE
 from include.libLoader import LibLoader
-from include.ros.rosutils import ros2Obj, obj2Ros
 
+from include.ros.rosConfigurator import RosConfigurator
+from include.ros.rosutils import ros2Obj, obj2Ros
 from include.ros.dependencies.third_party import *
 
 # PubSub Handlers
@@ -58,9 +59,11 @@ def loadMsgHandlers(robot_data):
                     "class": theclass,
                 }
                 subscribers.append(rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra))
-        print "\n"
+        Log("INFO", "\n")
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
         Log("INFO", "Subscribed to " + robotName  + "'s topics\n")
+
+def connectionListeners():
     subscribers.append(rospy.Subscriber("disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber("connect", std_msgs.msg.String, _robotConnection))
 
@@ -100,4 +103,5 @@ def _robotDisconnection(data):
 def _robotConnection(data):
     robot_name = data.data
     Log("INFO", "Connected robot: " + robot_name)
-    CloudSubscriber.subscribe(robot_name, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName]["publisher"].keys())
+    loadMsgHandlers(RosConfigurator.systemTopics(True))
+    # CloudSubscriber.subscribe(robot_name, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName]["publisher"].keys())
