@@ -30,10 +30,11 @@ def loadMsgHandlers(robot_data):
     for robotName in robot_data:
         robotName = str(robotName)
         robot = robot_data[robotName]
-        ROBOT_TOPICS[robotName] = {
-            "publisher": {},
-            "subscriber": {}
-        }
+        if robotName not in ROBOT_TOPICS:
+            ROBOT_TOPICS[robotName] = {
+                "publisher": {},
+                "subscriber": {}
+            }
         Log("INFO", "  -" + robotName)
         for topic in robot['topics']:
             topicName = str(topic['name'])
@@ -57,15 +58,15 @@ def loadMsgHandlers(robot_data):
             elif topic["type"].lower() == "subscriber":
                 ROBOT_TOPICS[robotName]["subscriber"][topicName] = {
                     "class": theclass,
+                    "subscriber": rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra)
                 }
-                subscribers.append(rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra))
         Log("INFO", "\n")
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
         Log("INFO", "Subscribed to " + robotName  + "'s topics\n")
 
 def connectionListeners():
-    subscribers.append(rospy.Subscriber("disconnect", std_msgs.msg.String, _robotDisconnection))
-    subscribers.append(rospy.Subscriber("connect", std_msgs.msg.String, _robotConnection))
+    subscribers.append(rospy.Subscriber("firos/disconnect", std_msgs.msg.String, _robotDisconnection))
+    subscribers.append(rospy.Subscriber("firos/connect", std_msgs.msg.String, _robotConnection))
 
 class TopicHandler:
     @staticmethod
@@ -83,6 +84,9 @@ class TopicHandler:
         Log("INFO", "Unsubscribing topics...")
         for subscriber in subscribers:
             subscriber.unregister()
+        for robot_name in ROBOT_TOPICS:
+            for topic in ROBOT_TOPICS[robot_name]["subscriber"]:
+                ROBOT_TOPICS[robot_name]["subscriber"][topic]["subscriber"].unregister()
         Log("INFO", "Unsubscribed topics\n")
 
 def _callback(data, args):
