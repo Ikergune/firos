@@ -3,7 +3,7 @@ import time
 import rospy
 import urllib2
 
-from include.constants import CONTEXTBROKER
+from include.constants import CONTEXTBROKER, SEPARATOR_CHAR
 from include.pubsub.iPubSub import Ipublisher
 
 PUBLISH_FREQUENCY = 250
@@ -15,7 +15,7 @@ class CbPublisher(Ipublisher):
         return {
             "name": topic,
             "type": datatype,
-            "value": json.dumps(data).replace('"', "%27")
+            "value": json.dumps(data).replace('"', SEPARATOR_CHAR)
         }
 
     def publish(self, context_id, datatype, attributes=[]):
