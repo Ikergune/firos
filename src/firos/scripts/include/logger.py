@@ -1,12 +1,12 @@
-# LOGGING LEVELS
-# 'CRITICAL', 'DEBUG', 'ERROR', 'INFO', 'WARNING'
-
+import os
 import logging
 import logging.handlers
 
 from include.constants import LOGLEVEL
 
 _logger = logging.getLogger('firos_logger')
+
+SYSLOG_ADDRESS = '/dev/log'
 
 if LOGLEVEL == 'CRITICAL':
     _logger.setLevel(logging.CRITICAL)
@@ -31,20 +31,20 @@ if LOGLEVEL == "NONE":
 else:
     _levelId = PRIORITIES[LOGLEVEL]
 
-handler = logging.handlers.SysLogHandler(address = '/dev/log')
-
-_logger.addHandler(handler)
+if os.path.exists(SYSLOG_ADDRESS):
+    handler = logging.handlers.SysLogHandler(address = SYSLOG_ADDRESS)
+    _logger.addHandler(handler)
+else:
+    handler = None
 
 
 def Log(level, *args):
-    if PRIORITIES[level] <= _levelId:
+    if PRIORITIES[level] >= _levelId:
         text = ""
         for arg in args:
             text = text + " " + str(arg)
         text = text[1:]
-        if PRIORITIES[level] <= 2:
-            print text
-        else:
+        if handler is not None:
             if level == 'CRITICAL':
                 _logger.critical(text)
             elif level == 'ERROR':
@@ -52,8 +52,5 @@ def Log(level, *args):
                 _logger.error(text)
             elif level == 'WARNING':
                 _logger.warning(text)
-            # elif level == 'DEBUG':
-            #     print(text)
-            # elif level == 'INFO':
-            #     print(text)
-            print text
+        print text
+
