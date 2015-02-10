@@ -1,6 +1,7 @@
 import json
 import urllib2
 
+from include.logger import Log
 from include.constants import CONTEXTBROKER
 from include.pubsub.iPubSub import IqueryBuilder
 
@@ -19,10 +20,15 @@ class CbQueryBuilder(IqueryBuilder):
         return self._sendRequest(url, json.dumps(data))
 
     def _sendRequest(self, url, data, method=None):
-        request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-        if method is not None:
-            request.get_method = lambda: method
-        response = urllib2.urlopen(request)
-        data = response.read()
-        response_body = json.loads(data)
-        response.close()
+        try:
+            request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+            if method is not None:
+                request.get_method = lambda: method
+            response = urllib2.urlopen(request)
+            data = response.read()
+            response_body = json.loads(data)
+            response.close()
+            return response_body
+        except Exception as ex:
+            Log("ERROR", ex.reason)
+            return None

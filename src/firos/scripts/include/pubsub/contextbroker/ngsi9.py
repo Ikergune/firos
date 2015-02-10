@@ -3,6 +3,7 @@ import copy
 import json
 import urllib2
 
+from include.logger import Log
 from include.constants import CONTEXTBROKER, SUBSCRIPTION_LENGTH
 
 # PubSub Handlers
@@ -40,22 +41,23 @@ def registerContext(entity_id, data_type, robot,  isPattern=False):
         ],
         "duration": SUBSCRIPTION_LENGTH
     }
-    response = _sendRequest(url, json.dumps(data))
-    if "registrationId" in response:
-        contexts[entity_id] = {
-            "data": data,
-            "registrationId": response["registrationId"]
-        }
+    response_body = _sendRequest(url, json.dumps(data))
+    if response_body != None:
+        if "registrationId" in response_body:
+            contexts[entity_id] = {
+                "data": data,
+                "registrationId": response_body["registrationId"]
+            }
 
-        if entity_id in description_data:
-            _descs = ""
-            for link in description_data[entity_id]["descriptions"]:
-                _descs =  _descs + "||" + link
-            Publisher.publish(entity_id, data_type, [{
-                "name" : "descriptions",
-                "type" : "DescriptionData",
-                "value" : _descs[2:]
-            }])
+            if entity_id in description_data:
+                _descs = ""
+                for link in description_data[entity_id]["descriptions"]:
+                    _descs =  _descs + "||" + link
+                Publisher.publish(entity_id, data_type, [{
+                    "name" : "descriptions",
+                    "type" : "DescriptionData",
+                    "value" : _descs[2:]
+                }])
 
 def deleteAllContexts():
     for key in contexts:
@@ -102,12 +104,15 @@ def iterateTopics(topics, topic_type):
 
 
 def _sendRequest(url, data, method=None):
-    request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-    if method is not None:
-        request.get_method = lambda: method
-    response = urllib2.urlopen(request)
-    data = response.read()
-    response_body = json.loads(data)
-    response.close()
-    return response_body
-
+    try:
+        request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+        if method is not None:
+            request.get_method = lambda: method
+        response = urllib2.urlopen(request)
+        data = response.read()
+        response_body = json.loads(data)
+        response.close()
+        return response_body
+    except Exception as ex:
+            Log("ERROR", ex.reason)
+            return None

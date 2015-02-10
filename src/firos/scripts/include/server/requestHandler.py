@@ -4,6 +4,7 @@ import json
 from urlparse import urlparse, parse_qs
 from BaseHTTPServer import BaseHTTPRequestHandler
 
+from include.logger import Log
 from include.confManager import getRobots
 from include.ros.rosutils import ros2Definition
 from include.ros.topicHandler import TopicHandler, ROBOT_TOPICS
@@ -71,25 +72,28 @@ def getAction(path, method):
 ###############################################################################
 
 def onTopic(request, action):
-    contexts = postParams(request)
-    contexts = contexts['contextResponses']
-    for context in contexts:
-        if context['statusCode']['code'] == "200":
-            robot = context['contextElement']
-            robotName = robot['id']
-            if robotName not in TOPIC_TIMESTAMPS:
-                TOPIC_TIMESTAMPS[robotName] = {}
-            for topic in robot['attributes']:
-                if topic["name"] == "COMMAND":
-                    commands = topic["value"]
-                    robot['attributes'].remove(topic)
-                    break
-            for topic in robot['attributes']:
-                if topic["name"] in commands:
-                    value = CloudSubscriber.parseData(topic['value'])
-                    if topic["name"] not in TOPIC_TIMESTAMPS[robotName] or TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]:
-                        TopicHandler.publish(robotName, topic['name'], value)
-                    TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
+    try:
+        contexts = postParams(request)
+        contexts = contexts['contextResponses']
+        for context in contexts:
+            if context['statusCode']['code'] == "200":
+                robot = context['contextElement']
+                robotName = robot['id']
+                if robotName not in TOPIC_TIMESTAMPS:
+                    TOPIC_TIMESTAMPS[robotName] = {}
+                for topic in robot['attributes']:
+                    if topic["name"] == "COMMAND":
+                        commands = topic["value"]
+                        robot['attributes'].remove(topic)
+                        break
+                for topic in robot['attributes']:
+                    if topic["name"] in commands:
+                        value = CloudSubscriber.parseData(topic['value'])
+                        if topic["name"] not in TOPIC_TIMESTAMPS[robotName] or TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]:
+                            TopicHandler.publish(robotName, topic['name'], value)
+                        TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
+    except Exception as e:
+        Log("ERROR", e)
     request.send_response(200)
     request.send_header('Content-type','text/plain')
     request.end_headers()
@@ -122,7 +126,6 @@ def onRobots(request, action):
 
 def onRobotData(request, action):
     robot_name = pathParams(request, action["regexp"])[0]
-    # data = CloudQueryBulder.findById(".*", "ROBOT", True)
     data = CloudQueryBulder.findById(robot_name, "ROBOT", True)
     if "errorCode" in data:
         request.send_response(int(data["errorCode"]["code"]))

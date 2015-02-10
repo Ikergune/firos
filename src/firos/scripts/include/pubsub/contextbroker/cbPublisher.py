@@ -3,6 +3,7 @@ import time
 import rospy
 import urllib2
 
+from include.logger import Log
 from include.constants import CONTEXTBROKER, SEPARATOR_CHAR
 from include.pubsub.iPubSub import Ipublisher
 
@@ -52,11 +53,15 @@ class CbPublisher(Ipublisher):
 
             url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
             data_json = json.dumps(data)
-            request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-            response = urllib2.urlopen(request)
-            response_body = json.loads(response.read())
-            response.close()
+            try:
+                request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+                response = urllib2.urlopen(request)
+                response_body = json.loads(response.read())
+                response.close()
 
-            if "errorCode" in response_body:
-                rospy.logerr("Error sending data to Context Broker:")
-                rospy.logerr(response_body["errorCode"]["details"])
+                if "errorCode" in response_body:
+                    rospy.logerr("Error sending data to Context Broker:")
+                    rospy.logerr(response_body["errorCode"]["details"])
+            except Exception as ex:
+                Log("ERROR", ex.reason)
+                return None

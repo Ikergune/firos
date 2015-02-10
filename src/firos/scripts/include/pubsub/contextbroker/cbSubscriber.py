@@ -34,14 +34,15 @@ class CbSubscriber(Isubscriber):
             url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
             subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
             response_body = self._sendRequest(url, subscriber_json)
-            if "subscribeError" in response_body:
-                Log("ERROR","Error Subscribing to Context Broker:")
-                Log("ERROR",response_body["subscribeError"]["errorCode"]["details"])
-                os.kill(os.getpid(), signal.SIGINT)
-            else:
-                subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
-                self.subscriptions[namespace] = subscription
-                Log("INFO", "Connected to Context Broker with id {}".format(subscription["id"]))
+            if response_body != None:
+                if "subscribeError" in response_body:
+                    Log("ERROR","Error Subscribing to Context Broker:")
+                    Log("ERROR",response_body["subscribeError"]["errorCode"]["details"])
+                    os.kill(os.getpid(), signal.SIGINT)
+                else:
+                    subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
+                    self.subscriptions[namespace] = subscription
+                    Log("INFO", "Connected to Context Broker with id {}".format(subscription["id"]))
             if self.refresh_thread is None:
                 self.refresh_thread = thread.start_new_thread( self._refreshSubscriptions, ("CBSub-Refresh", 2, ) )
 
@@ -56,12 +57,13 @@ class CbSubscriber(Isubscriber):
                 "subscriptionId": subscriptionId
             })
             response_body = self._sendRequest(url, disconnect_json)
-            if int(response_body["statusCode"]["code"]) >= 400:
-                Log("ERROR", "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId))
-                Log("ERROR", response_body["statusCode"]["reasonPhrase"])
-                Log("INFO", "\n")
-            else:
-                Log("INFO", "Disconnected subscription {} from Context Broker ".format(subscriptionId))
+            if response_body != None:
+                if int(response_body["statusCode"]["code"]) >= 400:
+                    Log("ERROR", "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId))
+                    Log("ERROR", response_body["statusCode"]["reasonPhrase"])
+                    Log("INFO", "\n")
+                else:
+                    Log("INFO", "Disconnected subscription {} from Context Broker ".format(subscriptionId))
 
             Log("INFO", "Deleting entity")
             self.deleteEntity(subscription["namespace"], subscription["data_type"])
@@ -83,14 +85,15 @@ class CbSubscriber(Isubscriber):
             url = "http://{}:{}/{}/contextSubscriptions/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"], subscription["id"])
             subscriber_json = json.dumps(subscriber_dict)
             response_body = self._sendRequest(url, subscriber_json, 'PUT')
-            if "subscribeError" in response_body:
-                Log("ERROR", "Error Refreshing subscription")
-                Log("ERROR", response_body["subscribeError"]["errorCode"]["details"])
-            elif "orionError" in response_body:
-                Log("ERROR", "Error Refreshing subscription")
-                Log("ERROR", response_body["orionError"]["details"])
-            else:
-                Log("INFO", "Refreshed Connection to Context Broker with id {}".format(subscription["id"]))
+            if response_body != None:
+                if "subscribeError" in response_body:
+                    Log("ERROR", "Error Refreshing subscription")
+                    Log("ERROR", response_body["subscribeError"]["errorCode"]["details"])
+                elif "orionError" in response_body:
+                    Log("ERROR", "Error Refreshing subscription")
+                    Log("ERROR", response_body["orionError"]["details"])
+                else:
+                    Log("INFO", "Refreshed Connection to Context Broker with id {}".format(subscription["id"]))
 
     def parseData(self, data):
         return json.loads(data.replace(SEPARATOR_CHAR, '"'))
@@ -109,14 +112,15 @@ class CbSubscriber(Isubscriber):
         })
         url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         response_body = self._sendRequest(url, operation_json)
-        if "errorCode" in response_body:
-            Log("ERROR", "Error deleting entity")
-            Log("ERROR", response_body["errorCode"]["details"])
-        elif "orionError" in response_body:
-            Log("ERROR", "Error deleting entity")
-            Log("ERROR", response_body["orionError"]["details"])
-        else:
-            Log("INFO", "Deleted entity " + namespace)
+        if response_body != None:
+            if "errorCode" in response_body:
+                Log("ERROR", "Error deleting entity")
+                Log("ERROR", response_body["errorCode"]["details"])
+            elif "orionError" in response_body:
+                Log("ERROR", "Error deleting entity")
+                Log("ERROR", response_body["orionError"]["details"])
+            else:
+                Log("INFO", "Deleted entity " + namespace)
 
         deleteContext(namespace, True)
 
@@ -153,11 +157,15 @@ class CbSubscriber(Isubscriber):
             self.refreshSubscriptions()
 
     def _sendRequest(self, url, data, method=None):
-        request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-        if method is not None:
-            request.get_method = lambda: method
-        response = urllib2.urlopen(request)
-        response_body = json.loads(response.read())
-        response.close()
-        return response_body
+        try:
+            request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+            if method is not None:
+                request.get_method = lambda: method
+            response = urllib2.urlopen(request)
+            response_body = json.loads(response.read())
+            response.close()
+            return response_body
+        except Exception as ex:
+            Log("ERROR", ex.reason)
+            return None
 

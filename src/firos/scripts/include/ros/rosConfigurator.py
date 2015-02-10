@@ -24,7 +24,6 @@ class RosConfigurator:
     def setRobot(_robots, topic, t_type, pubsub, whiteList):
         global ROBO_TOPIC_REG
         global robots
-        print topic
         matching = re.search(regex, topic)
         robot_topic = matching.group(2)
         if robot_topic != '':
@@ -124,7 +123,6 @@ def _getWhiteList():
         whiteregex = whiteregex[:-1]
         whiteregex += "$"
         whiteregex = ur'^' + whiteregex
-        print whiteregex
         return whiteregex
     except:
         return None
