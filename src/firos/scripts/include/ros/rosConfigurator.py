@@ -117,14 +117,13 @@ def _getWhiteList():
         current_path = os.path.dirname(os.path.abspath(__file__))
         json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
         data = json.load(open(json_path))
-        whiteregex = ur'^'
+        whiteregex = ur''
         for robot_name in data:
             for topic in data[robot_name]:
                 whiteregex += '(/' + robot_name + '/' + topic + ')|'
-        if len(whiteregex) > 1:
-            whiteregex = whiteregex[:-1]
+        whiteregex = whiteregex[:-1]
         whiteregex += "$"
-        whiteregex = ur'' + whiteregex
+        whiteregex = ur'^' + whiteregex
         print whiteregex
         return whiteregex
     except:
