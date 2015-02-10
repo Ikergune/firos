@@ -101,11 +101,16 @@ def _callback(data, args):
 def _robotDisconnection(data):
     robot_name = data.data
     Log("INFO", "Disconnected robot: " + robot_name)
-    CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
-    CloudSubscriber.disconnect(robot_name, True)
+    if robot_name in ROBOT_TOPICS:
+        CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
+        CloudSubscriber.disconnect(robot_name, True)
+        for topic in ROBOT_TOPICS[robot_name]["publisher"]:
+            ROBOT_TOPICS[robot_name]["publisher"][topic]["publisher"].unregister()
+        for topic in ROBOT_TOPICS[robot_name]["subscriber"]:
+            ROBOT_TOPICS[robot_name]["subscriber"][topic]["subscriber"].unregister()
+        RosConfigurator.removeRobot(robot_name)
 
 def _robotConnection(data):
     robot_name = data.data
     Log("INFO", "Connected robot: " + robot_name)
     loadMsgHandlers(RosConfigurator.systemTopics(True))
-    # CloudSubscriber.subscribe(robot_name, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName]["publisher"].keys())

@@ -118,6 +118,8 @@ class CbSubscriber(Isubscriber):
         else:
             Log("INFO", "Deleted entity " + namespace)
 
+        deleteContext(namespace, True)
+
 
     def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[], subscriptionId=None):
         data = {

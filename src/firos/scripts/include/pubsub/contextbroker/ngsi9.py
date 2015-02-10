@@ -62,19 +62,20 @@ def deleteAllContexts():
         deleteContext(key)
 
 def deleteContext(entity_id, delete=False):
-    url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
-    data = {
-        "contextRegistrations": [
-            {
-                "providingApplication": "http://{}:{}/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
-            }
-        ],
-        "duration": "P0D",
-        "registrationId": contexts[entity_id]["registrationId"]
-    }
-    response = _sendRequest(url, json.dumps(data))
-    if delete:
-        del contexts[entity_id]
+    if entity_id in contexts:
+        url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+        data = {
+            "contextRegistrations": [
+                {
+                    "providingApplication": "http://{}:{}/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+                }
+            ],
+            "duration": "P0D",
+            "registrationId": contexts[entity_id]["registrationId"]
+        }
+        response = _sendRequest(url, json.dumps(data))
+        if delete:
+            del contexts[entity_id]
 
 def refreshAllContexts():
     for key in contexts:

@@ -49,6 +49,14 @@ class RosConfigurator:
                         "type": pubsub
                     })
 
+
+    @staticmethod
+    def removeRobot(robot_name):
+        global robots
+        if robot_name in robots:
+            del robots[robot_name]
+            del ROBO_TOPIC_REG[robot_name]
+
     @staticmethod
     def systemTopics(refresh=False):
         global robots
@@ -89,7 +97,6 @@ class RosConfigurator:
 
             except socket.error:
                 raise rostopic.ROSTopicIOException("Unable to communicate with master!")
-
             return _robots
         else:
             return robots
@@ -114,9 +121,11 @@ def _getWhiteList():
         for robot_name in data:
             for topic in data[robot_name]:
                 whiteregex += '(/' + robot_name + '/' + topic + ')|'
-        whiteregex = whiteregex[:-1]
+        if len(whiteregex) > 1:
+            whiteregex = whiteregex[:-1]
         whiteregex += "$"
         whiteregex = ur'' + whiteregex
+        print whiteregex
         return whiteregex
     except:
         return None
