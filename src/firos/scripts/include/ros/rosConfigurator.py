@@ -24,11 +24,12 @@ class RosConfigurator:
     def setRobot(_robots, topic, t_type, pubsub, whiteList):
         global ROBO_TOPIC_REG
         global robots
+        print topic
         matching = re.search(regex, topic)
         robot_topic = matching.group(2)
         if robot_topic != '':
             robot_name = matching.group(1)
-            if (whiteList is not None and robot_name in whiteList and robot_topic in whiteList[robot_name]) or (whiteList is None):
+            if (whiteList is not None and re.search(whiteList, topic) is not None) or (whiteList is None):
                 if robot_name not in ROBO_TOPIC_REG:
                     ROBO_TOPIC_REG[robot_name] = {"topics": []}
                 if robot_name not in _robots:
@@ -108,6 +109,14 @@ def _getWhiteList():
     try:
         current_path = os.path.dirname(os.path.abspath(__file__))
         json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
-        return json.load(open(json_path))
+        data = json.load(open(json_path))
+        whiteregex = ur'^'
+        for robot_name in data:
+            for topic in data[robot_name]:
+                whiteregex += '(/' + robot_name + '/' + topic + ')|'
+        whiteregex = whiteregex[:-1]
+        whiteregex += "$"
+        whiteregex = ur'' + whiteregex
+        return whiteregex
     except:
         return None
