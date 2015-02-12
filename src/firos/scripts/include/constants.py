@@ -22,6 +22,17 @@ if not configured:
 environment = ENVIRONMENT
 
 CONFIGURATIONS = {
+    "mobile": {
+        "SERVER": {
+            "ADDRESS" : "0.0.0.0",
+            "PORT"    : 10100
+        },
+        "CONTEXTBROKER": {
+            "ADDRESS": "192.168.43.159",
+            "PORT"    : 1026,
+            "PROTOCOL": "NGSI10"
+        }
+    },
     "local": {
         "SERVER": {
             "ADDRESS" : "0.0.0.0",

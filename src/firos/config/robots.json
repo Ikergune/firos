@@ -1,53 +1,5 @@
 {
-    "cmd_vel_mux":{
-        "topics": [
-            {
-                "name": "input/teleop",
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            }
-        ]
-    },"move_base":{
-        "topics": [
-            {
-                "name": "goal",
-                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
-                "type": "publisher"
-            }
-        ]
-    },
-    "myrobot": {
-        "topics": [
-            {
-                "name": "cmd_vel",
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            },{
-                "name": "talk",
-                "msg": "std_msgs.msg.String",
-                "type": "publisher"
-            },{
-                "name": "goal",
-                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
-                "type": "publisher"
-            },{
-                "name": "pose3",
-                "msg": "turtlesim.msg.Pose",
-                "type": "subscriber"
-            },{
-                "name": "pose2",
-                "msg": {
-                    "x_pose": "int32",
-                    "y_pose": "int32"
-                },
-                "type": "subscriber"
-            },{
-                "name": "result",
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "subscriber"
-            }
-        ]
-    },"robot1":{
+    "robot2":{
         "topics": [
             {
                 "name": "cmd_vel_mux/input/teleop",
@@ -55,7 +7,7 @@
                 "type": "publisher"
             },
             {
-                "name": "action",
+                "name": "cmd_serial",
                 "msg": "std_msgs.msg.String",
                 "type": "publisher"
             },
@@ -63,6 +15,11 @@
                 "name": "move_base/goal",
                 "msg": "move_base_msgs.msg.MoveBaseActionGoal",
                 "type": "publisher"
+            },
+            {
+                "name": "move_base/result",
+                "msg": "move_base_msgs.msg.MoveBaseActionResult",
+                "type": "subscriber"
             }
         ]
     }
