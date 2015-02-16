@@ -21,6 +21,10 @@ from include.logger import Log
 from include.server.requestHandler import RequestHandler
 
 class FirosServer:
+    ## \brief FIROS http server
+    # \param self
+    # \param ip address
+    # \param port to listen to
     def __init__(self, address="127.0.0.1", port=8000):
         self.address = address
         self.port = port
@@ -34,10 +38,14 @@ class FirosServer:
         self.httpd = HTTPServer(server_address, RequestHandler)
 
     def start(self):
+        ## \brief start FIROS http server
+        # \param self
         sa = self.httpd.socket.getsockname()
         Log("INFO", "\nServing HTTP on", sa[0], "port", sa[1], "...")
         while not self.stopped:
             self.httpd.handle_request()
 
     def close(self):
+        ## \brief stop FIROS http server
+        # \param self
         self.stopped = True

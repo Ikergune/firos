@@ -55,6 +55,9 @@ else:
 
 
 def Log(level, *args):
+    ## \brief Logging function
+    # \param Log Level (INFO, DEBUG, WARNING, ERROR, CRITICAL)
+    # \param Logging data
     if PRIORITIES[level] >= _levelId:
         text = ""
         for arg in args:

@@ -32,7 +32,10 @@ CloudQueryBulder = QueryBuilderFactory.create()
 TOPIC_TIMESTAMPS = {}
 
 class RequestHandler(BaseHTTPRequestHandler):
+    ## \brief FIROS http request handler
     def do_GET(self):
+        ## \brief GET request handler
+        # \param self
         path = urlparse("http://localhost" + self.path).path
         action = getAction(path, "GET")
         if action is not None:
@@ -45,6 +48,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         return
 
     def do_POST(self):
+        ## \brief POST request handler
+        # \param self
         path = urlparse("http://localhost" + self.path).path
         action = getAction(path, "POST")
         if action is not None:
@@ -57,12 +62,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         return
 
 def pathParams(request, regexp):
+    ## \brief Get url path params
+    # \param client request to parse
+    # \param regexp to use
     return list(re.match(regexp, urlparse("http://localhost" + request.path).path).groups())
 
 def getParams(request):
+    ## \brief GET requests' param parser
+    # \param client request
     return parse_qs(urlparse("http://localhost" + request.path).query)
 
 def postParams(request):
+    ## \brief POST requests' param parser
+    # \param client request
     ctype, pdict = cgi.parse_header(request.headers.getheader('content-type'))
     if ctype == 'multipart/form-data':
         return cgi.parse_multipart(request.rfile, pdict)
@@ -76,6 +88,9 @@ def postParams(request):
         return {}
 
 def getAction(path, method):
+    ## \brief URL checker to find what action to execute
+    # \param url string
+    # \param HTTP method
     for route in MAPPER[method]:
         if re.search(route['regexp'], path):
             return route
@@ -88,6 +103,9 @@ def getAction(path, method):
 ###############################################################################
 
 def onTopic(request, action):
+    ## \brief Handle topic reception
+    # \param client request
+    # \param action
     try:
         contexts = postParams(request)
         contexts = contexts['contextResponses']
@@ -116,6 +134,9 @@ def onTopic(request, action):
     request.wfile.write("Received by firos")
 
 def onRobots(request, action):
+    ## \brief Handle robot list request
+    # \param client request
+    # \param action
     robots = getRobots(False, True)
     data = []
     for robot_name in robots.keys():
@@ -141,6 +162,9 @@ def onRobots(request, action):
     request.wfile.write(json.dumps(data))
 
 def onRobotData(request, action):
+    ## \brief Handle robot info request
+    # \param client request
+    # \param action
     robot_name = pathParams(request, action["regexp"])[0]
     data = CloudQueryBulder.findById(robot_name, "ROBOT", True)
     if "errorCode" in data:
@@ -175,6 +199,8 @@ MAPPER = {
 }
 
 def setCors(request):
+    # \brief Set CORS headers in request
+    # \param client request
     request.send_header("Access-Control-Allow-Credentials", True);
     request.send_header("Access-Control-Allow-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time");
     request.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");

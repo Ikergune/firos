@@ -24,6 +24,8 @@ regex = re.compile(ur'^(.*)(\b.msg\b)(.*)$')
 class LibLoader:
     @staticmethod
     def loadFromFile(filepath):
+        ## \brief Load file from path
+        # \param File path
         mod_name,file_ext = os.path.splitext(os.path.split(filepath)[-1])
 
         if file_ext.lower() == '.py':
@@ -36,11 +38,16 @@ class LibLoader:
 
     @staticmethod
     def load3rdParty(filepath, className):
+        ## \brief Load class from file
+        # \param File path
+        # \param Class name
         module = LibLoader.loadFromFile(filepath)
         return getattr(module, className)
 
     @staticmethod
     def loadFromSystem(lib):
+        ## \brief Load library
+        # \param library name
         module = None
         matches = re.search(regex, lib)
         if matches is not None:

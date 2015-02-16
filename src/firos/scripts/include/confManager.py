@@ -23,6 +23,9 @@ from include.logger import Log
 from include.ros.rosConfigurator import RosConfigurator
 
 def getRobots(refresh=False, withJson=True):
+    ## \brief Get robots managed by firos
+    # \param Refresh the robot list
+    # \param Merge the robots with the configurtation JSON
     try:
         robots = copy.deepcopy(RosConfigurator.systemTopics(refresh))
         if withJson:
@@ -53,6 +56,7 @@ def getRobots(refresh=False, withJson=True):
 
 
 def getRobotsByJson():
+    ## \brief Get robots in the JSON file
     try:
         current_path = os.path.dirname(os.path.abspath(__file__))
         json_path = current_path.replace("scripts/include", "config/robots.json")
