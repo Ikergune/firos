@@ -28,9 +28,13 @@ robots = {}
 ROBO_TOPIC_REG = {}
 
 class RosConfigurator:
+    ## \brief Tool to get Ros data from system
 
     @staticmethod
     def topic_type(t, topic_types):
+        ## \brief Get topic's data type
+        # \param topic
+        # \param topic types
         matches = [t_type for t_name, t_type in topic_types if t_name == t]
         if matches:
             return matches[0].replace("msgs/", "msgs.msg.").replace("/", ".msg.")
@@ -38,6 +42,12 @@ class RosConfigurator:
 
     @staticmethod
     def setRobot(_robots, topic, t_type, pubsub, whiteList):
+        ## \brief Set robot in robot container based on whitelist and topic lifecycle
+        # \param local robot dictionary
+        # \param topic name
+        # \param topic type
+        # \param publisher/subscriber action
+        # \param whitelist regular expresion
         global ROBO_TOPIC_REG
         global robots
         matching = re.search(regex, topic)
@@ -67,6 +77,8 @@ class RosConfigurator:
 
     @staticmethod
     def removeRobot(robot_name):
+        ## \brief Remove robot from list
+        # \param robot name
         global robots
         if robot_name in robots:
             del robots[robot_name]
@@ -74,6 +86,8 @@ class RosConfigurator:
 
     @staticmethod
     def systemTopics(refresh=False):
+        ## \brief Get existing topics and return in a map grouped by namespace
+        # \param refresh list
         global robots
         if refresh:
             existing_topics = {

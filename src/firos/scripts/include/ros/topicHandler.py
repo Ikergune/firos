@@ -41,6 +41,8 @@ robot_data   = {}
 subscribers  = []
 
 def loadMsgHandlers(robot_data):
+    ## \brief Load ROS publishers/subscribers based on robot data
+    # \param robot data
     Log("INFO", "Getting configuration data")
     Log("INFO", "Generating topic handlers:")
     for robotName in robot_data:
@@ -81,12 +83,17 @@ def loadMsgHandlers(robot_data):
         Log("INFO", "Subscribed to " + robotName  + "'s topics\n")
 
 def connectionListeners():
+    ## \brief Create firos listeners for robot creation or removal
     subscribers.append(rospy.Subscriber("firos/disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber("firos/connect", std_msgs.msg.String, _robotConnection))
 
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
+        ## \brief Publish data to ROS
+        # \param robot name
+        # \param topic name
+        # \param data to publish
         if robot in ROBOT_TOPICS and topic in ROBOT_TOPICS[robot]["publisher"]:
             instance = ROBOT_TOPICS[robot]["publisher"][topic]
             msg = instance["class"]()
@@ -96,6 +103,7 @@ class TopicHandler:
 
     @staticmethod
     def unregisterAll():
+        ## \brief Unregister from all ROS topics
         CloudSubscriber.disconnectAll()
         Log("INFO", "Unsubscribing topics...")
         for subscriber in subscribers:
@@ -106,6 +114,9 @@ class TopicHandler:
         Log("INFO", "Unsubscribed topics\n")
 
 def _callback(data, args):
+    ## \brief Callback to handle ROS published data and send it to Context Broker
+    # \param data
+    # \param extra arguments
     robot = str(args['robot'])
     topic = str(args['topic'])
     datatype = "NotYet"
@@ -115,6 +126,8 @@ def _callback(data, args):
     CloudPublisher.publish(robot, contextType, content)
 
 def _robotDisconnection(data):
+    ## \brief Handle robot diconnection
+    # \param robot data dict (name)
     robot_name = data.data
     Log("INFO", "Disconnected robot: " + robot_name)
     if robot_name in ROBOT_TOPICS:
@@ -127,6 +140,8 @@ def _robotDisconnection(data):
         RosConfigurator.removeRobot(robot_name)
 
 def _robotConnection(data):
+    ## \brief Handle robot connection
+    # \param robot data (Not neccessary)
     robot_name = data.data
     Log("INFO", "Connected robot: " + robot_name)
     loadMsgHandlers(RosConfigurator.systemTopics(True))

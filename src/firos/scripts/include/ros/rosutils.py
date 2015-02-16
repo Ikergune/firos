@@ -15,6 +15,8 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 def ros2Obj(msgInstance):
+    ## \brief Map a Ros Object to dict
+    # \param Ros Object instance
     obj = {}
     for key in msgInstance.__slots__:
         attr = getattr(msgInstance, key)
@@ -25,6 +27,9 @@ def ros2Obj(msgInstance):
     return obj
 
 def obj2Ros(obj, msgInstance):
+    ## \brief Map a dict to Ros Object
+    # \param dictionary
+    # \param Ros Object instance
     if hasattr(msgInstance, '__slots__'):
         for key in msgInstance.__slots__:
             if key in obj:
@@ -36,6 +41,8 @@ def obj2Ros(obj, msgInstance):
     return msgInstance
 
 def ros2Definition(msgInstance):
+    ## \brief Generate Ros object definition
+    # \param ROS Object instance
     obj = {}
     index = 0
     for key in msgInstance.__slots__:
