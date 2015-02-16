@@ -66,7 +66,7 @@ CONFIGURATIONS = {
             "PORT"    : 10100
         },
         "CONTEXTBROKER": {
-            "ADDRESS" : "130.206.127.115",
+            "ADDRESS" : "130.206.156.190",
             "PORT"    : 1026,
             "PROTOCOL": "NGSI10"
         }
@@ -77,7 +77,7 @@ CONFIGURATIONS = {
             "PORT"    : 10100
         },
         "CONTEXTBROKER": {
-            "ADDRESS" : "130.206.127.115",
+            "ADDRESS" : "130.206.156.190",
             "PORT"    : 1026,
             "PROTOCOL": "NGSI10"
         }
