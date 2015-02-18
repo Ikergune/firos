@@ -54,8 +54,9 @@ def loadMsgHandlers(robot_data):
                 "subscriber": {}
             }
         Log("INFO", "  -" + robotName)
-        for topic in robot['topics']:
-            topicName = str(topic['name'])
+        for topicName in robot['topics']:
+            topic = robot['topics'][topicName]
+            topicName = str(topicName)
             Log("INFO", "    -" + topicName)
             extra = {"robot": robotName, "topic": topicName}
             if type(topic['msg']) is dict:
@@ -70,11 +71,13 @@ def loadMsgHandlers(robot_data):
                 extra["type"] = str(topic['msg'])
             if topic["type"].lower() == "publisher":
                 ROBOT_TOPICS[robotName]["publisher"][topicName] = {
+                    "msg": str(topic['msg']),
                     "class": theclass,
                     "publisher": rospy.Publisher(robotName + "/" + topicName, theclass, queue_size=DEFAULT_QUEUE_SIZE)
                 }
             elif topic["type"].lower() == "subscriber":
                 ROBOT_TOPICS[robotName]["subscriber"][topicName] = {
+                    "msg": str(topic['msg']),
                     "class": theclass,
                     "subscriber": rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra)
                 }
@@ -119,7 +122,7 @@ def _callback(data, args):
     # \param extra arguments
     robot = str(args['robot'])
     topic = str(args['topic'])
-    datatype = "NotYet"
+    datatype = ROBOT_TOPICS[robot]["subscriber"][topic]["msg"]
     contextType = DEFAULT_CONTEXT_TYPE
     content = []
     content.append(CloudPublisher.createContent(topic, datatype,ros2Obj(data)))

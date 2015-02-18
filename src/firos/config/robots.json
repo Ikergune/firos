@@ -1,26 +1,22 @@
 {
-    "robot2":{
-        "topics": [
-            {
-                "name": "cmd_vel_mux/input/teleop",
+    "robotjjj":{
+        "topics": {
+            "cmd_vel_mux/input/teleop": {
                 "msg": "geometry_msgs.msg.Twist",
                 "type": "publisher"
             },
-            {
-                "name": "cmd_serial",
+            "cmd_serial": {
                 "msg": "std_msgs.msg.String",
                 "type": "publisher"
             },
-            {
-                "name": "move_base/goal",
+            "move_base/goal": {
                 "msg": "move_base_msgs.msg.MoveBaseActionGoal",
                 "type": "publisher"
             },
-            {
-                "name": "move_base/result",
+            "move_base/result": {
                 "msg": "move_base_msgs.msg.MoveBaseActionResult",
                 "type": "subscriber"
             }
-        ]
+        }
     }
 }

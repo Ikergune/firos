@@ -142,9 +142,10 @@ def onRobots(request, action):
     for robot_name in robots.keys():
         robot_data = {"name": robot_name, "topics": []}
         robot = robots[robot_name]
-        for topic in robot["topics"]:
+        for topic_name in robot["topics"]:
+            topic = robot["topics"][topic_name]
             topic_data = {
-                "name": topic["name"],
+                "name": topic_name,
                 "pubsub": topic["type"]
             }
             if type(topic["msg"]) is dict:
@@ -152,7 +153,7 @@ def onRobots(request, action):
                 topic_data["structure"] = topic["msg"]
             else:
                 topic_data["type"] = topic["msg"]
-                topic_data["structure"] = ros2Definition(ROBOT_TOPICS[robot_name][topic["type"]][topic["name"]]["class"]())
+                topic_data["structure"] = ros2Definition(ROBOT_TOPICS[robot_name][topic["type"]][topic_name]["class"]())
             robot_data["topics"].append(topic_data)
         data.append(robot_data)
     request.send_response(200)

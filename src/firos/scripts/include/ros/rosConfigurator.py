@@ -63,26 +63,24 @@ class RosConfigurator:
                     CURRENT_TOPIC_REG[robot_name] = {"topics": []}
 
                 if robot_name not in _robots:
-                    _robots[robot_name] = {"topics": []}
+                    _robots[robot_name] = {"topics": {}}
 
-                if robot_topic not in CURRENT_TOPIC_REG[robot_name]["topics"]:
+                if robot_topic not in _robots[robot_name]["topics"]:
                     CURRENT_TOPIC_REG[robot_name]["topics"].append(robot_topic)
-                    _robots[robot_name]["topics"].append({
-                        "name": robot_topic,
+                    _robots[robot_name]["topics"][robot_topic] = {
                         "msg": t_type,
                         "type": pubsub
-                    })
+                    }
 
 
                 if robot_name not in robots:
-                    robots[robot_name] = {"topics": []}
-                if robot_topic not in ROBO_TOPIC_REG[robot_name]["topics"]:
+                    robots[robot_name] = {"topics": {}}
+                if robot_topic not in robots[robot_name]["topics"]:
                     ROBO_TOPIC_REG[robot_name]["topics"].append(robot_topic)
-                    robots[robot_name]["topics"].append({
-                        "name": robot_topic,
+                    robots[robot_name]["topics"][robot_topic] = {
                         "msg": t_type,
                         "type": pubsub
-                    })
+                    }
 
 
     @staticmethod

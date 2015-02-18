@@ -34,18 +34,15 @@ def getRobots(refresh=False, withJson=True):
                 robot_name = str(robot_name)
                 if robot_name not in robots:
                     robots[robot_name] = {
-                        "topics": []
+                        "topics": {}
                     }
-                for topic in robots_json[robot_name]["topics"]:
-                    for i, v in enumerate(robots[robot_name]["topics"]):
-                        if topic["name"] == v["name"]:
-                            del robots[robot_name]["topics"][i]
-                            break
-                    robots[robot_name]["topics"].append({
-                        "name"      : str(topic["name"]),
+                for topic_name in robots_json[robot_name]["topics"]:
+                    topic = robots_json[robot_name]["topics"][topic_name]
+
+                    robots[robot_name]["topics"][str(topic_name)] = {
                         "msg"       : str(topic["msg"]) if type(topic["msg"]) is str else topic["msg"],
                         "type"      : str(topic["type"])
-                    })
+                    }
         return robots
 
     except Exception as e:
