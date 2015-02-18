@@ -27,6 +27,8 @@ regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
 robots = {}
 ROBO_TOPIC_REG = {}
 
+CURRENT_TOPIC_REG = {}
+
 class RosConfigurator:
     ## \brief Tool to get Ros data from system
 
@@ -41,7 +43,7 @@ class RosConfigurator:
         return 'unknown type'
 
     @staticmethod
-    def setRobot(_robots, topic, t_type, pubsub, whiteList):
+    def setRobot(_robots, topic, t_type, pubsub, whiteLists):
         ## \brief Set robot in robot container based on whitelist and topic lifecycle
         # \param local robot dictionary
         # \param topic name
@@ -54,16 +56,24 @@ class RosConfigurator:
         robot_topic = matching.group(2)
         if robot_topic != '':
             robot_name = matching.group(1)
-            if (whiteList is not None and re.search(whiteList, topic) is not None) or (whiteList is None):
+            if (whiteLists[pubsub] is not None and re.search(whiteLists[pubsub], topic) is not None) or (whiteLists[pubsub] is None):
                 if robot_name not in ROBO_TOPIC_REG:
                     ROBO_TOPIC_REG[robot_name] = {"topics": []}
+                if robot_name not in CURRENT_TOPIC_REG:
+                    CURRENT_TOPIC_REG[robot_name] = {"topics": []}
+
                 if robot_name not in _robots:
                     _robots[robot_name] = {"topics": []}
-                _robots[robot_name]["topics"].append({
-                    "name": robot_topic,
-                    "msg": t_type,
-                    "type": pubsub
-                })
+
+                if robot_topic not in CURRENT_TOPIC_REG[robot_name]["topics"]:
+                    CURRENT_TOPIC_REG[robot_name]["topics"].append(robot_topic)
+                    _robots[robot_name]["topics"].append({
+                        "name": robot_topic,
+                        "msg": t_type,
+                        "type": pubsub
+                    })
+
+
                 if robot_name not in robots:
                     robots[robot_name] = {"topics": []}
                 if robot_topic not in ROBO_TOPIC_REG[robot_name]["topics"]:
@@ -89,12 +99,14 @@ class RosConfigurator:
         ## \brief Get existing topics and return in a map grouped by namespace
         # \param refresh list
         global robots
+        global CURRENT_TOPIC_REG
+        CURRENT_TOPIC_REG = {}
         if refresh:
             existing_topics = {
                 "publisher": {},
                 "subscriber": {}
             }
-            whiteList = _getWhiteList()
+            whiteLists = _getWhiteLists()
             _robots = {}
             master = rosgraph.Master('/rostopic')
             try:
@@ -114,7 +126,8 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(_robots, t,_type, "subscriber", whiteList)
+                        RosConfigurator.setRobot(_robots, t,_type, "subscriber", whiteLists)
+                        RosConfigurator.setRobot(_robots, t,_type, "publisher", whiteLists)
 
                 # ROS subscriber --> firos publishes data to them
                 for t, l in subs:
@@ -122,10 +135,17 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(_robots, t,_type, "publisher", whiteList)
+                        RosConfigurator.setRobot(_robots, t,_type, "publisher", whiteLists)
+                        RosConfigurator.setRobot(_robots, t,_type, "subscriber", whiteLists)
 
             except socket.error:
                 raise rostopic.ROSTopicIOException("Unable to communicate with master!")
+
+            print "\n\nrobots\n\n"
+            print robots
+            print "\n\nrobots2\n\n"
+            print _robots
+
             return _robots
         else:
             return robots
@@ -141,14 +161,20 @@ def _isInFiros(topic_name, list2Check,nodes):
 
     return using
 
-def _getWhiteList():
+def _getWhiteLists():
+    return {
+        "publisher": _getWhiteList("publisher"),
+        "subscriber": _getWhiteList("subscriber")
+    }
+
+def _getWhiteList(pubsub):
     try:
         current_path = os.path.dirname(os.path.abspath(__file__))
         json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
         data = json.load(open(json_path))
         whiteregex = ur''
         for robot_name in data:
-            for topic in data[robot_name]:
+            for topic in data[robot_name][pubsub]:
                 whiteregex += '(/' + robot_name + '/' + topic + ')|'
         whiteregex = whiteregex[:-1]
         whiteregex += "$"

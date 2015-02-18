@@ -1,6 +1,10 @@
 {
-    "turtle\\w+": [
-        "cmd_vel",
-        "pose"
-    ]
+    "turtle\\w+": {
+        "publisher": ["cmd_vel"],
+        "subscriber": ["pose"]
+    },
+    "robot\\w+": {
+        "publisher": ["cmd_vel.*teleop", ".*move_base/goal"],
+        "subscriber": [".*move_base/result"]
+    }
 }

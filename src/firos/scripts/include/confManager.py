@@ -46,7 +46,6 @@ def getRobots(refresh=False, withJson=True):
                         "msg"       : str(topic["msg"]) if type(topic["msg"]) is str else topic["msg"],
                         "type"      : str(topic["type"])
                     })
-
         return robots
 
     except Exception as e:
