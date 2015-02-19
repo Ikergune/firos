@@ -24,6 +24,7 @@ import rosgraph
 from include.constants import NODE_NAME
 
 regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
+substitution_regex = re.compile(ur'^([\/\-\w]*)\/([\w]+)$')
 robots = {}
 ROBO_TOPIC_REG = {}
 
@@ -39,7 +40,12 @@ class RosConfigurator:
         # \param topic types
         matches = [t_type for t_name, t_type in topic_types if t_name == t]
         if matches:
-            return matches[0].replace("msgs/", "msgs.msg.").replace("/", ".msg.")
+            text = re.search(substitution_regex, str(matches[0]))
+            if text is not None:
+                return str(text.group(1)) + ".msg." + str(text.group(2))
+            else:
+                return matches[0].replace("msgs/", "msgs.msg.").replace("/", ".msg.")
+
         return 'unknown type'
 
     @staticmethod
@@ -49,7 +55,7 @@ class RosConfigurator:
         # \param topic name
         # \param topic type
         # \param publisher/subscriber action
-        # \param whitelist regular expresion
+        # \param whitelist regular expresions
         global ROBO_TOPIC_REG
         global robots
         matching = re.search(regex, topic)

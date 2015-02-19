@@ -4,7 +4,7 @@
         "subscriber": ["pose"]
     },
     "robot\\w+": {
-        "publisher": ["cmd_vel.*teleop", ".*move_base/goal"],
+        "publisher": ["cmd_vel.*teleop", ".*move_base/goal", ".*move_base/cancel"],
         "subscriber": [".*move_base/result"]
     }
 }
