@@ -6,5 +6,9 @@
     "robot\\w+": {
         "publisher": ["cmd_vel.*teleop", ".*move_base/goal", ".*move_base/cancel"],
         "subscriber": [".*move_base/result"]
+    },
+    "\\w+bot\\w*": {
+        "publisher": [".*cmd_vel.*", ".*move_base/goal.*"],
+        "subscriber": []
     }
 }
