@@ -29,7 +29,12 @@ contexts = {}
 Publisher = CbPublisher()
 
 
-def registerContext(entity_id, data_type, robot,  isPattern=False):
+def registerContext(entity_id, data_type, robot, isPattern=False):
+    ## \brief Register context in NGSI9
+    # \param entity name
+    # \param entity type
+    # \param robot object (with topics)
+    # \param if entity name is pattern (default false)
     url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
     attributes = topics2NGSI9(robot)
     current_path = os.path.dirname(os.path.abspath(__file__))
@@ -76,10 +81,14 @@ def registerContext(entity_id, data_type, robot,  isPattern=False):
                 }])
 
 def deleteAllContexts():
+    ## \brief Delete all contexts from NGSI9
     for key in contexts:
         deleteContext(key)
 
 def deleteContext(entity_id, delete=False):
+    ## \brief Delete context from NGSI9
+    # \param entity name
+    # \param if context must be deleted locally (default false)
     if entity_id in contexts:
         url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
         data = {
@@ -96,19 +105,27 @@ def deleteContext(entity_id, delete=False):
             del contexts[entity_id]
 
 def refreshAllContexts():
+    ## \brief Refresh exisiting NGSI9 contexts on context broker
     for key in contexts:
         refreshContext(key)
 
 def refreshContext(entity_id):
+    ## \brief Refresh exisiting NGSI9 context on context broker
+    # \param entity name
     url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
     data = copy.deepcopy(contexts[entity_id]["data"])
     data["registrationId"] = contexts[entity_id]["registrationId"]
     response = _sendRequest(url, json.dumps(data))
 
 def topics2NGSI9(robot):
+    ## \brief Robot topics to NGSI9 transcoder
+    # \param robot
     return iterateTopics(robot["publisher"], "publisher") + iterateTopics(robot["subscriber"], "subscriber")
 
 def iterateTopics(topics, topic_type):
+    ## \brief Topic iterator
+    # \param topics
+    # \param topic type
     elems = []
     for key in topics:
         elems.append( {
@@ -120,6 +137,10 @@ def iterateTopics(topics, topic_type):
 
 
 def _sendRequest(url, data, method=None):
+    ## \brief Send request to context broker
+    # \param url to request to
+    # \param data to send
+    # \param HTTP method (GET by default)
     try:
         request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
         if method is not None:

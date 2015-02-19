@@ -34,10 +34,15 @@ else:
     IP = netifaces.ifaddresses(INTERFACE)[2][0]['addr']
 
 class CbSubscriber(Isubscriber):
+    ## \brief Context broker subscription handler
     subscriptions = {}
     refresh_thread = None
 
     def subscribe(self, namespace, data_type, robot):
+        ## \brief Subscribe to entities' changes
+        # \param entity name
+        # \param entity type
+        # \param robot object
         if namespace not in self.subscriptions:
             registerContext(namespace, data_type, robot)
             topics = robot["publisher"].keys()
@@ -63,6 +68,9 @@ class CbSubscriber(Isubscriber):
                 self.refresh_thread = thread.start_new_thread( self._refreshSubscriptions, ("CBSub-Refresh", 2, ) )
 
     def disconnect(self, namespace, delete=False):
+        ## \brief Delete subscription by namespace
+        # \param entity name
+        # \param flag to indicate if the subscription must be deleted locally (False by default)
         if namespace in self.subscriptions:
             deleteContext(namespace, True)
             subscription = self.subscriptions[namespace]
@@ -88,11 +96,13 @@ class CbSubscriber(Isubscriber):
                 del self.subscriptions[namespace]
 
     def disconnectAll(self):
+        ## \brief Delete all subscriptions
         deleteAllContexts()
         for subscription in self.subscriptions:
             self.disconnect(subscription)
 
     def refreshSubscriptions(self):
+        ## \brief Refresh exisiting subscriptions on context broker
         refreshAllContexts()
         for subscription in self.subscriptions.values():
             subscriber_dict = self._generateSubscription(subscription["namespace"], subscription["data_type"], subscription["topics"], subscription["id"])
@@ -112,9 +122,14 @@ class CbSubscriber(Isubscriber):
                     Log("INFO", "Refreshed Connection to Context Broker with id {}".format(subscription["id"]))
 
     def parseData(self, data):
+        ## \brief Parse the received data
+        # \param data
         return json.loads(data.replace(SEPARATOR_CHAR, '"'))
 
     def deleteEntity(self, namespace, data_type):
+        ## \brief Delete entity from context broker
+        # \param entity name
+        # \param entity type
         Log("INFO", "DELETING: ", namespace, data_type)
         operation_json = json.dumps({
             "contextElements": [
@@ -142,6 +157,10 @@ class CbSubscriber(Isubscriber):
 
 
     def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[], subscriptionId=None):
+        ## \brief Generate subscription message
+        # \param entity name
+        # \param entity type
+        # \param entity's topics
         data = {
             "entities": [
                 {
@@ -166,6 +185,10 @@ class CbSubscriber(Isubscriber):
         return data
 
     def _refreshSubscriptions(self, threadName, delay):
+        ## \brief Thread handler for subscripiton refresh
+        # \param theradname
+        # \param delay time
+
         # Seconds to days
         total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 *60 * 24
         while True:
@@ -173,6 +196,10 @@ class CbSubscriber(Isubscriber):
             self.refreshSubscriptions()
 
     def _sendRequest(self, url, data, method=None):
+        ## \brief Send request to context broker
+        # \param url to request to
+        # \param data to send
+        # \param HTTP method (GET by default)
         try:
             request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
             if method is not None:

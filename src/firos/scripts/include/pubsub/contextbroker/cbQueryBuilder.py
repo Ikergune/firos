@@ -22,7 +22,12 @@ from include.constants import CONTEXTBROKER
 from include.pubsub.iPubSub import IqueryBuilder
 
 class CbQueryBuilder(IqueryBuilder):
+    ## \brief Query data to context broker
     def findById(self, entity_id, data_type="ROBOT", isPattern=False):
+        ## \brief Get entity data from context broker
+        # \param entity name (can be regular expression)
+        # \param entity type
+        # \param if the entity name is a pattern or not (false by default)
         url = "http://{}:{}/{}/queryContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
         data = {
             "entities": [
@@ -36,6 +41,10 @@ class CbQueryBuilder(IqueryBuilder):
         return self._sendRequest(url, json.dumps(data))
 
     def _sendRequest(self, url, data, method=None):
+        ## \brief Send request to context broker
+        # \param url to request to
+        # \param data to send
+        # \param HTTP method (GET by default)
         try:
             request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
             if method is not None:

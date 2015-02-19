@@ -27,7 +27,12 @@ PUBLISH_FREQUENCY = 250
 posted_history = {}
 
 class CbPublisher(Ipublisher):
+    ## \brief Context broker publisher class
     def createContent(self, topic, datatype, data):
+        ## \brief Format the data into FIROS format
+        # \param topic name
+        # \param topic type
+        # \param topic value
         data["firosstamp"] = time.time()
         return {
             "name": topic,
@@ -36,6 +41,10 @@ class CbPublisher(Ipublisher):
         }
 
     def publish(self, context_id, datatype, attributes=[]):
+        ## \brief Publish data of an entity in context broker
+        # \param entity name
+        # \param entity type
+        # \param entity attributes
         if context_id not in posted_history:
             posted_history[context_id] = {}
         commands = []

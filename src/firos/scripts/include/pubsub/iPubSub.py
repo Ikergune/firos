@@ -15,31 +15,60 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 class Ipublisher:
+    ## \brief Interface for content publisher
     def createContent(topic, datatype, data, isPrimitive=False):
+        ## \brief Format the data into FIROS format
+        # \param topic name
+        # \param topic type
+        # \param topic value
         raise Exception('Method not implemented')
 
     def publish(contex_id, datatype, attributes=[]):
+        ## \brief Publish data of an entity
+        # \param entity name
+        # \param entity type
+        # \param entity attributes
         raise Exception('Method not implemented')
 
 class Isubscriber:
+    ## \brief Interface for content listener
     def subscribe(self, namespace, data_type, robot):
+        ## \brief Subscribe to entities' changes
+        # \param entity name
+        # \param entity type
+        # \param robot object
         raise Exception('Method not implemented')
 
-    def disconnect(self):
+    def disconnect(self, namespace):
+        ## \brief Delete subscription by namespace
+        # \param entity name
         raise Exception('Method not implemented')
 
     def disconnectAll(self):
+        ## \brief Delete all subscriptions
         raise Exception('Method not implemented')
 
     def deleteEntity(self, namespace, data_type):
+        ## \brief Delete entity from content publisher
+        # \param entity name
+        # \param entity type
         raise Exception('Method not implemented')
 
-    def parseData(self):
+    def parseData(self, data):
+        ## \brief Parse the received data
+        # \param data
         raise Exception('Method not implemented')
 
     def _generateSubscription(self, namespace, data_type="Robot", topics=[]):
+        ## \brief Generate subscription message
+        # \param entity name
+        # \param entity type
+        # \param entity's topics
         raise Exception('Method not implemented')
 
 class IqueryBuilder:
+    ## \brief Content publisher query builder
     def findById(self, id):
+        ## \brief Search entity data by its name
+        # \param entity name
         raise Exception('Method not implemented')
