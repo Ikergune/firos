@@ -21,6 +21,7 @@ from urlparse import urlparse, parse_qs
 from BaseHTTPServer import BaseHTTPRequestHandler
 
 from include.logger import Log
+from include.constants import SEPARATOR_CHAR
 from include.confManager import getRobots
 from include.ros.rosutils import ros2Definition
 from include.ros.topicHandler import TopicHandler, ROBOT_TOPICS
@@ -167,7 +168,7 @@ def onRobotData(request, action):
     # \param client request
     # \param action
     robot_name = pathParams(request, action["regexp"])[0]
-    data = CloudQueryBulder.findById(robot_name, "ROBOT", True)
+    data = CloudQueryBulder.findById(robot_name, "ROBOT", False)
     if "errorCode" in data:
         request.send_response(int(data["errorCode"]["code"]))
     else:
@@ -175,8 +176,10 @@ def onRobotData(request, action):
         robot_list = []
         for context in data["contextResponses"]:
             for attribute in context["contextElement"]["attributes"]:
-                if attribute["name"] != "COMMAND":
-                    attribute["value"] = json.loads(attribute["value"].replace("'", '"'))
+                if attribute["name"] != "COMMAND" and attribute["name"] != "descriptions":
+                    print attribute["name"]
+                    print attribute["value"]
+                    attribute["value"] = json.loads(attribute["value"].replace(SEPARATOR_CHAR, '"'))
             context["contextElement"].pop("isPattern", None)
             robot_list.append(context["contextElement"])
         data = robot_list
