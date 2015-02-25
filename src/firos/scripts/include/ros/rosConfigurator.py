@@ -23,7 +23,7 @@ import rosgraph
 
 from include.constants import NODE_NAME
 
-regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
+topic_regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
 substitution_regex = re.compile(ur'^([\/\-\w]*)\/([\w]+)$')
 robots = {}
 ROBO_TOPIC_REG = {}
@@ -58,7 +58,7 @@ class RosConfigurator:
         # \param whitelist regular expresions
         global ROBO_TOPIC_REG
         global robots
-        matching = re.search(regex, topic)
+        matching = re.search(topic_regex, topic)
         robot_topic = matching.group(2)
         if robot_topic != '':
             robot_name = matching.group(1)

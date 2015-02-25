@@ -1,5 +1,5 @@
 {
-    "robotjjj":{
+    "robot1":{
         "topics": {
             "cmd_vel_mux/input/teleop": {
                 "msg": "geometry_msgs.msg.Twist",
