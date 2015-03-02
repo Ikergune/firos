@@ -991,8 +991,9 @@ class Generator(object):
         for robotName in data:
             try:
                 robot = data[robotName]
-                for topic in robot['topics']:
-                    full_type = str(robotName) + '/' + str(topic['name'])
+                for topic_name in robot['topics']:
+                    topic = robot['topics'][topic_name]
+                    full_type = str(robotName) + '/' + str(topic_name)
                     if type(topic['msg']) is dict:
                         self.firos_generate(msg_context, full_type, topic, outdir, search_path) #actual generation
             except Exception as e:
