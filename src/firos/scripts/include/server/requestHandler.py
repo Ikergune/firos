@@ -21,10 +21,11 @@ from urlparse import urlparse, parse_qs
 from BaseHTTPServer import BaseHTTPRequestHandler
 
 from include.logger import Log
-from include.constants import SEPARATOR_CHAR
+from include.constants import SEPARATOR_CHAR, DEFAULT_CONTEXT_TYPE
 from include.confManager import getRobots
 from include.ros.rosutils import ros2Definition
-from include.ros.topicHandler import TopicHandler, ROBOT_TOPICS
+from include.ros.rosConfigurator import RosConfigurator
+from include.ros.topicHandler import TopicHandler, loadMsgHandlers, ROBOT_TOPICS
 from include.pubsub.pubSubFactory import SubscriberFactory, QueryBuilderFactory
 
 CloudSubscriber = SubscriberFactory.create()
@@ -122,7 +123,7 @@ def onTopic(request, action):
                         robot['attributes'].remove(topic)
                         break
                 for topic in robot['attributes']:
-                    if topic["name"] in commands:
+                    if topic["name"] != "descriptions" and topic["name"] in commands:
                         value = CloudSubscriber.parseData(topic['value'])
                         if topic["name"] not in TOPIC_TIMESTAMPS[robotName] or TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]:
                             TopicHandler.publish(robotName, topic['name'], value)
@@ -190,14 +191,41 @@ def onRobotData(request, action):
     request.end_headers()
     request.wfile.write(json.dumps(data))
 
+def onConnect(request, action):
+    ## \brief Handle robot info request
+    # \param client request
+    # \param action
+    Log("INFO", "Connecting robots")
+    loadMsgHandlers(RosConfigurator.systemTopics(True))
+
+def onDisConnect(request, action):
+    ## \brief Handle robot info request
+    # \param client request
+    # \param action
+    robot_name = pathParams(request, action["regexp"])[0]
+    Log("INFO", "Disconnecting robot" + robot_name)
+    if robot_name in ROBOT_TOPICS:
+        CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
+        CloudSubscriber.disconnect(robot_name, True)
+        for topic in ROBOT_TOPICS[robot_name]["publisher"]:
+            ROBOT_TOPICS[robot_name]["publisher"][topic]["publisher"].unregister()
+        for topic in ROBOT_TOPICS[robot_name]["subscriber"]:
+            ROBOT_TOPICS[robot_name]["subscriber"][topic]["subscriber"].unregister()
+        RosConfigurator.removeRobot(robot_name)
+
 
 # URL structure
 # ^/firos/(\w+)/update/*$
 # ^/TEXT/whatever_is_inside/TEXT/+$
 
 MAPPER = {
-    "GET": [{"regexp": "^/robots/*$", "action": onRobots}, {"regexp": "^/robot/(\w+)/*$", "action": onRobotData}],
-    "POST": [{"regexp": "^/firos/*$", "action": onTopic}],
+    "GET": [
+        {"regexp": "^/robots/*$", "action": onRobots},
+        {"regexp": "^/robot/(\w+)/*$", "action": onRobotData}],
+    "POST": [
+        {"regexp": "^/firos/*$", "action": onTopic},
+        {"regexp": "^/robot/connect/*$", "action": onConnect},
+        {"regexp": "^/robot/disconnect/(\w+)/*$", "action": onDisConnect}],
     "PUT": [],
     "DELETE": [],
 }
