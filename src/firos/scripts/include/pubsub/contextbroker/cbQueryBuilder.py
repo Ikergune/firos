@@ -28,7 +28,7 @@ class CbQueryBuilder(IqueryBuilder):
         # \param entity name (can be regular expression)
         # \param entity type
         # \param if the entity name is a pattern or not (false by default)
-        url = "http://{}:{}/{}/queryContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+        url = "http://{}:{}/NGSI10/queryContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
         data = {
             "entities": [
                 {

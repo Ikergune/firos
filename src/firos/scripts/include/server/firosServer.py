@@ -25,7 +25,7 @@ class FirosServer:
     # \param self
     # \param ip address
     # \param port to listen to
-    def __init__(self, address="127.0.0.1", port=8000):
+    def __init__(self, address="0.0.0.0", port=8000):
         self.address = address
         self.port = port
         self.stopped = False

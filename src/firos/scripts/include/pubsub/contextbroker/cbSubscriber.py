@@ -52,7 +52,7 @@ class CbSubscriber(Isubscriber):
                 "data_type" : data_type,
                 "topics" : topics
             }
-            url = "http://{}:{}/{}/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+            url = "http://{}:{}/NGSI10/subscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
             subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
             response_body = self._sendRequest(url, subscriber_json)
             if response_body != None:
@@ -76,7 +76,7 @@ class CbSubscriber(Isubscriber):
             subscription = self.subscriptions[namespace]
             subscriptionId = subscription["id"]
             Log("INFO", "\nDisconnecting Context Broker subscription {}".format(subscriptionId))
-            url = "http://{}:{}/{}/unsubscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+            url = "http://{}:{}/NGSI10/unsubscribeContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
             disconnect_json = json.dumps({
                 "subscriptionId": subscriptionId
             })
@@ -108,7 +108,7 @@ class CbSubscriber(Isubscriber):
             subscriber_dict = self._generateSubscription(subscription["namespace"], subscription["data_type"], subscription["topics"], subscription["id"])
             subscriber_dict.pop("entities", None)
             subscriber_dict.pop("reference", None)
-            url = "http://{}:{}/{}/contextSubscriptions/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"], subscription["id"])
+            url = "http://{}:{}/NGSI10/contextSubscriptions/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], subscription["id"])
             subscriber_json = json.dumps(subscriber_dict)
             response_body = self._sendRequest(url, subscriber_json, 'PUT')
             if response_body != None:
@@ -141,7 +141,7 @@ class CbSubscriber(Isubscriber):
             ],
             "updateAction": "DELETE"
         })
-        url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+        url = "http://{}:{}/NGSI10/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
         response_body = self._sendRequest(url, operation_json)
         if response_body != None:
             if "errorCode" in response_body:
@@ -170,7 +170,7 @@ class CbSubscriber(Isubscriber):
                 }
             ],
             # "attributes": topics,
-            "reference": "http://{}:{}/firos".format(IP, SERVER["PORT"]),
+            "reference": "http://{}:{}/firos".format(IP, SERVER_PORT),
             "duration": SUBSCRIPTION_LENGTH,
             "notifyConditions": [
                 {

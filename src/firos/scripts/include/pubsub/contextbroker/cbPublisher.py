@@ -76,7 +76,7 @@ class CbPublisher(Ipublisher):
                 "updateAction": "APPEND"
             }
 
-            url = "http://{}:{}/{}/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+            url = "http://{}:{}/NGSI10/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
             data_json = json.dumps(data)
             try:
                 request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})

@@ -145,11 +145,6 @@ class RosConfigurator:
             except socket.error:
                 raise rostopic.ROSTopicIOException("Unable to communicate with master!")
 
-            print "\n\nrobots\n\n"
-            print robots
-            print "\n\nrobots2\n\n"
-            print _robots
-
             return _robots
         else:
             return robots

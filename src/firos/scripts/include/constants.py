@@ -20,8 +20,9 @@ import json
 def setConfiguration():
     try:
         current_path = os.path.dirname(os.path.abspath(__file__))
-        json_path = current_path.replace("scripts/include", "config/firosconfig.json")
-        return json.load(open(json_path))
+        json_path = current_path.replace("scripts/include", "config/config.json")
+        data = json.load(open(json_path))
+        return data[data["environment"]]
     except:
         return {}
 
@@ -30,69 +31,23 @@ configured = False
 if not configured:
     configured = True
     configData = setConfiguration()
-    INTERFACE = configData["net_interface"] if "net_interface" in configData else "public"
-    ENVIRONMENT = configData["environment"] if "environment" in configData else "local"
+    INTERFACE = configData["interface"] if "interface" in configData else "public"
     LOGLEVEL = configData["log_level"] if "log_level" in configData else "INFO"
 
 
-environment = ENVIRONMENT
 
-CONFIGURATIONS = {
-    "mobile": {
-        "SERVER": {
-            "ADDRESS" : "0.0.0.0",
-            "PORT"    : 10100
-        },
-        "CONTEXTBROKER": {
-            "ADDRESS": "192.168.43.159",
-            "PORT"    : 1026,
-            "PROTOCOL": "NGSI10"
-        }
-    },
-    "local": {
-        "SERVER": {
-            "ADDRESS" : "0.0.0.0",
-            "PORT"    : 10100
-        },
-        "CONTEXTBROKER": {
-            "ADDRESS": "192.168.4.70",
-            "PORT"    : 1026,
-            "PROTOCOL": "NGSI10"
-        }
-    },
-    "development": {
-        "SERVER": {
-            "ADDRESS" : "0.0.0.0",
-            "PORT"    : 10100
-        },
-        "CONTEXTBROKER": {
-            "ADDRESS" : "130.206.156.190",
-            "PORT"    : 1026,
-            "PROTOCOL": "NGSI10"
-        }
-    },
-    "production": {
-        "SERVER": {
-            "ADDRESS" : "0.0.0.0",
-            "PORT"    : 10100
-        },
-        "CONTEXTBROKER": {
-            "ADDRESS" : "130.206.156.190",
-            "PORT"    : 1026,
-            "PROTOCOL": "NGSI10"
-        }
-    }
+SERVER_PORT = configData["server"]["port"]
+CONTEXTBROKER = {
+    "ADDRESS": configData["contextbroker"]["address"],
+    "PORT": configData["contextbroker"]["port"],
 }
 
-SERVER = CONFIGURATIONS[environment]["SERVER"]
-CONTEXTBROKER = CONFIGURATIONS[environment]["CONTEXTBROKER"]
-
 # THROTTLING = "PT1S"
-THROTTLING = "PT0S"
-SUBSCRIPTION_LENGTH = "P1D"
-SUBSCRIPTION_REFRESH_DELAY = 20
+THROTTLING = configData["contextbroker"]["subscription"]["throttling"]
+SUBSCRIPTION_LENGTH = configData["contextbroker"]["subscription"]["subscription_length"]
+SUBSCRIPTION_REFRESH_DELAY = configData["contextbroker"]["subscription"]["subscription_refresh_delay"]
+
 SEPARATOR_CHAR = "%27"
-# SEPARATOR_CHAR = "'"
 
 # ROS CONFIG
 NODE_NAME = "firos"

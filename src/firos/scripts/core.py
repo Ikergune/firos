@@ -50,8 +50,8 @@ if __name__ == '__main__':
     if sys.argv[1:]:
         port = int(sys.argv[1])
     else:
-        port = SERVER["PORT"]
-    server = FirosServer(SERVER["ADDRESS"], port)
+        port = SERVER_PORT
+    server = FirosServer("0.0.0.0", port)
 
     def signal_handler(signal, frame):
         Log("INFO",('\nExiting from the application'))

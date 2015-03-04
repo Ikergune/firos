@@ -57,7 +57,7 @@ def registerContext(entity_id, data_type, robot, isPattern=False):
                     }
                 ],
                 "attributes": attributes,
-                "providingApplication": "http://{}:{}/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+                "providingApplication": "http://{}:{}/NGSI10".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
             }
         ],
         "duration": SUBSCRIPTION_LENGTH
@@ -94,7 +94,7 @@ def deleteContext(entity_id, delete=False):
         data = {
             "contextRegistrations": [
                 {
-                    "providingApplication": "http://{}:{}/{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"], CONTEXTBROKER["PROTOCOL"])
+                    "providingApplication": "http://{}:{}/NGSI10".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
                 }
             ],
             "duration": "P0D",
