@@ -24,7 +24,7 @@ from include.logger import Log
 from include.constants import SEPARATOR_CHAR, DEFAULT_CONTEXT_TYPE
 from include.confManager import getRobots
 from include.ros.rosutils import ros2Definition
-from include.ros.rosConfigurator import RosConfigurator
+from include.ros.rosConfigurator import RosConfigurator, setWhiteList
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers, ROBOT_TOPICS
 from include.pubsub.pubSubFactory import SubscriberFactory, QueryBuilderFactory
 
@@ -192,14 +192,17 @@ def onRobotData(request, action):
     request.wfile.write(json.dumps(data))
 
 def onConnect(request, action):
-    ## \brief Handle robot info request
+    ## \brief Launch robot search and connection
     # \param client request
     # \param action
     Log("INFO", "Connecting robots")
     loadMsgHandlers(RosConfigurator.systemTopics(True))
+    request.send_response(200)
+    request.end_headers()
+    request.wfile.write("")
 
 def onDisConnect(request, action):
-    ## \brief Handle robot info request
+    ## \brief Disconnect robot
     # \param client request
     # \param action
     robot_name = pathParams(request, action["regexp"])[0]
@@ -212,6 +215,38 @@ def onDisConnect(request, action):
         for topic in ROBOT_TOPICS[robot_name]["subscriber"]:
             ROBOT_TOPICS[robot_name]["subscriber"][topic]["subscriber"].unregister()
         RosConfigurator.removeRobot(robot_name)
+    request.send_response(200)
+    request.end_headers()
+    request.wfile.write("")
+
+def onWhitelistWrite(request, action):
+    ## \brief Handle robot info request
+    # \param client request
+    # \param action
+    data = postParams(request)
+    setWhiteList(data, None)
+    request.send_response(200)
+    request.end_headers()
+    request.wfile.write("")
+
+def onWhitelistRemove(request, action):
+    ## \brief Handle robot info request
+    # \param client request
+    # \param action
+    data = postParams(request)
+    setWhiteList(None, data)
+    request.send_response(200)
+    request.end_headers()
+    request.wfile.write("")
+
+def onWhitelistRestore(request, action):
+    ## \brief Handle robot info request
+    # \param client request
+    # \param action
+    setWhiteList(None, None, True)
+    request.send_response(200)
+    request.end_headers()
+    request.wfile.write("")
 
 
 # URL structure
@@ -225,7 +260,10 @@ MAPPER = {
     "POST": [
         {"regexp": "^/firos/*$", "action": onTopic},
         {"regexp": "^/robot/connect/*$", "action": onConnect},
-        {"regexp": "^/robot/disconnect/(\w+)/*$", "action": onDisConnect}],
+        {"regexp": "^/robot/disconnect/(\w+)/*$", "action": onDisConnect},
+        {"regexp": "^/whitelist/write/*$", "action": onWhitelistWrite},
+        {"regexp": "^/whitelist/remove/*$", "action": onWhitelistRemove},
+        {"regexp": "^/whitelist/restore/*$", "action": onWhitelistRestore}],
     "PUT": [],
     "DELETE": [],
 }

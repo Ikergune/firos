@@ -30,6 +30,8 @@ ROBO_TOPIC_REG = {}
 
 CURRENT_TOPIC_REG = {}
 
+mem_whitelist = None
+
 class RosConfigurator:
     ## \brief Tool to get Ros data from system
 
@@ -149,6 +151,29 @@ class RosConfigurator:
         else:
             return robots
 
+def setWhiteList(additions, deletions, restore=False):
+    global mem_whitelist
+    if mem_whitelist is None:
+        try:
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
+            mem_whitelist = json.load(open(json_path))
+        except:
+            mem_whitelist = {}
+    if additions:
+        for robot_name in additions:
+            mem_whitelist[robot_name] = additions[robot_name]
+    if deletions:
+        for robot_name in deletions:
+            for topic in deletions[robot_name]["publisher"]:
+                if topic in mem_whitelist[robot_name]["publisher"]:
+                    mem_whitelist[robot_name]["publisher"].remove(topic)
+            for topic in deletions[robot_name]["subscriber"]:
+                if topic in mem_whitelist[robot_name]["subscriber"]:
+                    mem_whitelist[robot_name]["subscriber"].remove(topic)
+    if restore:
+        mem_whitelist = None
+
 def _isInFiros(topic_name, list2Check,nodes):
     using = False
     if topic_name not in list2Check:
@@ -168,9 +193,16 @@ def _getWhiteLists():
 
 def _getWhiteList(pubsub):
     try:
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
-        data = json.load(open(json_path))
+        if mem_whitelist == None:
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
+            data = json.load(open(json_path))
+        else:
+            data = mem_whitelist
+
+        print("WHITELISTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+        print data
+
         whiteregex = ur''
         for robot_name in data:
             for topic in data[robot_name][pubsub]:
