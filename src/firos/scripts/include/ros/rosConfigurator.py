@@ -201,9 +201,6 @@ def _getWhiteList(pubsub):
         else:
             data = mem_whitelist
 
-        print("WHITELISTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-        print data
-
         whiteregex = ur''
         for robot_name in data:
             for topic in data[robot_name][pubsub]:
