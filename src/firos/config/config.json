@@ -11,7 +11,7 @@
         "subscription": {
           "throttling": "PT0S",
           "subscription_length": "P1D",
-          "subscription_refresh_delay": 20
+          "subscription_refresh_delay": 0.5
         }
     },
     "log_level": "INFO",
@@ -28,7 +28,7 @@
         "subscription": {
           "throttling": "PT0S",
           "subscription_length": "P1D",
-          "subscription_refresh_delay": 20
+          "subscription_refresh_delay": 0.5
         }
     },
     "log_level": "INFO",
@@ -40,12 +40,12 @@
         "port": 10100
     },
     "contextbroker": {
-        "address"   : "130.206.127.115",
+        "address"   : "0.0.0.0",
         "port"      : 1026,
         "subscription": {
           "throttling": "PT0S",
           "subscription_length": "P1D",
-          "subscription_refresh_delay": 20
+          "subscription_refresh_delay": 0.5
         }
     },
     "log_level": "INFO",
@@ -57,11 +57,11 @@
         "port": 10100
     },
     "contextbroker": {
-        "address"   : "130.206.127.115",
+        "address"   : "0.0.0.0",
         "port"      : 1026,
         "subscription": {
           "throttling": "PT0S",
-          "subscription_length": "P1D",
+          "subscription_length": "P1M",
           "subscription_refresh_delay": 20
         }
     },

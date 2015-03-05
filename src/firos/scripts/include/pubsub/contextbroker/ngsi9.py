@@ -57,7 +57,7 @@ def registerContext(entity_id, data_type, robot, isPattern=False):
                     }
                 ],
                 "attributes": attributes,
-                "providingApplication": "http://{}:{}/NGSI10".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+                "providingApplication": "http://{}:{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
             }
         ],
         "duration": SUBSCRIPTION_LENGTH
