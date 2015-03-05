@@ -165,12 +165,13 @@ def setWhiteList(additions, deletions, restore=False):
             mem_whitelist[robot_name] = additions[robot_name]
     if deletions:
         for robot_name in deletions:
-            for topic in deletions[robot_name]["publisher"]:
-                if topic in mem_whitelist[robot_name]["publisher"]:
-                    mem_whitelist[robot_name]["publisher"].remove(topic)
-            for topic in deletions[robot_name]["subscriber"]:
-                if topic in mem_whitelist[robot_name]["subscriber"]:
-                    mem_whitelist[robot_name]["subscriber"].remove(topic)
+            if robot_name in mem_whitelist:
+                for topic in deletions[robot_name]["publisher"]:
+                    if topic in mem_whitelist[robot_name]["publisher"]:
+                        mem_whitelist[robot_name]["publisher"].remove(topic)
+                for topic in deletions[robot_name]["subscriber"]:
+                    if topic in mem_whitelist[robot_name]["subscriber"]:
+                        mem_whitelist[robot_name]["subscriber"].remove(topic)
     if restore:
         mem_whitelist = None
 
