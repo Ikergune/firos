@@ -20,7 +20,7 @@ import json
 import urllib2
 
 from include.logger import Log
-from include.constants import CONTEXTBROKER, SUBSCRIPTION_LENGTH
+from include.constants import INDEX_CONTEXTBROKER, DATA_CONTEXTBROKER, SUBSCRIPTION_LENGTH
 
 # PubSub Handlers
 from include.pubsub.contextbroker.cbPublisher import CbPublisher
@@ -35,7 +35,7 @@ def registerContext(entity_id, data_type, robot, isPattern=False):
     # \param entity type
     # \param robot object (with topics)
     # \param if entity name is pattern (default false)
-    url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+    url = "http://{}:{}/NGSI9/registerContext".format(INDEX_CONTEXTBROKER["ADDRESS"], INDEX_CONTEXTBROKER["PORT"])
     attributes = topics2NGSI9(robot)
     current_path = os.path.dirname(os.path.abspath(__file__))
     json_path = current_path.replace("scripts/include/pubsub/contextbroker", "config/robotdescriptions.json")
@@ -57,7 +57,7 @@ def registerContext(entity_id, data_type, robot, isPattern=False):
                     }
                 ],
                 "attributes": attributes,
-                "providingApplication": "http://{}:{}".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+                "providingApplication": "http://{}:{}".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
             }
         ],
         "duration": SUBSCRIPTION_LENGTH
@@ -90,11 +90,11 @@ def deleteContext(entity_id, delete=False):
     # \param entity name
     # \param if context must be deleted locally (default false)
     if entity_id in contexts:
-        url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+        url = "http://{}:{}/NGSI9/registerContext".format(INDEX_CONTEXTBROKER["ADDRESS"], INDEX_CONTEXTBROKER["PORT"])
         data = {
             "contextRegistrations": [
                 {
-                    "providingApplication": "http://{}:{}/NGSI10".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+                    "providingApplication": "http://{}:{}".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
                 }
             ],
             "duration": "P0D",
@@ -112,7 +112,7 @@ def refreshAllContexts():
 def refreshContext(entity_id):
     ## \brief Refresh exisiting NGSI9 context on context broker
     # \param entity name
-    url = "http://{}:{}/NGSI9/registerContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+    url = "http://{}:{}/NGSI9/registerContext".format(INDEX_CONTEXTBROKER["ADDRESS"], INDEX_CONTEXTBROKER["PORT"])
     data = copy.deepcopy(contexts[entity_id]["data"])
     data["registrationId"] = contexts[entity_id]["registrationId"]
     response = _sendRequest(url, json.dumps(data))

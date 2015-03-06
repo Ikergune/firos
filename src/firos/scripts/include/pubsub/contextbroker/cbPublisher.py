@@ -20,7 +20,7 @@ import rospy
 import urllib2
 
 from include.logger import Log
-from include.constants import CONTEXTBROKER, SEPARATOR_CHAR
+from include.constants import DATA_CONTEXTBROKER, SEPARATOR_CHAR
 from include.pubsub.iPubSub import Ipublisher
 
 PUBLISH_FREQUENCY = 250
@@ -76,7 +76,7 @@ class CbPublisher(Ipublisher):
                 "updateAction": "APPEND"
             }
 
-            url = "http://{}:{}/NGSI10/updateContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+            url = "http://{}:{}/NGSI10/updateContext".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
             data_json = json.dumps(data)
             try:
                 request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})

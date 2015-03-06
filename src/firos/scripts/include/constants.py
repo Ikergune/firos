@@ -37,10 +37,26 @@ if not configured:
 
 
 SERVER_PORT = configData["server"]["port"]
-CONTEXTBROKER = {
-    "ADDRESS": configData["contextbroker"]["address"],
-    "PORT": configData["contextbroker"]["port"],
-}
+if("index" in configData["contextbroker"]):
+    INDEX_CONTEXTBROKER = {
+        "ADDRESS": configData["contextbroker"]["index"]["address"],
+        "PORT": configData["contextbroker"]["index"]["port"],
+    }
+
+    DATA_CONTEXTBROKER = {
+        "ADDRESS": configData["contextbroker"]["data"]["address"],
+        "PORT": configData["contextbroker"]["data"]["port"],
+    }
+else:
+    INDEX_CONTEXTBROKER = {
+        "ADDRESS": configData["contextbroker"]["address"],
+        "PORT": configData["contextbroker"]["port"],
+    }
+
+    DATA_CONTEXTBROKER = {
+        "ADDRESS": configData["contextbroker"]["address"],
+        "PORT": configData["contextbroker"]["port"],
+    }
 
 # THROTTLING = "PT1S"
 THROTTLING = configData["contextbroker"]["subscription"]["throttling"]

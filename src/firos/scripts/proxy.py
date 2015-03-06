@@ -20,7 +20,7 @@
 import os
 import rospy
 
-from include.constants import CONTEXTBROKER
+from include.constants import INDEX_CONTEXTBROKER
 
 PROXY_PATH = "/datos/bamboo_ros_ws/proxy/"
 
@@ -28,6 +28,6 @@ PROXY_PATH = "/datos/bamboo_ros_ws/proxy/"
 if __name__ == '__main__':
     rospy.init_node('proxy', anonymous=True)
 
-    start_command = "node app.js " + CONTEXTBROKER["ADDRESS"] + " " + str(CONTEXTBROKER["PORT"]) + " " + CONTEXTBROKER["PROTOCOL"]
+    start_command = "node app.js " + INDEX_CONTEXTBROKER["ADDRESS"] + " " + str(INDEX_CONTEXTBROKER["PORT"])
     os.system("cd " + PROXY_PATH + " && npm install && " + start_command)
 

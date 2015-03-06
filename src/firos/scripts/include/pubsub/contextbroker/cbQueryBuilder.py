@@ -18,7 +18,7 @@ import json
 import urllib2
 
 from include.logger import Log
-from include.constants import CONTEXTBROKER
+from include.constants import DATA_CONTEXTBROKER
 from include.pubsub.iPubSub import IqueryBuilder
 
 class CbQueryBuilder(IqueryBuilder):
@@ -28,7 +28,7 @@ class CbQueryBuilder(IqueryBuilder):
         # \param entity name (can be regular expression)
         # \param entity type
         # \param if the entity name is a pattern or not (false by default)
-        url = "http://{}:{}/NGSI10/queryContext".format(CONTEXTBROKER["ADDRESS"], CONTEXTBROKER["PORT"])
+        url = "http://{}:{}/NGSI10/queryContext".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
         data = {
             "entities": [
                 {
