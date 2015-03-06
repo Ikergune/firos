@@ -20,7 +20,7 @@ import rospy
 import urllib2
 
 from include.logger import Log
-from include.constants import DATA_CONTEXTBROKER, SEPARATOR_CHAR
+from include.constants import INDEX_CONTEXTBROKER, DATA_CONTEXTBROKER, SEPARATOR_CHAR
 from include.pubsub.iPubSub import Ipublisher
 
 PUBLISH_FREQUENCY = 250
@@ -45,48 +45,62 @@ class CbPublisher(Ipublisher):
         # \param entity name
         # \param entity type
         # \param entity attributes
-        if context_id not in posted_history:
-            posted_history[context_id] = {}
-        commands = []
-        attr2Send = []
-        current = time.time() * 1000
-        for attribute in attributes:
-            if attribute["name"] not in posted_history[context_id]:
-                posted_history[context_id][attribute["name"]] = 0
-            if (current - posted_history[context_id][attribute["name"]]) > PUBLISH_FREQUENCY:
-                commands.append(attribute["name"])
-                attr2Send.append(attribute)
-                posted_history[context_id][attribute["name"]] = current
+        _publish(context_id, datatype, attributes, DATA_CONTEXTBROKER)
 
-        if len(commands) > 0:
+    def publishMsg(self, attributes=[]):
+        ## \brief Publish message structures in context broker
+        # \param entity attributes
+        _publish("rosmsg", "ROSDEFINITION", attributes, INDEX_CONTEXTBROKER, False)
+
+def _publish(context_id, datatype, attributes, connection, sendCommand=True):
+    ## \brief Publish data of an entity in context broker
+    # \param entity name
+    # \param entity type
+    # \param entity attributes
+    # \param context broker to send to
+    if context_id not in posted_history:
+        posted_history[context_id] = {}
+    commands = []
+    attr2Send = []
+    current = time.time() * 1000
+    for attribute in attributes:
+        if attribute["name"] not in posted_history[context_id]:
+            posted_history[context_id][attribute["name"]] = 0
+        if (current - posted_history[context_id][attribute["name"]]) > PUBLISH_FREQUENCY:
+            commands.append(attribute["name"])
+            attr2Send.append(attribute)
+            posted_history[context_id][attribute["name"]] = current
+
+    if len(commands) > 0:
+        if(sendCommand):
             attr2Send.insert(0, {
                 "name": "COMMAND",
                 "type": "COMMAND",
                 "value": commands
             })
-            data = {
-                "contextElements": [
-                    {
-                        "id": context_id,
-                        "type": datatype,
-                        "isPattern": "false",
-                        "attributes": attr2Send
-                    }
-                ],
-                "updateAction": "APPEND"
-            }
+        data = {
+            "contextElements": [
+                {
+                    "id": context_id,
+                    "type": datatype,
+                    "isPattern": "false",
+                    "attributes": attr2Send
+                }
+            ],
+            "updateAction": "APPEND"
+        }
 
-            url = "http://{}:{}/NGSI10/updateContext".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
-            data_json = json.dumps(data)
-            try:
-                request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
-                response = urllib2.urlopen(request)
-                response_body = json.loads(response.read())
-                response.close()
+        url = "http://{}:{}/NGSI10/updateContext".format(connection["ADDRESS"], connection["PORT"])
+        data_json = json.dumps(data)
+        try:
+            request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
+            response = urllib2.urlopen(request)
+            response_body = json.loads(response.read())
+            response.close()
 
-                if "errorCode" in response_body:
-                    rospy.logerr("Error sending data to Context Broker:")
-                    rospy.logerr(response_body["errorCode"]["details"])
-            except Exception as ex:
-                Log("ERROR", ex.reason)
-                return None
+            if "errorCode" in response_body:
+                rospy.logerr("Error sending data to Context Broker:")
+                rospy.logerr(response_body["errorCode"]["details"])
+        except Exception as ex:
+            Log("ERROR", ex.reason)
+            return None

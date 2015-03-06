@@ -16,13 +16,6 @@
             "move_base/result": {
                 "msg": "move_base_msgs.msg.MoveBaseActionResult",
                 "type": "subscriber"
-            },
-            "setCoords": {
-                "msg": {
-                    "x": "int32",
-                    "y": "int32"
-                    },
-                "type": "publisher"
             }
         }
     }

@@ -15,15 +15,16 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import os
+import json
 import rospy
 
 
 from include.logger import Log
-from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE
+from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE, SEPARATOR_CHAR
 from include.libLoader import LibLoader
 
 from include.ros.rosConfigurator import RosConfigurator
-from include.ros.rosutils import ros2Obj, obj2Ros
+from include.ros.rosutils import ros2Obj, obj2Ros, ros2Definition
 from include.ros.dependencies.third_party import *
 
 # PubSub Handlers
@@ -45,6 +46,7 @@ def loadMsgHandlers(robot_data):
     # \param robot data
     Log("INFO", "Getting configuration data")
     Log("INFO", "Generating topic handlers:")
+    msg_types = {}
     for robotName in robot_data:
         robotName = str(robotName)
         robot = robot_data[robotName]
@@ -69,6 +71,13 @@ def loadMsgHandlers(robot_data):
                 else:
                     theclass = LibLoader.loadFromSystem(topic['msg'])
                 extra["type"] = str(topic['msg'])
+
+            msg_types[str(topic['msg'])] = {
+                "name": str(topic['msg']),
+                "type": "rosmsg",
+                "value": json.dumps(ros2Definition(theclass())).replace('"', SEPARATOR_CHAR)
+            }
+
             if topic["type"].lower() == "publisher":
                 ROBOT_TOPICS[robotName]["publisher"][topicName] = {
                     "msg": str(topic['msg']),
@@ -81,6 +90,7 @@ def loadMsgHandlers(robot_data):
                     "class": theclass,
                     "subscriber": rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra)
                 }
+        CloudPublisher.publishMsg(msg_types.values())
         Log("INFO", "\n")
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
         Log("INFO", "Subscribed to " + robotName  + "'s topics\n")

@@ -30,6 +30,11 @@ class Ipublisher:
         # \param entity attributes
         raise Exception('Method not implemented')
 
+    def publishMsg(attributes=[]):
+        ## \brief Publish message structures
+        # \param entity attributes
+        raise Exception('Method not implemented')
+
 class Isubscriber:
     ## \brief Interface for content listener
     def subscribe(self, namespace, data_type, robot):
