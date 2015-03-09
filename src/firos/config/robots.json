@@ -16,6 +16,14 @@
             "move_base/result": {
                 "msg": "move_base_msgs.msg.MoveBaseActionResult",
                 "type": "subscriber"
+            },
+            "cmd_height": {
+                "msg": {
+                    "x": "int32",
+                    "y": "int32",
+                    "z": "int32"
+                },
+                "type": "publisher"
             }
         }
     }

@@ -62,18 +62,20 @@ def loadMsgHandlers(robot_data):
             Log("INFO", "    -" + topicName)
             extra = {"robot": robotName, "topic": topicName}
             if type(topic['msg']) is dict:
+                _topic_name = robotName + ".msg." + topicName
                 module = LibLoader.loadFromFile(os.path.join(TOPIC_BASE_PATH, robotName+topicName+".py"))
                 theclass = getattr(module, topicName)
             else:
                 _final_name = topic['msg'].split('.')[-1]
+                _topic_name = str(topic['msg'])
                 if _final_name in globals():
                     theclass = globals()[_final_name]
                 else:
                     theclass = LibLoader.loadFromSystem(topic['msg'])
-                extra["type"] = str(topic['msg'])
+                extra["type"] = _topic_name
 
-            msg_types[str(topic['msg'])] = {
-                "name": str(topic['msg']),
+            msg_types[_topic_name] = {
+                "name": _topic_name,
                 "type": "rosmsg",
                 "value": json.dumps(ros2Definition(theclass())).replace('"', SEPARATOR_CHAR)
             }
