@@ -47,6 +47,12 @@ class CbPublisher(Ipublisher):
         # \param entity attributes
         _publish(context_id, datatype, attributes, DATA_CONTEXTBROKER)
 
+    def publishMap(self, context_id, attributes=[]):
+        ## \brief Publish data of an entity in context broker
+        # \param map topic name
+        # \param map connections
+        _publish(context_id, "MAP", attributes, DATA_CONTEXTBROKER, False)
+
     def publishMsg(self, attributes=[]):
         ## \brief Publish message structures in context broker
         # \param entity attributes

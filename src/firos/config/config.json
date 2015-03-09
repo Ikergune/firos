@@ -1,5 +1,5 @@
 {
-  "environment": "multiple",
+  "environment": "local",
 
   "mobile": {
     "server": {
@@ -55,7 +55,9 @@
         }
     },
     "log_level": "INFO",
-    "interface": "public"
+    "interface": "public",
+    "map_server_port": 10101,
+    "rosbridge_port": 9090
   },
 
   "development": {

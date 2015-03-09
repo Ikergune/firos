@@ -27,12 +27,6 @@ from include.logger import Log
 from include.pubsub.iPubSub import Isubscriber
 from include.pubsub.contextbroker.ngsi9 import registerContext, deleteContext, deleteAllContexts, refreshAllContexts
 
-if INTERFACE == "public":
-    IP = urllib2.urlopen('http://ip.42.pl/raw').read()
-else:
-    netifaces.ifaddresses(INTERFACE)
-    IP = netifaces.ifaddresses(INTERFACE)[2][0]['addr']
-
 class CbSubscriber(Isubscriber):
     ## \brief Context broker subscription handler
     subscriptions = {}
@@ -126,7 +120,7 @@ class CbSubscriber(Isubscriber):
         # \param data
         return json.loads(data.replace(SEPARATOR_CHAR, '"'))
 
-    def deleteEntity(self, namespace, data_type):
+    def deleteEntity(self, namespace, data_type, removeContext=True):
         ## \brief Delete entity from context broker
         # \param entity name
         # \param entity type
@@ -153,7 +147,8 @@ class CbSubscriber(Isubscriber):
             else:
                 Log("INFO", "Deleted entity " + namespace)
 
-        deleteContext(namespace, True)
+        if removeContext:
+            deleteContext(namespace, True)
 
 
     def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[], subscriptionId=None):

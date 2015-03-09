@@ -23,6 +23,8 @@ import rosgraph
 
 from include.constants import NODE_NAME
 
+# map_regex = re.compile(ur'^.*\/(map)[\/]*$')
+map_regex = re.compile(ur'^.*\/(map).*$')
 topic_regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
 substitution_regex = re.compile(ur'^([\/\-\w]*)\/([\w]+)$')
 robots = {}
@@ -34,6 +36,24 @@ mem_whitelist = None
 
 class RosConfigurator:
     ## \brief Tool to get Ros data from system
+
+    @staticmethod
+    def getMapTopics():
+        ## \brief Get topics that are maps
+
+        master = rosgraph.Master('/rostopic')
+        maps = []
+        try:
+            state = master.getSystemState()
+
+            pubs, subs, _ = state
+
+            for topic_name, l in pubs:
+                if re.search(map_regex, topic_name):
+                    maps.append(topic_name)
+        except socket.error:
+            raise rostopic.ROSTopicIOException("Unable to communicate with master!")
+        return maps
 
     @staticmethod
     def topic_type(t, topic_types):

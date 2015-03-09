@@ -30,6 +30,12 @@ class Ipublisher:
         # \param entity attributes
         raise Exception('Method not implemented')
 
+    def publishMap(self, context_id, attributes=[]):
+        ## \brief Publish data of an entity in context broker
+        # \param map topic name
+        # \param map connections
+        raise Exception('Method not implemented')
+
     def publishMsg(attributes=[]):
         ## \brief Publish message structures
         # \param entity attributes

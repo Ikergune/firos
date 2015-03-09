@@ -20,7 +20,7 @@ import rospy
 
 
 from include.logger import Log
-from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE, SEPARATOR_CHAR
+from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE, SEPARATOR_CHAR, IP, MAP_SERVER_PORT, ROSBRIDGE_PORT
 from include.libLoader import LibLoader
 
 from include.ros.rosConfigurator import RosConfigurator
@@ -96,11 +96,39 @@ def loadMsgHandlers(robot_data):
         Log("INFO", "\n")
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
         Log("INFO", "Subscribed to " + robotName  + "'s topics\n")
+        MapHandler.mapPublisher()
 
 def connectionListeners():
     ## \brief Create firos listeners for robot creation or removal
     subscribers.append(rospy.Subscriber("firos/disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber("firos/connect", std_msgs.msg.String, _robotConnection))
+
+class MapHandler:
+    @staticmethod
+    def mapPublisher():
+        ## \brief Obtain map topics and publsh their link into context broker
+        maps = RosConfigurator.getMapTopics()
+        for map_topic in maps:
+            CloudPublisher.publishMap(map_topic, [
+                {
+                    "name": "websocket",
+                    "type": "connection",
+                    "value": "ws://{}:{}".format(IP, ROSBRIDGE_PORT)
+                },{
+                    "name": "socketio",
+                    "type": "connection",
+                    "value": "http://{}:{}".format(IP, MAP_SERVER_PORT)
+                }
+            ])
+
+    @staticmethod
+    def mapRemover():
+        ## \brief Delete map topics from context broker
+        maps = RosConfigurator.getMapTopics()
+        for map_topic in maps:
+            CloudSubscriber.deleteEntity(map_topic, "MAP", False)
+
+
 
 class TopicHandler:
     @staticmethod
@@ -120,6 +148,7 @@ class TopicHandler:
     def unregisterAll():
         ## \brief Unregister from all ROS topics
         CloudSubscriber.disconnectAll()
+        MapHandler.mapRemover()
         Log("INFO", "Unsubscribing topics...")
         for subscriber in subscribers:
             subscriber.unregister()

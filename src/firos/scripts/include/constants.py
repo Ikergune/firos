@@ -16,6 +16,8 @@
 
 import os
 import json
+import urllib2
+import netifaces
 
 def setConfiguration():
     try:
@@ -69,3 +71,19 @@ SEPARATOR_CHAR = "%27"
 NODE_NAME = "firos"
 DEFAULT_CONTEXT_TYPE = "ROBOT"
 DEFAULT_QUEUE_SIZE = 10
+
+if INTERFACE == "public":
+    IP = urllib2.urlopen('http://ip.42.pl/raw').read()
+else:
+    netifaces.ifaddresses(INTERFACE)
+    IP = netifaces.ifaddresses(INTERFACE)[2][0]['addr']
+
+if "map_server_port" in configData:
+    MAP_SERVER_PORT = configData["map_server_port"]
+else:
+    MAP_SERVER_PORT = 10101
+
+if "rosbridge_port" in configData:
+    ROSBRIDGE_PORT = configData["rosbridge_port"]
+else:
+    ROSBRIDGE_PORT = 9090
