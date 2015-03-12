@@ -81,7 +81,7 @@ else:
 if "map_server_port" in configData:
     MAP_SERVER_PORT = configData["map_server_port"]
 else:
-    MAP_SERVER_PORT = 10101
+    MAP_SERVER_PORT = None
 
 if "rosbridge_port" in configData:
     ROSBRIDGE_PORT = configData["rosbridge_port"]

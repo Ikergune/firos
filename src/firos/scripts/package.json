@@ -1,0 +1,23 @@
+{
+  "name"            : "FirosMapServer",
+  "version"         : "0.0.1",
+  "description"     : "Firos socketio map server",
+  "author"          : "Iñigo Gonzalez Vazquez <ingonza85@gmail.com> (@haas85)",
+  "license"         : "MIT",
+  "dependencies": {
+    "socket.io": "*",
+    "roslib-socketio": "*"
+  },
+  "devDependencies": {
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/Ikergune/firos.git"
+  },
+  "scripts": {
+    "start": "node mapserver.js"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  }
+}

@@ -36,6 +36,7 @@ from include.constants import *
 
 from include import confManager
 from include.logger import Log
+from include.mapServer import MapServer
 from include.server.firosServer import FirosServer
 
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers, connectionListeners
@@ -70,10 +71,7 @@ if __name__ == '__main__':
     loadMsgHandlers(confManager.getRobots(True, True))
     connectionListeners()
 
-    # Initialize the node and name it.
-    # Log("INFO", "Initializing ROS node: " + NODE_NAME)
-    # rospy.init_node(NODE_NAME)
-    # Log("INFO", "Initialized")
+    MapServer.load()
 
     Log("INFO", "\nPress Ctrl+C to Exit\n")
     server.start()

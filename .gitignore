@@ -5,5 +5,6 @@ devel/**
 src/firos/scripts/**.pyc
 src/firos/scripts/**/**.pyc
 src/firos/scripts/**/**/**.pyc
+src/firos/scripts/node_modules/**
 src/firos/scripts/include/ros/topics
 src/firos/scripts/include/ros/dependencies

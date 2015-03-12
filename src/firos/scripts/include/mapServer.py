@@ -18,16 +18,24 @@
 
 # Import required Python code.
 import os
-import rospy
+import subprocess
+from threading import Thread
 
-from include.constants import INDEX_CONTEXTBROKER
+from include.constants import MAP_SERVER_PORT, ROSBRIDGE_PORT
 
-PROXY_PATH = "/datos/bamboo_ros_ws/proxy/"
+MAP_SERVER_PROCESS = None
 
-# Main function.
-if __name__ == '__main__':
-    rospy.init_node('proxy', anonymous=True)
+mapserver_path = os.path.dirname(os.path.abspath(__file__)).replace("include","")
+print(mapserver_path)
+start_command = "node mapserver.js " + str(MAP_SERVER_PORT) + " " + str(ROSBRIDGE_PORT)
+class MapServer:
+    @staticmethod
+    def load():
+        MapThread = Thread(target = _launchMapServer)
+        MapThread.daemon = True
+        MapThread.start()
 
-    start_command = "node app.js " + INDEX_CONTEXTBROKER["ADDRESS"] + " " + str(INDEX_CONTEXTBROKER["PORT"])
-    os.system("cd " + PROXY_PATH + " && npm install && " + start_command)
-
+def _launchMapServer():
+    if(MAP_SERVER_PORT):
+        os.system("cd {} && npm install".format(mapserver_path))
+        subprocess.Popen(["node", mapserver_path + "mapserver.js", str(MAP_SERVER_PORT), str(ROSBRIDGE_PORT)])

@@ -108,18 +108,21 @@ class MapHandler:
     def mapPublisher():
         ## \brief Obtain map topics and publsh their link into context broker
         maps = RosConfigurator.getMapTopics()
+        cb_maps = [
+            {
+                "name": "websocket",
+                "type": "connection",
+                "value": "ws://{}:{}".format(IP, ROSBRIDGE_PORT)
+            }
+        ]
+        if(MAP_SERVER_PORT):
+            cb_maps.append({
+                "name": "socketio",
+                "type": "connection",
+                "value": "http://{}:{}".format(IP, MAP_SERVER_PORT)
+            })
         for map_topic in maps:
-            CloudPublisher.publishMap(map_topic, [
-                {
-                    "name": "websocket",
-                    "type": "connection",
-                    "value": "ws://{}:{}".format(IP, ROSBRIDGE_PORT)
-                },{
-                    "name": "socketio",
-                    "type": "connection",
-                    "value": "http://{}:{}".format(IP, MAP_SERVER_PORT)
-                }
-            ])
+            CloudPublisher.publishMap(map_topic, cb_maps)
 
     @staticmethod
     def mapRemover():
