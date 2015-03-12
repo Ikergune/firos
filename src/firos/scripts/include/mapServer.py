@@ -31,11 +31,13 @@ start_command = "node mapserver.js " + str(MAP_SERVER_PORT) + " " + str(ROSBRIDG
 class MapServer:
     @staticmethod
     def load():
+        ## \brief Starts Map server thread
         MapThread = Thread(target = _launchMapServer)
         MapThread.daemon = True
         MapThread.start()
 
 def _launchMapServer():
+    ## \brief If map_server is configured launches it
     if(MAP_SERVER_PORT):
         os.system("cd {} && npm install".format(mapserver_path))
         subprocess.Popen(["node", mapserver_path + "mapserver.js", str(MAP_SERVER_PORT), str(ROSBRIDGE_PORT)])
