@@ -125,7 +125,7 @@ def onTopic(request, action):
                 for topic in robot['attributes']:
                     if topic["name"] != "descriptions" and topic["name"] in commands:
                         value = CloudSubscriber.parseData(topic['value'])
-                        if topic["name"] not in TOPIC_TIMESTAMPS[robotName] or TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]:
+                        if (topic["name"] not in TOPIC_TIMESTAMPS[robotName]) or ("firosstamp" in value and TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]) or ("firosstamp" not in value):
                             TopicHandler.publish(robotName, topic['name'], value)
                         TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
     except Exception as e:
