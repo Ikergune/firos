@@ -1,5 +1,5 @@
 {
-  "environment": "local",
+  "environment": "demo",
 
   "mobile": {
     "server": {
@@ -28,7 +28,7 @@
         "port"      : 1026
       },
       "data": {
-        "address"   : "0.0.0.0",
+        "address"   : "130.206.127.115",
         "port"      : 1026
       },
       "subscription": {
@@ -55,7 +55,26 @@
         }
     },
     "log_level": "INFO",
-    "interface": "public",
+    "interface": "eth0",
+    "map_server_port": 10101,
+    "rosbridge_port": 9090
+  },
+
+  "demo": {
+    "server": {
+        "port": 10100
+    },
+    "contextbroker": {
+        "address"   : "192.168.4.70",
+        "port"      : 1026,
+        "subscription": {
+          "throttling": "PT0S",
+          "subscription_length": "P1D",
+          "subscription_refresh_delay": 0.5
+        }
+    },
+    "log_level": "INFO",
+    "interface": "wlan0",
     "map_server_port": 10101,
     "rosbridge_port": 9090
   },
@@ -65,7 +84,7 @@
         "port": 10100
     },
     "contextbroker": {
-        "address"   : "0.0.0.0",
+        "address"   : "130.206.127.115",
         "port"      : 1026,
         "subscription": {
           "throttling": "PT0S",
@@ -73,6 +92,8 @@
           "subscription_refresh_delay": 0.5
         }
     },
+    "map_server_port": 10101,
+    "rosbridge_port": 9090,
     "log_level": "INFO",
     "interface": "public"
   },
@@ -82,7 +103,7 @@
         "port": 10100
     },
     "contextbroker": {
-        "address"   : "0.0.0.0",
+        "address"   : "130.206.127.115",
         "port"      : 1026,
         "subscription": {
           "throttling": "PT0S",
