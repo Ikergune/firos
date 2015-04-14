@@ -21,6 +21,7 @@ from include.logger import Log
 from include.constants import DATA_CONTEXTBROKER
 from include.pubsub.iPubSub import IqueryBuilder
 
+
 class CbQueryBuilder(IqueryBuilder):
     ## \brief Query data to context broker
     def findById(self, entity_id, data_type="ROBOT", isPattern=False):

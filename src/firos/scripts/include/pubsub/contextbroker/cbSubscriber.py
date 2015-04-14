@@ -20,12 +20,12 @@ import time
 import thread
 import signal
 import urllib2
-import netifaces
 
 from include.constants import *
 from include.logger import Log
 from include.pubsub.iPubSub import Isubscriber
 from include.pubsub.contextbroker.ngsi9 import registerContext, deleteContext, deleteAllContexts, refreshAllContexts
+
 
 class CbSubscriber(Isubscriber):
     ## \brief Context broker subscription handler
@@ -42,24 +42,24 @@ class CbSubscriber(Isubscriber):
             topics = robot["publisher"].keys()
             Log("INFO", "Subscribing on context broker to " + data_type + " " + namespace + " and topics: " + str(topics))
             subscription = {
-                "namespace" : namespace,
-                "data_type" : data_type,
-                "topics" : topics
+                "namespace": namespace,
+                "data_type": data_type,
+                "topics": topics
             }
             url = "http://{}:{}/NGSI10/subscribeContext".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
             subscriber_json = json.dumps(self._generateSubscription(namespace, data_type, topics))
             response_body = self._sendRequest(url, subscriber_json)
-            if response_body != None:
+            if response_body is not None:
                 if "subscribeError" in response_body:
-                    Log("ERROR","Error Subscribing to Context Broker:")
-                    Log("ERROR",response_body["subscribeError"]["errorCode"]["details"])
+                    Log("ERROR", "Error Subscribing to Context Broker:")
+                    Log("ERROR", response_body["subscribeError"]["errorCode"]["details"])
                     os.kill(os.getpid(), signal.SIGINT)
                 else:
                     subscription["id"] = response_body["subscribeResponse"]["subscriptionId"]
                     self.subscriptions[namespace] = subscription
                     Log("INFO", "Connected to Context Broker with id {}".format(subscription["id"]))
             if self.refresh_thread is None:
-                self.refresh_thread = thread.start_new_thread( self._refreshSubscriptions, ("CBSub-Refresh", 2, ) )
+                self.refresh_thread = thread.start_new_thread(self._refreshSubscriptions, ("CBSub-Refresh", 2, ))
 
     def disconnect(self, namespace, delete=False):
         ## \brief Delete subscription by namespace
@@ -75,7 +75,7 @@ class CbSubscriber(Isubscriber):
                 "subscriptionId": subscriptionId
             })
             response_body = self._sendRequest(url, disconnect_json)
-            if response_body != None:
+            if response_body is not None:
                 if int(response_body["statusCode"]["code"]) >= 400:
                     Log("ERROR", "Error Disconnecting from Context Broker (subscription: {}):".format(subscriptionId))
                     Log("ERROR", response_body["statusCode"]["reasonPhrase"])
@@ -105,7 +105,7 @@ class CbSubscriber(Isubscriber):
             url = "http://{}:{}/NGSI10/contextSubscriptions/{}".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"], subscription["id"])
             subscriber_json = json.dumps(subscriber_dict)
             response_body = self._sendRequest(url, subscriber_json, 'PUT')
-            if response_body != None:
+            if response_body is not None:
                 if "subscribeError" in response_body:
                     Log("ERROR", "Error Refreshing subscription")
                     Log("ERROR", response_body["subscribeError"]["errorCode"]["details"])
@@ -137,7 +137,7 @@ class CbSubscriber(Isubscriber):
         })
         url = "http://{}:{}/NGSI10/updateContext".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
         response_body = self._sendRequest(url, operation_json)
-        if response_body != None:
+        if response_body is not None:
             if "errorCode" in response_body:
                 Log("ERROR", "Error deleting entity")
                 Log("ERROR", response_body["errorCode"]["details"])
@@ -149,7 +149,6 @@ class CbSubscriber(Isubscriber):
 
         if removeContext:
             deleteContext(namespace, True)
-
 
     def _generateSubscription(self, namespace, data_type=DEFAULT_CONTEXT_TYPE, topics=[], subscriptionId=None):
         ## \brief Generate subscription message
@@ -185,7 +184,7 @@ class CbSubscriber(Isubscriber):
         # \param delay time
 
         # Seconds to days
-        total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 *60 * 24
+        total_delay = SUBSCRIPTION_REFRESH_DELAY * 60 * 60 * 24
         while True:
             time.sleep(total_delay)
             self.refreshSubscriptions()
@@ -206,4 +205,3 @@ class CbSubscriber(Isubscriber):
         except Exception as ex:
             Log("ERROR", ex.reason)
             return None
-

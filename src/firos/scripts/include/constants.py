@@ -19,6 +19,7 @@ import json
 import urllib2
 import netifaces
 
+
 def setConfiguration():
     try:
         current_path = os.path.dirname(os.path.abspath(__file__))
@@ -35,7 +36,6 @@ if not configured:
     configData = setConfiguration()
     INTERFACE = configData["interface"] if "interface" in configData else "public"
     LOGLEVEL = configData["log_level"] if "log_level" in configData else "INFO"
-
 
 
 SERVER_PORT = configData["server"]["port"]

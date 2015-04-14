@@ -38,8 +38,9 @@ CloudPublisher = PublisherFactory.create()
 
 TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topics")
 ROBOT_TOPICS = {}
-robot_data   = {}
-subscribers  = []
+robot_data = {}
+subscribers = []
+
 
 def loadMsgHandlers(robot_data):
     ## \brief Load ROS publishers/subscribers based on robot data
@@ -95,13 +96,15 @@ def loadMsgHandlers(robot_data):
         CloudPublisher.publishMsg(msg_types.values())
         Log("INFO", "\n")
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
-        Log("INFO", "Subscribed to " + robotName  + "'s topics\n")
+        Log("INFO", "Subscribed to " + robotName + "'s topics\n")
         MapHandler.mapPublisher()
+
 
 def connectionListeners():
     ## \brief Create firos listeners for robot creation or removal
     subscribers.append(rospy.Subscriber("firos/disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber("firos/connect", std_msgs.msg.String, _robotConnection))
+
 
 class MapHandler:
     @staticmethod
@@ -132,7 +135,6 @@ class MapHandler:
             CloudSubscriber.deleteEntity(map_topic, "MAP", False)
 
 
-
 class TopicHandler:
     @staticmethod
     def publish(robot, topic, data):
@@ -160,6 +162,7 @@ class TopicHandler:
                 ROBOT_TOPICS[robot_name]["subscriber"][topic]["subscriber"].unregister()
         Log("INFO", "Unsubscribed topics\n")
 
+
 def _callback(data, args):
     ## \brief Callback to handle ROS published data and send it to Context Broker
     # \param data
@@ -169,8 +172,9 @@ def _callback(data, args):
     datatype = ROBOT_TOPICS[robot]["subscriber"][topic]["msg"]
     contextType = DEFAULT_CONTEXT_TYPE
     content = []
-    content.append(CloudPublisher.createContent(topic, datatype,ros2Obj(data)))
+    content.append(CloudPublisher.createContent(topic, datatype, ros2Obj(data)))
     CloudPublisher.publish(robot, contextType, content)
+
 
 def _robotDisconnection(data):
     ## \brief Handle robot diconnection
@@ -185,6 +189,7 @@ def _robotDisconnection(data):
         for topic in ROBOT_TOPICS[robot_name]["subscriber"]:
             ROBOT_TOPICS[robot_name]["subscriber"][topic]["subscriber"].unregister()
         RosConfigurator.removeRobot(robot_name)
+
 
 def _robotConnection(data):
     ## \brief Handle robot connection

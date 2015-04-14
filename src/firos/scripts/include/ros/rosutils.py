@@ -14,6 +14,7 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 def ros2Obj(msgInstance):
     ## \brief Map a Ros Object to dict
     # \param Ros Object instance
@@ -25,6 +26,7 @@ def ros2Obj(msgInstance):
         else:
             obj[key] = attr
     return obj
+
 
 def obj2Ros(obj, msgInstance):
     ## \brief Map a dict to Ros Object
@@ -39,6 +41,7 @@ def obj2Ros(obj, msgInstance):
             raise Exception("Not a primitive")
         msgInstance = obj
     return msgInstance
+
 
 def ros2Definition(msgInstance):
     ## \brief Generate Ros object definition

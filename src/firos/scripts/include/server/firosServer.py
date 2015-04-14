@@ -20,6 +20,7 @@ from include.logger import Log
 
 from include.server.requestHandler import RequestHandler
 
+
 class FirosServer:
     ## \brief FIROS http server
     # \param self
@@ -30,7 +31,7 @@ class FirosServer:
         self.port = port
         self.stopped = False
 
-        Protocol     = "HTTP/1.0"
+        Protocol = "HTTP/1.0"
 
         server_address = (self.address, self.port)
 

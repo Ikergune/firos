@@ -43,7 +43,7 @@ def registerContext(entity_id, data_type, robot, isPattern=False):
     if entity_id in description_data:
         attributes.append({
             "name": "descriptions",
-            "type":"publisher:DescriptionData",
+            "type": "publisher:DescriptionData",
             "isDomain": "false"
         })
     data = {
@@ -63,7 +63,7 @@ def registerContext(entity_id, data_type, robot, isPattern=False):
         "duration": SUBSCRIPTION_LENGTH
     }
     response_body = _sendRequest(url, json.dumps(data))
-    if response_body != None:
+    if response_body is not None:
         if "registrationId" in response_body:
             contexts[entity_id] = {
                 "data": data,
@@ -73,17 +73,19 @@ def registerContext(entity_id, data_type, robot, isPattern=False):
             if entity_id in description_data:
                 _descs = ""
                 for link in description_data[entity_id]["descriptions"]:
-                    _descs =  _descs + "||" + link
+                    _descs = _descs + "||" + link
                 Publisher.publish(entity_id, data_type, [{
-                    "name" : "descriptions",
-                    "type" : "DescriptionData",
-                    "value" : _descs[2:]
+                    "name": "descriptions",
+                    "type": "DescriptionData",
+                    "value": _descs[2:]
                 }])
+
 
 def deleteAllContexts():
     ## \brief Delete all contexts from NGSI9
     for key in contexts:
         deleteContext(key)
+
 
 def deleteContext(entity_id, delete=False):
     ## \brief Delete context from NGSI9
@@ -100,14 +102,16 @@ def deleteContext(entity_id, delete=False):
             "duration": "P0D",
             "registrationId": contexts[entity_id]["registrationId"]
         }
-        response = _sendRequest(url, json.dumps(data))
+        _sendRequest(url, json.dumps(data))
         if delete:
             del contexts[entity_id]
+
 
 def refreshAllContexts():
     ## \brief Refresh exisiting NGSI9 contexts on context broker
     for key in contexts:
         refreshContext(key)
+
 
 def refreshContext(entity_id):
     ## \brief Refresh exisiting NGSI9 context on context broker
@@ -115,12 +119,14 @@ def refreshContext(entity_id):
     url = "http://{}:{}/NGSI9/registerContext".format(INDEX_CONTEXTBROKER["ADDRESS"], INDEX_CONTEXTBROKER["PORT"])
     data = copy.deepcopy(contexts[entity_id]["data"])
     data["registrationId"] = contexts[entity_id]["registrationId"]
-    response = _sendRequest(url, json.dumps(data))
+    _sendRequest(url, json.dumps(data))
+
 
 def topics2NGSI9(robot):
     ## \brief Robot topics to NGSI9 transcoder
     # \param robot
     return iterateTopics(robot["publisher"], "publisher") + iterateTopics(robot["subscriber"], "subscriber")
+
 
 def iterateTopics(topics, topic_type):
     ## \brief Topic iterator
@@ -128,7 +134,7 @@ def iterateTopics(topics, topic_type):
     # \param topic type
     elems = []
     for key in topics:
-        elems.append( {
+        elems.append({
             "name": key,
             "type": topic_type + ":" + topics[key]["class"]._type.replace("/", ".msg."),
             "isDomain": "false"

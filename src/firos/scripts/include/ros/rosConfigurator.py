@@ -34,6 +34,7 @@ CURRENT_TOPIC_REG = {}
 
 mem_whitelist = None
 
+
 class RosConfigurator:
     ## \brief Tool to get Ros data from system
 
@@ -100,7 +101,6 @@ class RosConfigurator:
                         "type": pubsub
                     }
 
-
                 if robot_name not in robots:
                     robots[robot_name] = {"topics": {}}
                 if robot_topic not in robots[robot_name]["topics"]:
@@ -109,7 +109,6 @@ class RosConfigurator:
                         "msg": t_type,
                         "type": pubsub
                     }
-
 
     @staticmethod
     def removeRobot(robot_name):
@@ -152,8 +151,8 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(_robots, t,_type, "subscriber", whiteLists)
-                        RosConfigurator.setRobot(_robots, t,_type, "publisher", whiteLists)
+                        RosConfigurator.setRobot(_robots, t, _type, "subscriber", whiteLists)
+                        RosConfigurator.setRobot(_robots, t, _type, "publisher", whiteLists)
 
                 # ROS subscriber --> firos publishes data to them
                 for t, l in subs:
@@ -161,8 +160,8 @@ class RosConfigurator:
                     publishing = _isInFiros(t, existing_topics["publisher"], l)
                     if not subscribing and not publishing:
                         _type = RosConfigurator.topic_type(t, topic_types)
-                        RosConfigurator.setRobot(_robots, t,_type, "publisher", whiteLists)
-                        RosConfigurator.setRobot(_robots, t,_type, "subscriber", whiteLists)
+                        RosConfigurator.setRobot(_robots, t, _type, "publisher", whiteLists)
+                        RosConfigurator.setRobot(_robots, t, _type, "subscriber", whiteLists)
 
             except socket.error:
                 raise rostopic.ROSTopicIOException("Unable to communicate with master!")
@@ -170,6 +169,7 @@ class RosConfigurator:
             return _robots
         else:
             return robots
+
 
 def setWhiteList(additions, deletions, restore=False):
     global mem_whitelist
@@ -195,7 +195,8 @@ def setWhiteList(additions, deletions, restore=False):
     if restore:
         mem_whitelist = None
 
-def _isInFiros(topic_name, list2Check,nodes):
+
+def _isInFiros(topic_name, list2Check, nodes):
     using = False
     if topic_name not in list2Check:
         return False
@@ -206,15 +207,17 @@ def _isInFiros(topic_name, list2Check,nodes):
 
     return using
 
+
 def _getWhiteLists():
     return {
         "publisher": _getWhiteList("publisher"),
         "subscriber": _getWhiteList("subscriber")
     }
 
+
 def _getWhiteList(pubsub):
     try:
-        if mem_whitelist == None:
+        if mem_whitelist is None:
             current_path = os.path.dirname(os.path.abspath(__file__))
             json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
             data = json.load(open(json_path))

@@ -28,7 +28,7 @@
         "port"      : 1026
       },
       "data": {
-        "address"   : "130.206.127.115",
+        "address"   : 0.0.0.0,
         "port"      : 1026
       },
       "subscription": {
@@ -84,7 +84,7 @@
         "port": 10100
     },
     "contextbroker": {
-        "address"   : "130.206.127.115",
+        "address"   : "0.0.0.0",
         "port"      : 1026,
         "subscription": {
           "throttling": "PT0S",
@@ -103,7 +103,7 @@
         "port": 10100
     },
     "contextbroker": {
-        "address"   : "130.206.127.115",
+        "address"   : "0.0.0.0",
         "port"      : 1026,
         "subscription": {
           "throttling": "PT0S",

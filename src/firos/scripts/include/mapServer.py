@@ -25,16 +25,19 @@ from include.constants import MAP_SERVER_PORT, ROSBRIDGE_PORT
 
 MAP_SERVER_PROCESS = None
 
-mapserver_path = os.path.dirname(os.path.abspath(__file__)).replace("include","")
+mapserver_path = os.path.dirname(os.path.abspath(__file__)).replace("include", "")
 print(mapserver_path)
 start_command = "node mapserver.js " + str(MAP_SERVER_PORT) + " " + str(ROSBRIDGE_PORT)
+
+
 class MapServer:
     @staticmethod
     def load():
         ## \brief Starts Map server thread
-        MapThread = Thread(target = _launchMapServer)
+        MapThread = Thread(target=_launchMapServer)
         MapThread.daemon = True
         MapThread.start()
+
 
 def _launchMapServer():
     ## \brief If map_server is configured launches it

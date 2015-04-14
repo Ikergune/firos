@@ -33,6 +33,7 @@ CloudQueryBulder = QueryBuilderFactory.create()
 
 TOPIC_TIMESTAMPS = {}
 
+
 class RequestHandler(BaseHTTPRequestHandler):
     ## \brief FIROS http request handler
     def do_GET(self):
@@ -44,7 +45,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             action["action"](self, action)
         else:
             self.send_response(200)
-            self.send_header('Content-type','text/html')
+            self.send_header('Content-type', 'text/html')
             self.end_headers()
             self.wfile.write("GENERIC PAGE")
         return
@@ -58,10 +59,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             action["action"](self, action)
         else:
             self.send_response(200)
-            self.send_header('Content-type','text/html')
+            self.send_header('Content-type', 'text/html')
             self.end_headers()
             self.wfile.write("GENERIC PAGE")
         return
+
 
 def pathParams(request, regexp):
     ## \brief Get url path params
@@ -69,10 +71,12 @@ def pathParams(request, regexp):
     # \param regexp to use
     return list(re.match(regexp, urlparse("http://localhost" + request.path).path).groups())
 
+
 def getParams(request):
     ## \brief GET requests' param parser
     # \param client request
     return parse_qs(urlparse("http://localhost" + request.path).query)
+
 
 def postParams(request):
     ## \brief POST requests' param parser
@@ -89,6 +93,7 @@ def postParams(request):
     else:
         return {}
 
+
 def getAction(path, method):
     ## \brief URL checker to find what action to execute
     # \param url string
@@ -98,11 +103,10 @@ def getAction(path, method):
             return route
     return None
 
-
-
 ###############################################################################
 #############################   Request Mapping   #############################
 ###############################################################################
+
 
 def onTopic(request, action):
     ## \brief Handle topic reception
@@ -126,14 +130,17 @@ def onTopic(request, action):
                     if topic["name"] != "descriptions" and topic["name"] in commands:
                         value = CloudSubscriber.parseData(topic['value'])
                         if (topic["name"] not in TOPIC_TIMESTAMPS[robotName]) or ("firosstamp" in value and TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]) or ("firosstamp" not in value):
+                            if "firosstamp" in value:
+                                TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
+                                # value.remove(value["firosstamp"])
                             TopicHandler.publish(robotName, topic['name'], value)
-                        TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
     except Exception as e:
         Log("ERROR", e)
     request.send_response(200)
-    request.send_header('Content-type','text/plain')
+    request.send_header('Content-type', 'text/plain')
     request.end_headers()
     request.wfile.write("Received by firos")
+
 
 def onRobots(request, action):
     ## \brief Handle robot list request
@@ -159,10 +166,11 @@ def onRobots(request, action):
             robot_data["topics"].append(topic_data)
         data.append(robot_data)
     request.send_response(200)
-    request.send_header('Content-type','application/json')
-    setCors(request);
+    request.send_header('Content-type', 'application/json')
+    setCors(request)
     request.end_headers()
     request.wfile.write(json.dumps(data))
+
 
 def onRobotData(request, action):
     ## \brief Handle robot info request
@@ -185,11 +193,12 @@ def onRobotData(request, action):
             robot_list.append(context["contextElement"])
         data = robot_list
 
-    request.send_header('Content-type','application/json')
-    setCors(request);
+    request.send_header('Content-type', 'application/json')
+    setCors(request)
 
     request.end_headers()
     request.wfile.write(json.dumps(data))
+
 
 def onConnect(request, action):
     ## \brief Launch robot search and connection
@@ -200,6 +209,7 @@ def onConnect(request, action):
     request.send_response(200)
     request.end_headers()
     request.wfile.write("")
+
 
 def onDisConnect(request, action):
     ## \brief Disconnect robot
@@ -219,6 +229,7 @@ def onDisConnect(request, action):
     request.end_headers()
     request.wfile.write("")
 
+
 def onWhitelistWrite(request, action):
     ## \brief Handle robot info request
     # \param client request
@@ -229,6 +240,7 @@ def onWhitelistWrite(request, action):
     request.end_headers()
     request.wfile.write("")
 
+
 def onWhitelistRemove(request, action):
     ## \brief Handle robot info request
     # \param client request
@@ -238,6 +250,7 @@ def onWhitelistRemove(request, action):
     request.send_response(200)
     request.end_headers()
     request.wfile.write("")
+
 
 def onWhitelistRestore(request, action):
     ## \brief Handle robot info request
@@ -268,11 +281,12 @@ MAPPER = {
     "DELETE": [],
 }
 
+
 def setCors(request):
     # \brief Set CORS headers in request
     # \param client request
-    request.send_header("Access-Control-Allow-Credentials", True);
-    request.send_header("Access-Control-Allow-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time");
-    request.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
-    request.send_header("Access-Control-Expose-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time");
-    request.send_header("Access-Control-Allow-Origin", "*");
+    request.send_header("Access-Control-Allow-Credentials", True)
+    request.send_header("Access-Control-Allow-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time")
+    request.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE")
+    request.send_header("Access-Control-Expose-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time")
+    request.send_header("Access-Control-Allow-Origin", "*")

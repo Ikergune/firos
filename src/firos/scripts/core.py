@@ -55,10 +55,10 @@ if __name__ == '__main__':
     server = FirosServer("0.0.0.0", port)
 
     def signal_handler(signal, frame):
-        Log("INFO",('\nExiting from the application'))
+        Log("INFO", ('\nExiting from the application'))
         TopicHandler.unregisterAll()
         server.close()
-        Log("INFO",('\nExit'))
+        Log("INFO", ('\nExit'))
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)

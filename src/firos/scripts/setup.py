@@ -36,13 +36,13 @@ from include.genpy import genpy_firos
 from include import confManager
 from include.logger import Log
 
+
 def launchSetup(main=False):
     retcode = 0
 
     Log("INFO", "\nStarting Firos setup...")
     Log("INFO", "---------------------------------\n")
     Log("INFO", "\nGenerating Message Description Files\n")
-
 
     try:
         robots = confManager.getRobots(True, True)
@@ -63,4 +63,3 @@ if __name__ == '__main__':
     # Initialize the node and name it.
     rospy.init_node('firos_setup')
     launchSetup(True)
-

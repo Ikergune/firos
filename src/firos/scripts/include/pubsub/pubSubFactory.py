@@ -14,13 +14,14 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from include.pubsub.iPubSub import Ipublisher, Isubscriber
+from include.pubsub.iPubSub import Ipublisher, Isubscriber, IqueryBuilder
 
 from include.pubsub.contextbroker.cbPublisher import CbPublisher
 from include.pubsub.contextbroker.cbSubscriber import CbSubscriber
 from include.pubsub.contextbroker.cbQueryBuilder import CbQueryBuilder
 
 PUBSUB_TYPE = "ContextBroker"
+
 
 class PublisherFactory:
     @staticmethod
@@ -37,6 +38,7 @@ class PublisherFactory:
         else:
             return Ipublisher
 
+
 class SubscriberFactory:
     @staticmethod
     def create():
@@ -52,17 +54,18 @@ class SubscriberFactory:
         else:
             return Isubscriber
 
+
 class QueryBuilderFactory:
     @staticmethod
     def create():
         if PUBSUB_TYPE is "ContextBroker":
             return CbQueryBuilder()
         else:
-            return IQueryBuilder()
+            return IqueryBuilder()
 
     @staticmethod
     def getClass():
         if PUBSUB_TYPE is "ContextBroker":
             return CbQueryBuilder
         else:
-            return IQueryBuilder
+            return IqueryBuilder

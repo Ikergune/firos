@@ -17,16 +17,16 @@
 import os
 import re
 import imp
-import pkgutil
 
 regex = re.compile(ur'^(.*)(\b.msg\b)(.*)$')
+
 
 class LibLoader:
     @staticmethod
     def loadFromFile(filepath):
         ## \brief Load file from path
         # \param File path
-        mod_name,file_ext = os.path.splitext(os.path.split(filepath)[-1])
+        mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
 
         if file_ext.lower() == '.py':
             py_mod = imp.load_source(mod_name, filepath)
@@ -59,6 +59,7 @@ class LibLoader:
                 module = getattr(module, name)
         return module
 
+
 def generateRosDependencies():
     directories = os.environ["ROS_PACKAGE_PATH"].split(":")
     imports = """from include.logger import Log\n\n"""
@@ -67,9 +68,9 @@ def generateRosDependencies():
         if os.path.isdir(directory):
             for folder in os.listdir(directory):
                 if "msg" in folder:
-                    imports += """try:\n    import {}.msg\nexcept Exception:\n    unloaded += 1\n    libs.append('{}')\n""".format(folder,folder)
+                    imports += """try:\n    import {}.msg\nexcept Exception:\n    unloaded += 1\n    libs.append('{}')\n""".format(folder, folder)
     imports += "Log('WARNING', str(unloaded) + ' libraries not loaded: ' + str(libs))"
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ros", "dependencies", "generated.py")
-    f = open(path,'w')
+    f = open(path, 'w')
     f.write(imports)
     f.close()

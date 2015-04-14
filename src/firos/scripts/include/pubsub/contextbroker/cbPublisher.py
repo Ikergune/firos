@@ -26,6 +26,7 @@ from include.pubsub.iPubSub import Ipublisher
 PUBLISH_FREQUENCY = 250
 posted_history = {}
 
+
 class CbPublisher(Ipublisher):
     ## \brief Context broker publisher class
     def createContent(self, topic, datatype, data):
@@ -57,6 +58,7 @@ class CbPublisher(Ipublisher):
         ## \brief Publish message structures in context broker
         # \param entity attributes
         _publish("rosmsg", "ROSDEFINITION", attributes, INDEX_CONTEXTBROKER, False)
+
 
 def _publish(context_id, datatype, attributes, connection, sendCommand=True):
     ## \brief Publish data of an entity in context broker

@@ -22,6 +22,7 @@ import traceback
 from include.logger import Log
 from include.ros.rosConfigurator import RosConfigurator
 
+
 def getRobots(refresh=False, withJson=True):
     ## \brief Get robots managed by firos
     # \param Refresh the robot list
@@ -40,8 +41,8 @@ def getRobots(refresh=False, withJson=True):
                     topic = robots_json[robot_name]["topics"][topic_name]
 
                     robots[robot_name]["topics"][str(topic_name)] = {
-                        "msg"       : str(topic["msg"]) if type(topic["msg"]) is str else topic["msg"],
-                        "type"      : str(topic["type"])
+                        "msg": str(topic["msg"]) if type(topic["msg"]) is str else topic["msg"],
+                        "type": str(topic["type"])
                     }
         return robots
 

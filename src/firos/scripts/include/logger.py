@@ -48,7 +48,7 @@ else:
     _levelId = PRIORITIES[LOGLEVEL]
 
 if os.path.exists(SYSLOG_ADDRESS):
-    handler = logging.handlers.SysLogHandler(address = SYSLOG_ADDRESS)
+    handler = logging.handlers.SysLogHandler(address=SYSLOG_ADDRESS)
     _logger.addHandler(handler)
 else:
     handler = None
@@ -72,4 +72,3 @@ def Log(level, *args):
             elif level == 'WARNING':
                 _logger.warning(text)
         print text
-

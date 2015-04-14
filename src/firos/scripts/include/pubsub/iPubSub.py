@@ -14,6 +14,7 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 class Ipublisher:
     ## \brief Interface for content publisher
     def createContent(topic, datatype, data, isPrimitive=False):
@@ -40,6 +41,7 @@ class Ipublisher:
         ## \brief Publish message structures
         # \param entity attributes
         raise Exception('Method not implemented')
+
 
 class Isubscriber:
     ## \brief Interface for content listener
@@ -76,6 +78,7 @@ class Isubscriber:
         # \param entity type
         # \param entity's topics
         raise Exception('Method not implemented')
+
 
 class IqueryBuilder:
     ## \brief Content publisher query builder
