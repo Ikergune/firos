@@ -1,0 +1,2 @@
+string entity_name
+int16 entity_status

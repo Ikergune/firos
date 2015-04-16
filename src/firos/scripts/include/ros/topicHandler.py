@@ -102,7 +102,7 @@ def loadMsgHandlers(robot_data):
 
 def connectionListeners():
     ## \brief Create firos listeners for robot creation or removal
-    subscribers.append(rospy.Subscriber("firos/disconnect", std_msgs.msg.String, _robotDisconnection))
+    subscribers.append(rospy.Subscriber("firos/disconnect", std_msgs.msg.String, robotDisconnection))
     subscribers.append(rospy.Subscriber("firos/connect", std_msgs.msg.String, _robotConnection))
 
 
@@ -176,7 +176,7 @@ def _callback(data, args):
     CloudPublisher.publish(robot, contextType, content)
 
 
-def _robotDisconnection(data):
+def robotDisconnection(data):
     ## \brief Handle robot diconnection
     # \param robot data dict (name)
     robot_name = data.data
