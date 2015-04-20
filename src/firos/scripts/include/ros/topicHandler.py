@@ -93,11 +93,11 @@ def loadMsgHandlers(robot_data):
                     "class": theclass,
                     "subscriber": rospy.Subscriber(robotName + "/" + topicName, theclass, _callback, extra)
                 }
-        CloudPublisher.publishMsg(msg_types.values())
         Log("INFO", "\n")
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
         Log("INFO", "Subscribed to " + robotName + "'s topics\n")
-        MapHandler.mapPublisher()
+    CloudPublisher.publishMsg(msg_types.values())
+    MapHandler.mapPublisher()
 
 
 def connectionListeners():
