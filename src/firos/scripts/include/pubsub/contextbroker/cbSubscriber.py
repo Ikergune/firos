@@ -118,6 +118,7 @@ class CbSubscriber(Isubscriber):
     def parseData(self, data):
         ## \brief Parse the received data
         # \param data
+        # print data
         return json.loads(data.replace(SEPARATOR_CHAR, '"'))
 
     def deleteEntity(self, namespace, data_type, removeContext=True):

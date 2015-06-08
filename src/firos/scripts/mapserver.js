@@ -18,7 +18,7 @@ var io = require('socket.io')(app);
 app.listen(HTTP_PORT);
 
 
-console.log("Launched Map server");
+console.log("Launched Map server at port " + HTTP_PORT);
 RosBridge = {
     ros: null,
     connect: function(http){

@@ -27,6 +27,7 @@
 
 # Import required Python code.
 import sys
+import copy
 import rospy
 import signal
 
@@ -49,10 +50,19 @@ if __name__ == '__main__':
     rospy.init_node(NODE_NAME)
     Log("INFO", "Initialized")
 
-    if sys.argv[1:]:
-        port = int(sys.argv[1])
-    else:
+    port = None
+
+    args = copy.deepcopy(sys.argv)
+    args.pop(0)
+
+    for i in range(len(args)-1):
+        if args[i].upper() == "-P":
+            i = i + 1
+            port = args[i]
+
+    if port is None:
         port = SERVER_PORT
+
     server = FirosServer("0.0.0.0", port)
 
     def signal_handler(signal, frame):
