@@ -63,28 +63,32 @@ if __name__ == '__main__':
     if port is None:
         port = SERVER_PORT
 
-    server = FirosServer("0.0.0.0", port)
+    try:
+        server = FirosServer("0.0.0.0", port)
+    except Exception as ex:
+        sys.stderr.write('CB_COMMUNICATION_FAILED')
+        exit(1)
+    else:
+        def signal_handler(signal, frame):
+            Log("INFO", ('\nExiting from the application'))
+            TopicHandler.unregisterAll()
+            topicManager.removeListeners()
+            server.close()
+            Log("INFO", ('\nExit'))
+            sys.exit(0)
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
 
-    def signal_handler(signal, frame):
-        Log("INFO", ('\nExiting from the application'))
-        TopicHandler.unregisterAll()
-        topicManager.removeListeners()
-        server.close()
-        Log("INFO", ('\nExit'))
-        sys.exit(0)
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+        launchSetup()
 
-    launchSetup()
+        Log("INFO", "\nStarting Firos...")
+        Log("INFO", "---------------------------------\n")
 
-    Log("INFO", "\nStarting Firos...")
-    Log("INFO", "---------------------------------\n")
+        loadMsgHandlers(confManager.getRobots(True, True))
+        connectionListeners()
+        topicManager.setListeners()
 
-    loadMsgHandlers(confManager.getRobots(True, True))
-    connectionListeners()
-    topicManager.setListeners()
+        MapServer.load()
 
-    MapServer.load()
-
-    Log("INFO", "\nPress Ctrl+C to Exit\n")
-    server.start()
+        Log("INFO", "\nPress Ctrl+C to Exit\n")
+        server.start()
