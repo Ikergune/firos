@@ -1,11 +1,11 @@
-Firos
+FIROS
 =====
 
-Firos is a tool that makes easy to connect robots to the cloud. For this purpose it uses the Robot Operating System (ROS, <http://www.ros.org/>) and uses Context Broker (http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) as a way to publish and listen robot data.
+FIROS is a tool that helps connecting robots to the cloud. For this purpose it uses the Robot Operating System (ROS, <http://www.ros.org/>) and the FIWARE  Context Broker (http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) as a way to publish and listen robot's data.
 
-Firos works as a translator between the robot world and the cloud world, transforming ROS messages into NGSI to publish them in the cloud, and vice versa to send cloud data to ROS.
+FIROS works as a translator between the robotics field and the cloud world, transforming ROS messages into NGSI to publish them in the cloud, and vice versa.
 
-Installing Firos
+Installing FIROS
 ================
 
 Requirements
@@ -18,33 +18,49 @@ Requirements
 Installation
 ------------
 
-1.  Download firos from <https://github.com/ikergune/firos> into your ROS workspace
-2.  In command line get inside firos folder and execute "catkin_make", It will create devel and build folder
-3.  Go inside devel folder. there you can do:
-    1.  Execute "source setup.bash" to allow the current command line instance to use firos
-    2.  Add "source /ROUTE_TO_FIROS/devel/setup.bash" at the end of your .bashrc file to allow any new command line instance to use firos
+1.  Make sure you have set your working space (http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment)
+2.  Open a Terminal and navigate to the ROS workspace you want to use. If you just followed the ROS environment tutorial, it will be /home/catkin_ws.
+	`cd /home/catkin_ws`
+3.  Clone the FIROS git repository into your ROS workspace.
+	`git clone https://github.com/ikergune/firos`
+4.  Build the FIROS package with the following command. This will create a devel and build folder under your workspace.
+	`catkin_make`
+5.  For convenience, add the FIROS source to your *.bashrc*" in order to allow any new command line instance to use FIROS.
+	`echo source /FIROS_PATH/devel/setup.bash>>-/.bashrc`
+	Just replace *FIROS_PATH* with the actual path to your FIROS package. For example:
+	`echo source /home/catkin_ws/firos/devel/setup.bash>>-/.bashrc`
+6.  Execute "source setup.bash" to allow the current command line instance to use FIROS
 
-After that you can use firos by executing
+FIROS is now installed in your robot! 
 
-``` bash
-rosrun firos core.py
-```
 
-NOTE: Before connecting to any robot its libraries must be intalled in the system, for example turtlebot installation: <http://wiki.ros.org/Robots/TurtleBot#turtlebot.2BAC8-Tutorials.2BAC8-indigo.Installation>
-
-Configuring Firos
+Configuring FIROS
 =================
 
-Firos has several configuration files, they ar located at src/firos/config.
+FIROS has several configuration files located at *src/firos/config*.
 
 config.json
 -----------
 
-This file contains the configuration related to firos launching environment:
+This file contains the configuration related to FIROS launching environment. Here is a description of each parameter:
 
--   environment: This parameters sets the environment configuration (local, development, production), that will configure the context broker's IP, and port, and firos rest apis' port
--   the other keys are environment definitions. Firos will use an environment's configuration based on environment key's value. Here is an environement example (there can be as many environments as you want):
+-   *environment*: These parameters take care of the *local*, *development* and *production* environment configurations by setting up the `*context broker's IP*, *port* and *FIROS rest apis' port*. 
+FIROS will use an environment's configuration based this value, but there can be as many environments as you want.
+-   *server*: It contains information related to the FIROS server
+	- *port*: The port in which FIROS is listening. If you want to let access outside of your local network, you might want to redirect that port on your router.
+-   *contextbroker*: Contains information related to the Context broker configuration
+    -   *address*: Context broker's IP address
+    -   *port*: Context broker's port
+    -   *subscription*: Context broker's subscription information
+        -   *throttling*: The update frequency at which the Context Broker sends updates to the robot.
+        -   *subscription_length*: The subscription expiration time
+        -   *subscription_refresh_delay*: The subscription refresh rate in days in order to avoid its expiration
+-   *interface*: Network configuration of the card in use
+    -   *public*: Public IP. Do not forget to redirect the proper ports in your network
+    -   *wlan0, et0, tun0*, etc: Different network interface configuration.
+-   *log_level*: It represents the verbosity of the logging system for FIROS. Available options are as follows: *"NONE", "INFO", "DEBUG" ,"WARNING", "ERROR"* and *"CRITICAL"*
 
+Here is an example of a *config.json* file for a *local* environment:
 ``` javascript
 {
   "environment": "local",
@@ -68,18 +84,6 @@ This file contains the configuration related to firos launching environment:
 }
 ```
 
--   server.port: The port that firos will be listening at
--   contextbroker: Context broker configuration
-    -   address: Context broker's IP address
-    -   port: Context broker's port
-    -   subscription: Context broker's subscription information
-        -   throttling: The update frecuency
-        -   subscription_length: The subscription expiration time
-        -   subscription_refresh_delay: The subscription refresh rate in days (to avoid expiration)
--   interface: This parameters sets the source of the ip that the context broker will publish to
-    -   public: For public address (External), Take in mind port redirection inside your network
-    -   wlan0, et0, tun0... For different computer interfaces (Recommended if the CB is in your network)
--   log_level: This represents the logging level for Firos it can be: "NONE", "INFO", "DEBUG" ,"WARNING", "ERROR" and "CRITICAL"
 
 robotdescriptions.json
 ----------------------
@@ -103,7 +107,7 @@ The robots can have some public files that can be useful for users to understand
 whitelist.json
 --------------
 
-When firos is launched or is notified that a new robot has been connected, it searchs for the new robots and topics. this file contains a whitelist that represents the robots that are allowed to connect to firos, the topics that will be used and their role (publisher or subscriber), if a topic is publisher it means that firos will publish on it and if it is subscriber firos will listen to it. The robot and the topic names can be regular expressions (without the "^" at the beginning and "$" at the end). Here is an example:
+When FIROS is launched or is notified that a new robot has been connected, it searchs for the new robots and topics. this file contains a whitelist that represents the robots that are allowed to connect to FIROS, the topics that will be used and their role (publisher or subscriber), if a topic is publisher it means that FIROS will publish on it and if it is subscriber FIROS will listen to it. The robot and the topic names can be regular expressions (without the "^" at the beginning and "$" at the end). Here is an example:
 
 ``` javascript
 "turtle\\w+": {
@@ -169,7 +173,7 @@ To get the topic type to add it to robots.json these are the steps you need to d
         Subscribers:
             * /turtlesim (http://192.168.4.42 :45825/)
 
-This means that the robot is listening to data published on /turtle1/cmd_vel so firos should publish on it (publisher). The type is "geometry_msgs/Twist" but firos needs it package, the package used to be the same name replacing "/" with ".msg.", so the type is "geometry_msgs.msg.Twist"
+This means that the robot is listening to data published on /turtle1/cmd_vel so FIROS should publish on it (publisher). The type is "geometry_msgs/Twist" but FIROS needs it package, the package used to be the same name replacing "/" with ".msg.", so the type is "geometry_msgs.msg.Twist"
 
 Another example:
 
@@ -181,7 +185,7 @@ Another example:
 
         Subscribers: None
 
-This means that the robot is publishing data on /turtle1/pose so firos should listen to it (subscriber). The type is "turtlesim/Pose" but firos needs it package, the package used to be the same name replacing "/" with ".msg.", so the type is "turtlesim.msg.Pose"
+This means that the robot is publishing data on /turtle1/pose so FIROS should listen to it (subscriber). The type is "turtlesim/Pose" but FIROS needs it package, the package used to be the same name replacing "/" with ".msg.", so the type is "turtlesim.msg.Pose"
 
 So the robots.json should have this content (it can have more robots and topics):
 
@@ -200,17 +204,17 @@ So the robots.json should have this content (it can have more robots and topics)
 }
 ```
 
-Firos Topics
+FIROS Topics
 ============
 
-Firos is listening to 2 topics to handle robot connections.
+FIROS is listening to 2 topics to handle robot connections.
 
-/firos/connect
+/FIROS/connect
 --------------
 
 When this topic is called (with an empty string) it will search for new robots and topics and will connect with any robot and topic that matches with the whitelist.
 
-/firos/disconnect
+/FIROS/disconnect
 -----------------
 
 This topic must be called with a String message with the name of the robot that has to be disconnected.
@@ -218,12 +222,12 @@ This topic must be called with a String message with the name of the robot that 
 API
 ===
 
-Firos has several REST entry points that are used to connect with the context broker or get data from firos.
+FIROS has several REST entry points that are used to connect with the context broker or get data from FIROS.
 
 GET /robots
 -----------
 
-Get robots handled by firos with their topics, each topic contains name, type, role and structure:
+Get robots handled by FIROS with their topics, each topic contains name, type, role and structure:
 
 ``` javascript
 [
@@ -291,7 +295,7 @@ Get a robot's data published on context broker. What it does is to build query u
                 "type": "turtlesim.msg.Pose",
                 "name": "pose",
                 "value": {
-                    "firosstamp": 1424423606.27683,
+                    "FIROSstamp": 1424423606.27683,
                     "linear_velocity": 0,
                     "theta": 0,
                     "y": 5.544444561004639,
@@ -303,7 +307,7 @@ Get a robot's data published on context broker. What it does is to build query u
                 "type": "geometry_msgs.msg.Twist",
                 "name": "cmd_vel",
                 "value": {
-                    "firosstamp": 1424423604309,
+                    "FIROSstamp": 1424423604309,
                     "linear": {
                         "y": 0,
                         "x": 0,
@@ -321,7 +325,7 @@ Get a robot's data published on context broker. What it does is to build query u
 ]
 ```
 
-POST /firos
+POST /FIROS
 -----------
 
 This is the api that will handle the context broker's subscription data. So the user doesn't have to use it.
@@ -329,12 +333,12 @@ This is the api that will handle the context broker's subscription data. So the 
 POST /robot/connect
 -------------------
 
-This API will make firos to search for new robots and topics that are allowed in the configuration whitelist and will connect to them
+This API will make FIROS to search for new robots and topics that are allowed in the configuration whitelist and will connect to them
 
 POST /robot/diconnect/NAME
 --------------------------
 
-This API will make firos to disconnect from the robot specified in the path parameter NAME. It will delete any connection an delete the entity from the context broker.
+This API will make FIROS to disconnect from the robot specified in the path parameter NAME. It will delete any connection an delete the entity from the context broker.
 
 POST /whitelist/write
 ---------------------
@@ -460,3 +464,16 @@ POST /whitelist/restore
 -----------------------
 
 This api restores whitelist to its initial state
+
+
+======================================================
+=============================================
+=============================================
+
+After that you can use FIROS by executing
+
+``` bash
+rosrun FIROS core.py
+```
+
+NOTE: Before connecting to any robot its libraries must be intalled in the system, for example turtlebot installation: <http://wiki.ros.org/Robots/TurtleBot#turtlebot.2BAC8-Tutorials.2BAC8-indigo.Installation>
