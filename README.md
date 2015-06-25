@@ -88,7 +88,7 @@ Here is an example of a *config.json* file for a *local* environment:
 robotdescriptions.json
 ----------------------
 
-The robots can have some public files that can be useful for users to understand or use the robot. This files' references can be published in context broker, to do this att the descriptions under the robot name like in this example:
+Robotsmay have some public files so users can understand some characteristics or even use their devices. All the references contained in this file can be published on the Context Broker; to do so, just follow the next example:
 
 ``` javascript
 "turtle1": {
@@ -107,7 +107,8 @@ The robots can have some public files that can be useful for users to understand
 whitelist.json
 --------------
 
-When FIROS is launched or is notified that a new robot has been connected, it searchs for the new robots and topics. this file contains a whitelist that represents the robots that are allowed to connect to FIROS, the topics that will be used and their role (publisher or subscriber), if a topic is publisher it means that FIROS will publish on it and if it is subscriber FIROS will listen to it. The robot and the topic names can be regular expressions (without the "^" at the beginning and "$" at the end). Here is an example:
+Everytime FIROS is launched or whenever it gets a notification about a new robot being connected, it looks the available *topics* on the robot. this configuration file contains a list of allowed robots and topics to be connected to this particular instance of FIROS. It also defines whether the topic is a *publisher*, when FIROS transmits data to it, or a *subscriber* in case FIROS should be listening to any incoming information on that topic.
+Names corresponding to both *robots* and *topics* can also be *regular expressions* avoiding the '^' at the beginning and '$' at the end. Here is an example:
 
 ``` javascript
 "turtle\\w+": {
@@ -123,7 +124,7 @@ When FIROS is launched or is notified that a new robot has been connected, it se
 robots.json
 -----------
 
-Despite of connecting to new robots you can force some connections, to do this you must add the robot name and topics with their role to this file. The role is the same as in whitelist (publisher to publish on it and subscriber to listen to it). Each topic should need also to define its type. Here is an example:
+It is also possible to force some robot connections. This is done by adding the robot name, its topics and roles to the *robots.json* file. The role parameter must be the same as the on in the *whitelist.json* file and each topic must also contain a *type* parameter to define its role. The next file is an example of this configuration:
 
 ``` javascript
 "robot1":{
@@ -158,36 +159,37 @@ Despite of connecting to new robots you can force some connections, to do this y
 Getting Topic Types
 ===================
 
-To get the topic type to add it to robots.json these are the steps you need to do (example using the turtlesim <http://wiki.ros.org/turtlesim>):
+There is also a way to request the topic type, which is usefull in order to add them to the previous *robots.json* file. The following example is based on the *Turtlesim* example of ROS available here <http://wiki.ros.org/turtlesim>. Here are the steps to follow:
 
-1.  Launch command "rostopic list" it will show you all the topics that are registered
-2.  Select the topic you want and launch the command "rostopic info THE_TOPIC". It will show something like this:
+1.  Launch the `rostopic list` command. This will show all the registered topics.
+2.  Now that you know the name of the topic, just execute the following command: `rostopic info TOPIC_NAME`. It will result on something like this:
 
 <!-- -->
-
+`
     rostopic info /turtle1/cmd_vel
         Type: geometry_msgs/Twist
 
         Publishers: None
 
         Subscribers:
-            * /turtlesim (http://192.168.4.42 :45825/)
+            * /turtlesim (http://192.168.4.42 :45825/)`
 
-This means that the robot is listening to data published on /turtle1/cmd_vel so FIROS should publish on it (publisher). The type is "geometry_msgs/Twist" but FIROS needs it package, the package used to be the same name replacing "/" with ".msg.", so the type is "geometry_msgs.msg.Twist"
+This means that the robot `turtle1` is listening to data published on `/turtle1/cmd_vel` so FIROS should be publishing on it. 
+The *type* of the `/turtle1/cmd_vel` is `geometry_msgs/Twist` what internally corresponds to the `geometry_msgs.msg.Twist` package
 
-Another example:
-
+Here is another example:
+`
     rostopic info /turtle1/pose
         Type: turtlesim/Pose
 
         Publishers:
             * /turtlesim (http://192.168.4.42 :45825/)
 
-        Subscribers: None
+        Subscribers: None`
 
-This means that the robot is publishing data on /turtle1/pose so FIROS should listen to it (subscriber). The type is "turtlesim/Pose" but FIROS needs it package, the package used to be the same name replacing "/" with ".msg.", so the type is "turtlesim.msg.Pose"
+In this case, `turtle1` is publishing data on `/turtle1/pose`, so FIROS can listen to it. As seen before, the *type* `turtlesim/Pose` corresponds to the internal package `turtlesim.msg.Pose`
 
-So the robots.json should have this content (it can have more robots and topics):
+So we can deduce the slice of *robots.json* related to `turtle1`:
 
 ``` javascript
 "turtle1":{
@@ -207,27 +209,29 @@ So the robots.json should have this content (it can have more robots and topics)
 FIROS Topics
 ============
 
-FIROS is listening to 2 topics to handle robot connections.
+FIROS is listening to 2 topics in order to handle robot connections.
 
 /FIROS/connect
 --------------
 
-When this topic is called (with an empty string) it will search for new robots and topics and will connect with any robot and topic that matches with the whitelist.
+Calling this topic with an empty string will make FIROS connect to new robots in case their names and topics match the ones allowed on the *whitelist.json*
+
 
 /FIROS/disconnect
 -----------------
 
-This topic must be called with a String message with the name of the robot that has to be disconnected.
+Disconnecting robots from FIROS is possible by simply calling this topic with the robot name.
+`/FIROS/disconnect turtle1`
 
 API
 ===
 
-FIROS has several REST entry points that are used to connect with the context broker or get data from FIROS.
+FIROS has several REST entry points that are used for connecting with the context broker or getting data from FIROS.
 
 GET /robots
 -----------
 
-Get robots handled by FIROS with their topics, each topic contains name, type, role and structure:
+Get robots handled by FIROS with their corresponding *topics*. Each *topic* contains the `name`, `type`, `role` and `structure`:
 
 ``` javascript
 [
@@ -271,7 +275,7 @@ Get robots handled by FIROS with their topics, each topic contains name, type, r
 GET /robot/NAME
 ---------------
 
-Get a robot's data published on context broker. What it does is to build query using the NAME that must be send in the path and it will return data using this structure:
+Get the data published by the robot on Context Broker. It builds a query using the *NAME*, what will return data using the following structure:
 
 ``` javascript
 [
@@ -328,22 +332,22 @@ Get a robot's data published on context broker. What it does is to build query u
 POST /FIROS
 -----------
 
-This is the api that will handle the context broker's subscription data. So the user doesn't have to use it.
+This API handles the subscription data of the context broker. 
 
 POST /robot/connect
 -------------------
 
-This API will make FIROS to search for new robots and topics that are allowed in the configuration whitelist and will connect to them
+This API makes FIROS connecting to new robots in case their names and topics match the ones allowed on the *whitelist.json*
 
 POST /robot/diconnect/NAME
 --------------------------
 
-This API will make FIROS to disconnect from the robot specified in the path parameter NAME. It will delete any connection an delete the entity from the context broker.
+This API forces FIROS to disconnect from the robot specified by the *NAME* parameter. It will also delete any connection and entity associated to the particular robot on the Context Broker.
 
 POST /whitelist/write
 ---------------------
 
-This api overwrites or creates entries in the robot whitelist described. To do this you must send the data in the next fomat:
+This API overwrites or creates entries in the robot *whitelist*. This can be done by sending the following data:
 
 ``` javascript
 {
@@ -358,11 +362,11 @@ This api overwrites or creates entries in the robot whitelist described. To do t
 }
 ```
 
-NOTE: The elements you want to overwrite should be sent with the elements yo want to keep.
+NOTE: In case you want to keep any element, it must be sent along with the ones to be replaced.
 
 EXAMPLE:
 
-if we have this whitelist:
+Take this *whitelist.json* as a starting point:
 
 ``` javascript
 {
@@ -373,9 +377,10 @@ if we have this whitelist:
 }
 ```
 
-and you send:
+Now, the following command is sent:
 
 ``` javascript
+POST /whitelist/write
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel2"],
@@ -384,7 +389,7 @@ and you send:
 }
 ```
 
-the result will be:
+The resulting *whitelist* will be as follows:
 
 ``` javascript
 {
@@ -398,7 +403,7 @@ the result will be:
 POST /whitelist/remove
 ----------------------
 
-This api removes whitelist elements the format is the next one:
+This API removes elements from the *whitelist*. The format is as follows:
 
 ``` javascript
 {
@@ -415,7 +420,7 @@ This api removes whitelist elements the format is the next one:
 
 EXAMPLE:
 
-If we have this whitelist:
+Take this *whitelist.json* as a starting point:
 
 ``` javascript
 {
@@ -430,9 +435,10 @@ If we have this whitelist:
 }
 ```
 
-sending this json:
+Now, the following json is sent:
 
 ``` javascript
+POST /whitelist/remove
 {
     "turtle\\w+": {
         "publisher": [],
@@ -445,7 +451,7 @@ sending this json:
 }
 ```
 
-The result will be:
+The resulting *whitelist* will look as follows:
 
 ``` javascript
 {
@@ -463,17 +469,4 @@ The result will be:
 POST /whitelist/restore
 -----------------------
 
-This api restores whitelist to its initial state
-
-
-======================================================
-=============================================
-=============================================
-
-After that you can use FIROS by executing
-
-``` bash
-rosrun FIROS core.py
-```
-
-NOTE: Before connecting to any robot its libraries must be intalled in the system, for example turtlebot installation: <http://wiki.ros.org/Robots/TurtleBot#turtlebot.2BAC8-Tutorials.2BAC8-indigo.Installation>
+This API restores the *whitelist* file to its initial state.
