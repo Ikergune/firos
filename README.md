@@ -20,17 +20,16 @@ Installation
 ------------
 
 1.  Make sure you have set your working space (http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment)
-2.  Open a Terminal and navigate to the ROS workspace you want to use. If you just followed the ROS environment tutorial, it will be /home/catkin_ws.
-	`cd /home/catkin_ws`
+2.  Open a Terminal and navigate to the ROS workspace you want to use. If you just followed the ROS environment tutorial, it will be ~/catkin_ws.
+	`cd ~/catkin_ws/src`
 3.  Clone the FIROS git repository into your ROS workspace.
 	`git clone https://github.com/ikergune/firos`
-4.  Build the FIROS package with the following command. This will create a devel and build folder under your workspace.
+4.  Build the FIROS package with the following commands. This will create a devel and build folder under your workspace.
+    `cd ~/catkin_ws`
 	`catkin_make`
-5.  For convenience, add the FIROS source to your *.bashrc*" in order to allow any new command line instance to use FIROS.
-	`echo source /FIROS_PATH/devel/setup.bash>>-/.bashrc`
-	Just replace *FIROS_PATH* with the actual path to your FIROS package. For example:
-	`echo source /home/catkin_ws/firos/devel/setup.bash>>-/.bashrc`
-6.  Execute "source setup.bash" to allow the current command line instance to use FIROS
+5.  For convenience, you may wish to source your setup.sh script from your .bashrc so that your environment is ready as soon as you log in. e.g. 
+	`echo source ~/catkin_ws/firos/devel/setup.bash >> ~/.bashrc`
+6.  Execute "source devel/setup.bash" to allow the current command line instance to use FIROS
 
 FIROS is now installed in your robot! 
 
