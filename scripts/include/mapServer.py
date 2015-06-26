@@ -18,6 +18,7 @@
 
 # Import required Python code.
 import os
+import getpass
 import subprocess
 from threading import Thread
 
@@ -42,5 +43,6 @@ class MapServer:
 def _launchMapServer():
     ## \brief If map_server is configured launches it
     if(MAP_SERVER_PORT):
-        os.system("cd {} && sudo npm install".format(mapserver_path))
+        if not os.path.exists(os.path.join(mapserver_path, 'node_modules')):
+            os.system("cd {} && sudo npm install && sudo chown -R {} node_modules".format(mapserver_path, getpass.getuser()))
         subprocess.Popen(["node", mapserver_path + "mapserver.js", str(MAP_SERVER_PORT), str(ROSBRIDGE_PORT)])
