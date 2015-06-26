@@ -13,6 +13,7 @@ Requirements
 
 -   Ubuntu
 -   Python 2.7 or greater
+-   Nodejs v0.10 or greater
 -   ROS Hydro or greater <http://wiki.ros.org/es/ROS/Installation>
 
 Installation
@@ -32,6 +33,8 @@ Installation
 6.  Execute "source setup.bash" to allow the current command line instance to use FIROS
 
 FIROS is now installed in your robot! 
+
+**Important Note:** The first time FIROS is launched it will ask you for root permissions to install it's dependencies
 
 
 Configuring FIROS
