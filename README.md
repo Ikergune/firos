@@ -88,7 +88,7 @@ Here is an example of a *config.json* file for a *local* environment:
 robotdescriptions.json
 ----------------------
 
-Robotsmay have some public files so users can understand some characteristics or even use their devices. All the references contained in this file can be published on the Context Broker; to do so, just follow the next example:
+Robots may have some public files so users can understand some characteristics or even use their devices. All the references contained in this file can be published on the Context Broker; to do so, just follow the next example:
 
 ``` javascript
 "turtle1": {
