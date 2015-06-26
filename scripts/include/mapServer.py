@@ -42,5 +42,5 @@ class MapServer:
 def _launchMapServer():
     ## \brief If map_server is configured launches it
     if(MAP_SERVER_PORT):
-        os.system("cd {} && npm install".format(mapserver_path))
+        os.system("cd {} && sudo npm install".format(mapserver_path))
         subprocess.Popen(["node", mapserver_path + "mapserver.js", str(MAP_SERVER_PORT), str(ROSBRIDGE_PORT)])
