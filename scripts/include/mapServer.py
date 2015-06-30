@@ -44,5 +44,11 @@ def _launchMapServer():
     ## \brief If map_server is configured launches it
     if(MAP_SERVER_PORT):
         if not os.path.exists(os.path.join(mapserver_path, 'node_modules')):
+            text = "---------------------------------------------------------------------------------------\n"
+            text += "---------------------------------------------------------------------------------------\n"
+            text += "FIROS is going to install mapserver's dependencies, to do this it will need root access\n"
+            text += "---------------------------------------------------------------------------------------\n"
+            text += "---------------------------------------------------------------------------------------"
+            print text
             os.system("cd {} && sudo npm install && sudo chown -R {} node_modules".format(mapserver_path, getpass.getuser()))
         subprocess.Popen(["node", mapserver_path + "mapserver.js", str(MAP_SERVER_PORT), str(ROSBRIDGE_PORT)])
