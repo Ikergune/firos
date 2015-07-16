@@ -1,0 +1,10 @@
+{
+    "robot1":{
+        "topics": {
+            "chatter": {
+                "msg": "std_msgs.msg.String",
+                "type": "publisher"
+            }
+        }
+    }
+}
