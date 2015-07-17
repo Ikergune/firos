@@ -1,4 +1,4 @@
-package com.firos.kiara;
+package com.firos.kiara.connector;
 
 import com.firos.kiara.interfaces.Firos;
 

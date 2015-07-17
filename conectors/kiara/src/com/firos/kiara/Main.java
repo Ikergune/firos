@@ -1,5 +1,7 @@
 package com.firos.kiara;
 
+import com.firos.kiara.connector.Connector;
+
 public class Main {
 
 	public static void main(String[] args) {

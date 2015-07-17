@@ -3,5 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/py4j0.8.2.1.jar"/>
+	<classpathentry kind="lib" path="libs/antxr.jar"/>
+	<classpathentry kind="lib" path="libs/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="libs/guava-17.0.jar"/>
+	<classpathentry kind="lib" path="libs/kiara-0.2.0.jar"/>
+	<classpathentry kind="lib" path="libs/netty-all-4.0.21.Final.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-api-1.7.7.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-jdk14-1.7.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
