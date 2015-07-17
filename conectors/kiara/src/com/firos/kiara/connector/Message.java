@@ -1,12 +1,12 @@
 package com.firos.kiara.connector;
 
-import java.io.IOException;
 import java.util.Objects;
+import java.io.IOException;
 
-import org.fiware.kiara.serialization.impl.BinaryInputStream;
-import org.fiware.kiara.serialization.impl.BinaryOutputStream;
 import org.fiware.kiara.serialization.impl.Serializable;
 import org.fiware.kiara.serialization.impl.SerializerImpl;
+import org.fiware.kiara.serialization.impl.BinaryInputStream;
+import org.fiware.kiara.serialization.impl.BinaryOutputStream;
 
 public class Message implements Serializable
 {
