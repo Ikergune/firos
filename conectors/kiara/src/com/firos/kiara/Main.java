@@ -2,7 +2,6 @@ package com.firos.kiara;
 
 import com.firos.kiara.connector.Connector;
 
-import py4j.GatewayServer;
 
 public class Main {
 	
@@ -11,11 +10,11 @@ public class Main {
 	
 	private static void loadArgs(String[] args){
 		for (int i = 0; i < args.length; i++) {
-			if(args[i] == "-a"){
+			if(args[i].equals("-a")){
 				i++;
 				KIARA_IP = args[i];
 			}
-			if(args[i] == "-p"){
+			if(args[i].equals("-p")){
 				i++;
 				KIARA_PORT = Integer.parseInt(args[i]);
 			}
@@ -25,11 +24,14 @@ public class Main {
 	public static void main(String[] args) {
 		loadArgs(args);
 	    Main app = new Main();
-	    // app is now the gateway.entry_point
-	    GatewayServer server = new GatewayServer(app);
-	    server.start();
-		// TODO Auto-generated method stub
+	    
 		Connector connector = Connector.getInstance();
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+            	System.out.println("EXIT JAVA");
+            	connector.stop();
+            }
+        });
 	}
 
 }
