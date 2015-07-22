@@ -17,38 +17,38 @@
 from include.pubsub.iPubSub import Isubscriber
 
 
-class kiarasSubscriber(Isubscriber):
+class KiaraSubscriber(Isubscriber):
     ## \brief Interface for content listener
     def subscribe(self, namespace, data_type, robot):
         ## \brief Subscribe to entities' changes
         # \param entity name
         # \param entity type
         # \param robot object
-        raise Exception('Method not implemented')
+        pass
 
     def disconnect(self, namespace):
         ## \brief Delete subscription by namespace
         # \param entity name
-        raise Exception('Method not implemented')
+        pass
 
     def disconnectAll(self):
         ## \brief Delete all subscriptions
-        raise Exception('Method not implemented')
+        pass
 
     def deleteEntity(self, namespace, data_type):
         ## \brief Delete entity from content publisher
         # \param entity name
         # \param entity type
-        raise Exception('Method not implemented')
+        pass
 
     def parseData(self, data):
         ## \brief Parse the received data
         # \param data
-        raise Exception('Method not implemented')
+        pass
 
     def _generateSubscription(self, namespace, data_type="Robot", topics=[]):
         ## \brief Generate subscription message
         # \param entity name
         # \param entity type
         # \param entity's topics
-        raise Exception('Method not implemented')
+        pass

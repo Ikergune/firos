@@ -17,6 +17,7 @@ import json
 import time
 
 from include.pubsub.iPubSub import Ipublisher
+from include.constants import SEPARATOR_CHAR
 from include.pubsub.kiara.kiaraGateway import KiaraGateway
 
 kiara = KiaraGateway()
@@ -24,9 +25,9 @@ PUBLISH_FREQUENCY = 250
 posted_history = {}
 
 
-class kiaraPublisher(Ipublisher):
+class KiaraPublisher(Ipublisher):
     ## \brief Interface for content publisher
-    def createContent(topic, datatype, data, isPrimitive=False):
+    def createContent(self, topic, datatype, data, isPrimitive=False):
         ## \brief Format the data into FIROS format
         # \param topic name
         # \param topic type
@@ -38,7 +39,7 @@ class kiaraPublisher(Ipublisher):
             "value": json.dumps(data).replace('"', SEPARATOR_CHAR)
         }
 
-    def publish(contex_id, datatype, attributes=[]):
+    def publish(self, context_id, datatype, attributes=[]):
         ## \brief Publish data of a robot
         # \param robot name
         # \param robot type
@@ -51,7 +52,7 @@ class kiaraPublisher(Ipublisher):
         # \param map connections
         _publish(context_id, "MAP", attributes, False)
 
-    def publishMsg(attributes=[]):
+    def publishMsg(self, attributes=[]):
         ## \brief Publish message structures
         # \param robot attributes
         _publish("rosmsg", "ROSDEFINITION", attributes, False)

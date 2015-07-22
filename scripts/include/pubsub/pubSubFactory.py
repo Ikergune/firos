@@ -20,7 +20,12 @@ from include.pubsub.contextbroker.cbPublisher import CbPublisher
 from include.pubsub.contextbroker.cbSubscriber import CbSubscriber
 from include.pubsub.contextbroker.cbQueryBuilder import CbQueryBuilder
 
+from include.pubsub.kiara.kiaraPublisher import KiaraPublisher
+from include.pubsub.kiara.kiaraSubscriber import KiaraSubscriber
+from include.pubsub.kiara.kiaraQueryBuilder import KiaraQueryBuilder
+
 PUBSUB_TYPE = "ContextBroker"
+PUBSUB_TYPE = "Kiara"
 
 
 class PublisherFactory:
@@ -28,6 +33,8 @@ class PublisherFactory:
     def create():
         if PUBSUB_TYPE is "ContextBroker":
             return CbPublisher()
+        elif PUBSUB_TYPE is "Kiara":
+            return KiaraPublisher()
         else:
             return Ipublisher()
 
@@ -35,6 +42,8 @@ class PublisherFactory:
     def getClass():
         if PUBSUB_TYPE is "ContextBroker":
             return CbPublisher
+        elif PUBSUB_TYPE is "Kiara":
+            return KiaraPublisher
         else:
             return Ipublisher
 
@@ -44,6 +53,8 @@ class SubscriberFactory:
     def create():
         if PUBSUB_TYPE is "ContextBroker":
             return CbSubscriber()
+        elif PUBSUB_TYPE is "Kiara":
+            return KiaraSubscriber()
         else:
             return Isubscriber()
 
@@ -51,6 +62,8 @@ class SubscriberFactory:
     def getClass():
         if PUBSUB_TYPE is "ContextBroker":
             return CbSubscriber
+        elif PUBSUB_TYPE is "Kiara":
+            return KiaraSubscriber
         else:
             return Isubscriber
 
@@ -60,6 +73,8 @@ class QueryBuilderFactory:
     def create():
         if PUBSUB_TYPE is "ContextBroker":
             return CbQueryBuilder()
+        elif PUBSUB_TYPE is "Kiara":
+            return KiaraQueryBuilder()
         else:
             return IqueryBuilder()
 
@@ -67,5 +82,7 @@ class QueryBuilderFactory:
     def getClass():
         if PUBSUB_TYPE is "ContextBroker":
             return CbQueryBuilder
+        elif PUBSUB_TYPE is "Kiara":
+            return KiaraQueryBuilder
         else:
             return IqueryBuilder

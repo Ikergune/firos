@@ -17,7 +17,7 @@
 from include.pubsub.iPubSub import IqueryBuilder
 
 
-class kiaraQueryBuiler(IqueryBuilder):
+class KiaraQueryBuilder(IqueryBuilder):
     ## \brief Content publisher query builder
     def findById(self, id):
         ## \brief Search entity data by its name

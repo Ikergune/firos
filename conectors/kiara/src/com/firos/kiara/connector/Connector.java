@@ -90,7 +90,7 @@ public class Connector {
 	}
 	
 	public void onData(String data){
-		System.out.println("RECEIVED FIROS");
+		System.out.println("RECEIVED TO SEND TO FIROS");
 		this.firos.onData(data);
 	}
 	
