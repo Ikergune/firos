@@ -6,13 +6,10 @@ class KiaraGateway:
         def __init__(self):
         # self.gateway = JavaGateway(start_callback_server=True)
             self.gateway = JavaGateway()
-            # self.gateway.entry_point.setCallback(self)
+            self.gateway.entry_point.setFiros(self)
             self.entry_point = self.gateway.entry_point
 
         def sendData(self, data):
-            print "SENDING IN KIARA"
-            print data
-            print self.entry_point
             self.entry_point.sendMessage(data)
 
         def onData(self, data):

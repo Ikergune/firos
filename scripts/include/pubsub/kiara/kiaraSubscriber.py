@@ -16,6 +16,11 @@
 
 from include.pubsub.iPubSub import Isubscriber
 
+from include.constants import SEPARATOR_CHAR
+from include.pubsub.kiara.kiaraGateway import KiaraGateway
+
+kiara = KiaraGateway()
+
 
 class KiaraSubscriber(Isubscriber):
     ## \brief Interface for content listener
@@ -33,6 +38,7 @@ class KiaraSubscriber(Isubscriber):
 
     def disconnectAll(self):
         ## \brief Delete all subscriptions
+        # kiara.
         pass
 
     def deleteEntity(self, namespace, data_type):
