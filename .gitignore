@@ -8,3 +8,4 @@ scripts/**/**/**.pyc
 scripts/node_modules/**
 scripts/include/ros/topics/**
 scripts/include/ros/dependencies/thirdparty/**
+.idea
