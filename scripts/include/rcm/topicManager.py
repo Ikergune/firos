@@ -6,6 +6,7 @@ from firos.srv import FIROS_Info
 from firos.msg import RCM_Event, CB_Event
 from include.constants import DEFAULT_QUEUE_SIZE
 from include.ros.topicHandler import robotDisconnection, loadMsgHandlers
+from include.rcm.rcmutils import getRobotConfig
 
 rcm_listener = None
 firos_connect_listener = None
@@ -17,16 +18,19 @@ cb_publisher = rospy.Publisher("/firos/cb_event", CB_Event, queue_size=DEFAULT_Q
 def getRobotTopics(robot_name):
     robot_json = robot_topics_service(robot_name)
     parsed = json.loads(robot_json.json_format)
-    robot_data = {
-        robot_name: {
-            "topics": {}
-        }
-    }
-    for topic in parsed[robot_name]["topics"]:
-        robot_data[robot_name]["topics"][topic["name"]] = {
-            "msg": topic["msg"],
-            "type": topic["type"]
-        }
+
+    robot_data = getRobotConfig(parsed)
+
+    # robot_data = {
+    #     robot_name: {
+    #         "topics": {}
+    #     }
+    # }
+    # for topic in parsed[robot_name]["topics"]:
+    #     robot_data[robot_name]["topics"][topic["name"]] = {
+    #         "msg": topic["msg"],
+    #         "type": topic["type"]
+    #     }
     return robot_data
 
 

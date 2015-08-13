@@ -131,7 +131,7 @@ class RosConfigurator:
                 "publisher": {},
                 "subscriber": {}
             }
-            whiteLists = _getWhiteLists()
+            whiteLists = getWhiteLists()
             _robots = {}
             master = rosgraph.Master('/rostopic')
             try:
@@ -208,7 +208,7 @@ def _isInFiros(topic_name, list2Check, nodes):
     return using
 
 
-def _getWhiteLists():
+def getWhiteLists():
     return {
         "publisher": _getWhiteList("publisher"),
         "subscriber": _getWhiteList("subscriber")
@@ -224,6 +224,7 @@ def _getWhiteList(pubsub):
         else:
             data = mem_whitelist
 
+        print data
         whiteregex = ur''
         for robot_name in data:
             for topic in data[robot_name][pubsub]:
@@ -231,6 +232,7 @@ def _getWhiteList(pubsub):
         whiteregex = whiteregex[:-1]
         whiteregex += "$"
         whiteregex = ur'^' + whiteregex
+        print whiteregex
         return whiteregex
     except:
         return None
