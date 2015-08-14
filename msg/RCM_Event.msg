@@ -1,2 +1,0 @@
-string instance_name
-int16 instance_status

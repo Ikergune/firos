@@ -3,7 +3,7 @@ import rospy
 import std_msgs.msg
 
 from firos.srv import FIROS_Info
-from firos.msg import RCM_Event, CB_Event
+from firos.msg import Robot_Event, CB_Event
 from include.constants import DEFAULT_QUEUE_SIZE
 from include.ros.topicHandler import robotDisconnection, loadMsgHandlers
 from include.rcm.rcmutils import getRobotConfig
@@ -77,7 +77,7 @@ def setListeners():
     global rcm_listener
     global firos_disconnect_listener
     global firos_connect_listener
-    rcm_listener = rospy.Subscriber("/firos/rcm_event", RCM_Event, onRcmEvent, {})
+    rcm_listener = rospy.Subscriber("/firos/rcm_event", Robot_Event, onRcmEvent, {})
     firos_disconnect_listener = rospy.Subscriber("firos/disconnect", std_msgs.msg.String, onDisconnect)
     firos_connect_listener = rospy.Subscriber("firos/connect", std_msgs.msg.String, onConnect)
 
