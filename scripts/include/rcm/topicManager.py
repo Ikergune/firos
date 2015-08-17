@@ -18,19 +18,7 @@ cb_publisher = rospy.Publisher("/firos/cb_event", CB_Event, queue_size=DEFAULT_Q
 def getRobotTopics(robot_name):
     robot_json = robot_topics_service(robot_name)
     parsed = json.loads(robot_json.json_format)
-
-    robot_data = getRobotConfig(parsed)
-
-    # robot_data = {
-    #     robot_name: {
-    #         "topics": {}
-    #     }
-    # }
-    # for topic in parsed[robot_name]["topics"]:
-    #     robot_data[robot_name]["topics"][topic["name"]] = {
-    #         "msg": topic["msg"],
-    #         "type": topic["type"]
-    #     }
+    robot_data = getRobotConfig(robot_name, parsed[robot_name]["topics"])
     return robot_data
 
 

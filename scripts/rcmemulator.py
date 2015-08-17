@@ -3,6 +3,7 @@ import json
 import rospy
 from firos.srv import FIROS_Info, FIROS_InfoResponse
 
+
 def get_robot_info(req):
     ret = FIROS_InfoResponse()
     robot = {

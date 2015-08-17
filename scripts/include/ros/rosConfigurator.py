@@ -224,7 +224,6 @@ def _getWhiteList(pubsub):
         else:
             data = mem_whitelist
 
-        print data
         whiteregex = ur''
         for robot_name in data:
             for topic in data[robot_name][pubsub]:
@@ -232,7 +231,6 @@ def _getWhiteList(pubsub):
         whiteregex = whiteregex[:-1]
         whiteregex += "$"
         whiteregex = ur'^' + whiteregex
-        print whiteregex
         return whiteregex
     except:
         return None
