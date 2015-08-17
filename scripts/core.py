@@ -58,7 +58,7 @@ if __name__ == '__main__':
     for i in range(len(args)-1):
         if args[i].upper() == "-P":
             i = i + 1
-            port = args[i]
+            port = int(args[i])
 
     if port is None:
         port = SERVER_PORT
