@@ -87,3 +87,6 @@ if "rosbridge_port" in configData:
     ROSBRIDGE_PORT = configData["rosbridge_port"]
 else:
     ROSBRIDGE_PORT = 9090
+
+# ACTIVEMQ CONFIG
+ACTIVEMQ_QUEUE = '/queue/firos'

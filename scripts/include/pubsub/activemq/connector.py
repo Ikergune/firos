@@ -1,19 +1,20 @@
-import time
-import sys
-
 import stomp
 
+from include.constants import ACTIVEMQ_QUEUE
+
+
 class MyListener(stomp.ConnectionListener):
+
     def on_error(self, headers, message):
         print('received an error %s' % message)
+
     def on_message(self, headers, message):
         print('received a message %s' % message)
 
 
-
 class ActiveMq:
     class __impl:
-        QUEUE = '/queue/firos'
+        QUEUE = ACTIVEMQ_QUEUE
 
         def __init__(self):
             self.conn = stomp.Connection([('localhost', 61613)])
