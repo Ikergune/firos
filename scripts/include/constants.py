@@ -90,3 +90,4 @@ else:
 
 # ACTIVEMQ CONFIG
 ACTIVEMQ_QUEUE = '/queue/firos'
+ACTIVEMQ_TOPIC = '/topic/firos'
