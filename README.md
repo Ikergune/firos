@@ -238,6 +238,8 @@ API
 
 FIROS has several REST entry points that are used for connecting with the context broker or getting data from FIROS.
 
+You can find FIROS api at http://docs.firos.apiary.io/#
+
 GET /robots
 -----------
 
