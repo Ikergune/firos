@@ -26,5 +26,17 @@
                 "type": "publisher"
             }
         }
+    },
+    "end_end_test":{
+        "topics": {
+            "p1": {
+                "msg": "std_msgs.msg.String",
+                "type": "publisher"
+            },
+            "s1": {
+                "msg": "std_msgs.msg.String",
+                "type": "subscriber"
+            }
+        }
     }
 }
