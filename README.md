@@ -5,6 +5,8 @@ FIROS is a tool that helps connecting robots to the cloud. For this purpose it u
 
 FIROS works as a translator between the robotics field and the cloud world, transforming ROS messages into NGSI to publish them in the cloud, and vice versa.
 
+This project is part of [FIWARE](http://www.fiware.org).
+
 Installing FIROS
 ================
 
@@ -482,3 +484,105 @@ POST /whitelist/restore
 -----------------------
 
 This API restores the *whitelist* file to its initial state.
+
+Ent-to-end tests
+================
+
+In order to test if firos is publishing into ContextBroker you can run the following command:
+
+``` bash
+~$ rostopic pub -1 s1 std_msgs/String "data: 'test'"  __ns:=end_end_test
+```
+
+And then:
+
+``` bash
+~$ (curl contextbroker_ip:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+        "entities": [
+                {
+                        "type": "ROBOT",
+                        "isPattern": "true",
+                        "id": "end_end_test"
+                }
+        ],
+        "attributes": [
+                "s1"
+        ]
+}
+EOF
+```
+
+If everything went right you'll get something like this:
+
+``` javascript
+{
+        "contextResponses": [
+                {
+                        "contextElement": {
+                                "attributes": [
+                                        {
+                                                "name": "s1",
+                                                "type": "std_msgs.msg.String",
+                                                "value": "{%27firosstamp%27: 1443020619.58971, %27data%27: %27test%27}"
+                                        }
+                                ],
+                                "id": "end_end_test",
+                                "isPattern": "false",
+                                "type": "ROBOT"
+                        },
+                        "statusCode": {
+                                "code": "200",
+                                "reasonPhrase": "OK"
+                        }
+                }
+        ]
+}
+```
+
+Notifications from ContextBroker to firos can be tested by running the following command in one terminal...
+
+``` bash
+rostopic echo /end_end_test/p1
+```
+
+... and the following command in another terminal:
+
+``` bash
+~$ (curl contextbroker_ip:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+          "contextElements": [
+                  {
+                          "type": "ROBOT",
+                          "isPattern": "false",
+                          "id": "end_end_test",
+                          "attributes": [
+                          {
+                                  "name": "p1",
+                                  "type": "std_msgs.msg.String",
+                                  "value": "{%27data%27: %27`echo $RANDOM`%27}"
+                          },
+                          {
+                                  "name": "COMMAND",
+                                  "type": "COMMAND",
+                                  "value": ["p1"]
+                          }
+                          ]
+                  }
+          ],
+          "updateAction": "APPEND"
+}
+EOF
+```
+
+If everything went ok, in the first terminal you'll see something like this:
+
+``` bash
+data: random_number
+---
+```
+
+License
+=======
+
+Firos is licensed under [MIT License](https://opensource.org/licenses/MIT).
