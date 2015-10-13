@@ -43,6 +43,17 @@ from include.server.firosServer import FirosServer
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers, connectionListeners
 from include.rcm import topicManager
 
+
+# ACTIVEMQ
+ac = None
+
+
+def launchActiveMq():
+    global ac
+    from include.pubsub.activemq.connector import ActiveMq
+    ac = ActiveMq()
+# ACTIVEMQ--
+
 # Main function.
 if __name__ == '__main__':
 
@@ -69,10 +80,17 @@ if __name__ == '__main__':
         sys.stderr.write('CB_COMMUNICATION_FAILED')
         exit(1)
     else:
+        # ACTIVEMQ
+        launchActiveMq()
+        # ACTIVEMQ--
+
         def signal_handler(signal, frame):
             Log("INFO", ('\nExiting from the application'))
             TopicHandler.unregisterAll()
             topicManager.removeListeners()
+            # ACTIVEMQ
+            ac.close()
+            # ACTIVEMQ--
             server.close()
             Log("INFO", ('\nExit'))
             sys.exit(0)

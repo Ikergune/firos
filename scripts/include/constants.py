@@ -16,9 +16,12 @@
 
 import os
 import json
+import uuid
 import urllib2
 import netifaces
 
+# FIROS instance's UUID
+FIROS_INSTANCE = uuid.uuid4()
 
 def setConfiguration():
     try:
