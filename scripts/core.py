@@ -38,6 +38,7 @@ from include.constants import *
 from include import confManager
 from include.logger import Log
 from include.mapServer import MapServer
+from include.coap.manager import CoapManager
 from include.server.firosServer import FirosServer
 
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers, connectionListeners
@@ -62,6 +63,8 @@ if __name__ == '__main__':
 
     if port is None:
         port = SERVER_PORT
+
+    CoapManager()
 
     try:
         server = FirosServer("0.0.0.0", port)

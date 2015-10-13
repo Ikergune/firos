@@ -1,4 +1,15 @@
-var config = {};
+import os
+from include.constants import *
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+CONFIG_FILE_DIR = os.path.join(BASE_DIR, 'lightweightm2m-iotagent/new_config.js')
+
+class CoapManager(object):
+    def __init__(self):
+        self.generateConfigFile()
+
+    def generateConfigData(self):
+        return """var config = {};
 
 config.lwm2m = {
     logLevel: 'DEBUG',
@@ -31,11 +42,11 @@ config.lwm2m = {
 config.ngsi = {
     logLevel: 'DEBUG',
     contextBroker: {
-        host: '192.168.4.70',
-        port: '1026'
+        host: 'CB_HOST',
+        port: 'CB_PORT'
     },
     server: {
-        port: 4041
+        port: AGENT_PORT
     },
     deviceRegistry: {
         type: 'mongodb',
@@ -44,8 +55,15 @@ config.ngsi = {
     types: { },
     service: 'smartGondor',
     subservice: '/gardens',
-    providerUrl: 'http://192.168.4.42:4041',
+    providerUrl: 'http://FIROS_HOST:AGENT_PORT',
     deviceRegistrationDuration: 'P1M'
 };
 
-module.exports = config;
+module.exports = config;""".replace('CB_HOST', str(DATA_CONTEXTBROKER['ADDRESS']))\
+            .replace('CB_PORT', str(DATA_CONTEXTBROKER['PORT']))\
+            .replace('AGENT_PORT', str(AGENT_PORT)).replace('FIROS_HOST', str(IP))
+
+    def generateConfigFile(self):
+        file = open(CONFIG_FILE_DIR, 'w')
+        file.write(self.generateConfigData())
+        file.close()

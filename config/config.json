@@ -57,7 +57,8 @@
     "log_level": "INFO",
     "interface": "eth0",
     "map_server_port": 10101,
-    "rosbridge_port": 9090
+    "rosbridge_port": 9090,
+    "coap_agent_port": 4041
   },
 
   "demo": {
