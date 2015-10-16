@@ -30,7 +30,6 @@ config.lwm2m = {
 
 config.ngsi = {
     logLevel: 'DEBUG',
-    logLevel2: 'DEBUG2222',
     contextBroker: {
         host: '192.168.4.70',
         port: '1026'
@@ -38,10 +37,10 @@ config.ngsi = {
     server: {
         port: 4041
     },
-    deviceRegistry: {
-        type: 'mongodb',
-        host: 'localhost'
-    },
+    // deviceRegistry: {
+    //     type: 'mongodb',
+    //     host: 'localhost'
+    // },
     types: { },
     service: 'smartGondor',
     subservice: '/gardens',

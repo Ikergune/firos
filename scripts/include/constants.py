@@ -88,7 +88,13 @@ if "rosbridge_port" in configData:
 else:
     ROSBRIDGE_PORT = 9090
 
-if "coap_agent_port" in configData:
-    AGENT_PORT = configData["coap_agent_port"]
+if "coap" in configData:
+    COAP_AGENT_HOST = configData["coap"]["agent"]["host"]
+    COAP_AGENT_PORT = configData["coap"]["agent"]["port"]
+    COAP_AGENT_CB_PORT = configData["coap"]["agent"]["cbport"]
+    COAP_CLIENT_PORT = configData["coap"]["client"]["port"]
 else:
-    AGENT_PORT = None
+    COAP_AGENT_HOST = None
+    COAP_AGENT_PORT = None
+    COAP_AGENT_CB_PORT = None
+    COAP_CLIENT_PORT = None

@@ -13,7 +13,7 @@ Requirements
 
 -   Ubuntu
 -   Python 2.7 or greater
--   Nodejs v0.10 or greater
+-   Nodejs v0.12.7 or greater
 -   ROS Hydro or greater <http://wiki.ros.org/es/ROS/Installation>
 
 Installation
@@ -30,16 +30,16 @@ Installation
 
 4.  Build the FIROS package with the following commands. This will create a devel and build folder under your workspace.
 
-   `cd ~/catkin_ws`  
+   `cd ~/catkin_ws`
    `catkin_make`
 
-5.  For convenience, you may wish to source your setup.sh script from your .bashrc so that your environment is ready as soon as you log in. e.g. 
+5.  For convenience, you may wish to source your setup.sh script from your .bashrc so that your environment is ready as soon as you log in. e.g.
 
    `echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc`
 
 6.  Execute "source devel/setup.bash" to allow the current command line instance to use FIROS
 
-FIROS is now installed in your robot! 
+FIROS is now installed in your robot!
 
 **Important Note:** The first time FIROS is launched it will ask you for root permissions to install it's dependencies
 
@@ -54,7 +54,7 @@ config.json
 
 This file contains the configuration related to FIROS launching environment. Here is a description of each parameter:
 
--   *environment*: These parameters take care of the *local*, *development* and *production* environment configurations by setting up the `*context broker's IP*, *port* and *FIROS rest apis' port*. 
+-   *environment*: These parameters take care of the *local*, *development* and *production* environment configurations by setting up the `*context broker's IP*, *port* and *FIROS rest apis' port*.
 FIROS will use an environment's configuration based this value, but there can be as many environments as you want.
 -   *server*: It contains information related to the FIROS server
 	- *port*: The port in which FIROS is listening. If you want to let access outside of your local network, you might want to redirect that port on your router.
@@ -184,7 +184,7 @@ There is also a way to request the topic type, which is usefull in order to add 
         Subscribers:
             * /turtlesim (http://192.168.4.42 :45825/)`
 
-This means that the robot `turtle1` is listening to data published on `/turtle1/cmd_vel` so FIROS should be publishing on it. 
+This means that the robot `turtle1` is listening to data published on `/turtle1/cmd_vel` so FIROS should be publishing on it.
 The *type* of the `/turtle1/cmd_vel` is `geometry_msgs/Twist` what internally corresponds to the `geometry_msgs.msg.Twist` package
 
 Here is another example:
@@ -342,7 +342,7 @@ Get the data published by the robot on Context Broker. It builds a query using t
 POST /FIROS
 -----------
 
-This API handles the subscription data of the context broker. 
+This API handles the subscription data of the context broker.
 
 POST /robot/connect
 -------------------
@@ -480,3 +480,55 @@ POST /whitelist/restore
 -----------------------
 
 This API restores the *whitelist* file to its initial state.
+
+
+COAP MODULE
+===========
+FIROS include a COAP module to send low sized messages to context broker, it is composed of 2 components:
+-   lightweightm2m-iotagent: That is in charge of translating COAP to NGSI
+-   coap-client: That is in charge to send coap messages to the agent
+
+Installing
+----------
+Run the bash script scripts/include/coap/coap_dependencies.sh to install the dependencies
+
+Configuring
+-----------
+
+In the config.json file you will find a config attribute called coap:
+
+``` javascript
+"coap": {
+      "agent":{
+        "host": "192.168.4.70",
+        "port": 60001,
+        "cbport": 4041
+      },
+      "client":{
+        "port": 4043
+      }
+    }
+```
+The agent attributes are the folowwing:
+-   host: Public IP that will have the agent
+-   port: UDP port where the COAP messages should be sent
+-   cbport: TCP port that will listen to context broker notifications
+
+The client attributes are:
+-   port: the port that will use firos to connect to the coap-client
+
+Set them to fit your needs.
+
+After that launch the command:
+rosrun firos config_coap
+
+Then you can copy the folder scripts/include/coap/lightweightm2m-iotagent to the host where it will be deployed and run using inside it:
+    npm install
+    ./bin/lwm2mAgent.js
+
+Then you should launch the client, to do that go to scripts/include/coap/coap-client and launch:
+    npm install
+    node index.js
+
+After that you can launch firos as the normal way using:
+    rosrun firos core

@@ -37,14 +37,14 @@ config.ngsi = {
     server: {
         port: 4041
     },
-    deviceRegistry: {
-        type: 'mongodb',
-        host: 'localhost'
-    },
+    // deviceRegistry: {
+    //     type: 'mongodb',
+    //     host: 'localhost'
+    // },
     types: { },
     service: 'smartGondor',
     subservice: '/gardens',
-    providerUrl: 'http://192.168.4.42:4041',
+    providerUrl: 'http://192.168.4.70:4041',
     deviceRegistrationDuration: 'P1M'
 };
 

@@ -5,19 +5,25 @@ from include.constants import *
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 COAP_AGENT_DIR = os.path.join(BASE_DIR, 'lightweightm2m-iotagent')
-CONFIG_FILE_DIR = os.path.join(COAP_AGENT_DIR, 'new_config.js')
+COAP_AGENT_CONFIG_FILE_NAME = 'config.js'
+COAP_AGENT_CONFIG_FILE_DIR = os.path.join(COAP_AGENT_DIR, COAP_AGENT_CONFIG_FILE_NAME)
+
+COAP_CLIENT_DIR = os.path.join(BASE_DIR, 'coap-client')
+COAP_CLIENT_CONFIG_FILE_NAME = 'config.js'
+COAP_CLIENT_CONFIG_FILE_DIR = os.path.join(COAP_CLIENT_DIR, COAP_CLIENT_CONFIG_FILE_NAME)
+
 
 class CoapManager(object):
     def __init__(self):
-        self.generateConfigFile()
-        self.launchAgent()
+        self.generateAgentConfigFile()
+        self.generateClientConfigFile()
 
-    def generateConfigData(self):
+    def generateAgentConfigData(self):
         return """var config = {};
 
 config.lwm2m = {
     logLevel: 'DEBUG',
-    port: 60001,
+    port: COAP_PORT,
     defaultType: 'Device',
     ipProtocol: 'udp4',
     serverProtocol: 'udp4',
@@ -52,28 +58,28 @@ config.ngsi = {
     server: {
         port: AGENT_PORT
     },
-    deviceRegistry: {
-        type: 'mongodb',
-        host: 'localhost'
-    },
+    // deviceRegistry: {
+    //     type: 'mongodb',
+    //     host: 'localhost'
+    // },
     types: { },
     service: 'smartGondor',
     subservice: '/gardens',
-    providerUrl: 'http://FIROS_HOST:AGENT_PORT',
+    providerUrl: 'http://AGENT_HOST:AGENT_PORT',
     deviceRegistrationDuration: 'P1M'
 };
 
 module.exports = config;""".replace('CB_HOST', str(DATA_CONTEXTBROKER['ADDRESS']))\
             .replace('CB_PORT', str(DATA_CONTEXTBROKER['PORT']))\
-            .replace('AGENT_PORT', str(AGENT_PORT)).replace('FIROS_HOST', str(IP))
+            .replace('AGENT_HOST', str(COAP_AGENT_HOST)).replace('AGENT_PORT', str(COAP_AGENT_CB_PORT))\
+            .replace('COAP_PORT', str(COAP_AGENT_PORT)).replace('FIROS_HOST', str(IP))
 
-    def generateConfigFile(self):
-        file = open(CONFIG_FILE_DIR, 'w')
-        file.write(self.generateConfigData())
+    def generateAgentConfigFile(self):
+        file = open(COAP_AGENT_CONFIG_FILE_DIR, 'w')
+        file.write(self.generateAgentConfigData())
         file.close()
 
     def launchAgent(self):
-        ## \brief Starts Map server thread
         CoapThread = Thread(target=self._launchAgent)
         CoapThread.daemon = True
         CoapThread.start()
@@ -88,4 +94,45 @@ module.exports = config;""".replace('CB_HOST', str(DATA_CONTEXTBROKER['ADDRESS']
                 text += "---------------------------------------------------------------------------------------"
                 print text
                 os.system("cd {} && npm install".format(COAP_AGENT_DIR))
-            subprocess.Popen(["node", COAP_AGENT_DIR + '/bin/lwm2mAgent.js', 'new_config.js'])
+            subprocess.Popen(["node", COAP_AGENT_DIR + '/bin/lwm2mAgent.js', COAP_AGENT_CONFIG_FILE_NAME])
+
+    def generateClientConfigData(self):
+        return """var config = {};
+
+config.lwm2m = {
+    host: 'AGENT_HOST',
+    port: AGENT_PORT,
+    url: '',
+    endpointName: ''
+};
+
+config.client = {
+    port: CLIENT_PORT
+};
+
+module.exports = config;""".replace('CB_HOST', str(DATA_CONTEXTBROKER['ADDRESS']))\
+            .replace('CLIENT_PORT', str(COAP_CLIENT_PORT))\
+            .replace('AGENT_HOST', str(COAP_AGENT_HOST)).replace('AGENT_PORT', str(COAP_AGENT_PORT))\
+            .replace('FIROS_HOST', str(IP))
+
+    def generateClientConfigFile(self):
+        file = open(COAP_CLIENT_CONFIG_FILE_DIR, 'w')
+        file.write(self.generateClientConfigData())
+        file.close()
+
+    def launchClient(self):
+        CoapThread = Thread(target=self._launchClient)
+        CoapThread.daemon = True
+        CoapThread.start()
+
+    def _launchClient(self):
+        if COAP_CLIENT_PORT:
+            if not os.path.exists(os.path.join(COAP_CLIENT_DIR, 'node_modules')):
+                text = "---------------------------------------------------------------------------------------\n"
+                text += "---------------------------------------------------------------------------------------\n"
+                text += "FIROS is going to install coap client's dependencies\n"
+                text += "---------------------------------------------------------------------------------------\n"
+                text += "---------------------------------------------------------------------------------------"
+                print text
+                os.system("cd {} && npm install".format(COAP_CLIENT_DIR))
+            subprocess.Popen(["node", COAP_CLIENT_DIR + '/index.js'])

@@ -1,0 +1,30 @@
+{
+  "name": "coap-client",
+  "description": "coap client for lightweightm2m-iotagent",
+  "version": "0.1.0",
+  "keywords": [
+    "OMA",
+    "lightweight",
+    "iotagent",
+    "fiware",
+    "firos",
+    "coap",
+    "ngsi"
+  ],
+  "author": {
+    "name": "Inigo Gonzalez",
+    "email": "igonzalez@ikergune.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ikergune/firos.git"
+  },
+  "engines": {
+    "node": ">=0.10.8"
+  },
+  "dependencies": {
+    "zerorpc": "*",
+    "iotagent-node-lib": "0.8.1",
+    "lwm2m-node-lib": "0.4.0"
+  }
+}
