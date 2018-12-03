@@ -5,7 +5,25 @@ FIROS is a tool that helps connecting robots to the cloud. For this purpose it u
 
 FIROS works as a translator between the robotics field and the cloud world, transforming ROS messages into NGSI to publish them in the cloud, and vice versa.
 
-This project is part of [FIWARE](http://www.fiware.org).
+This project is a fork from Ikergunes FIROS package (https://github.com/Ikergune/firos). 
+
+Roadmap/ Changes
+================
+We have some ideas what we would like to change in FIROS. The following table shows the current features we are working on and what is actually planned.
+
+| # | Feature            | Description                                                                                       | Status            |
+|---|--------------------|---------------------------------------------------------------------------------------------------|-------------------|
+| 1 | ObjectConverter    | Our own, more efficient and easier to use Object<>Fiware Converter                                | Development |
+| 2 | NGSIv1->NGSIv2     | Currently NGSIv1 is supported, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Planned           |
+| 3 | Incremental Update |                                                                                                   | Planned           |
+
+Status:
+- **Development**: We are working on it, it will take some time.
+- **Beta**: Ready for testing. 
+- **Done**: We have finished this feature. Next!
+- **Planned**: Give us some time, we will come to this feature.
+
+If you have any feature requests, comments, ideas - feel free to contact us :)
 
 Installing FIROS
 ================
