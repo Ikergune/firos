@@ -615,5 +615,4 @@ Contributors
 =======
 
 Dominik Lux
-
 Peter Detzner
