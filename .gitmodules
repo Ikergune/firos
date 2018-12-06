@@ -1,0 +1,3 @@
+[submodule "scripts/include/FiwareObjectConverter"]
+	path = scripts/include/FiwareObjectConverter
+	url = https://github.com/iml130/FiwareObjectConverter.git

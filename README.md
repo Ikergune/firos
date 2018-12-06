@@ -15,7 +15,7 @@ We have some ideas what we would like to change in FIROS. The following table sh
 |---|--------------------|---------------------------------------------------------------------------------------------------|-------------------|
 | 1 | ObjectConverter    | Our own, more efficient and easier to use Object<>Fiware Converter                                | Development |
 | 2 | NGSI v1->v2     | Currently NGSIv1 is supported, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Planned           |
-| 3 | Incremental Update | Currently FIROS is updating the whole entity. We want to update only the required attributes to have a more efficinent communication and minimize the communication...                                                                                                  | Planned           |
+| 3 | Incremental Update | Currently FIROS is updating the whole entity. We want to update only the required attributes to have a more efficient communication and minimize the communication...                                                                                                  | Planned           |
 
 Status:
 - **Development**: We are working on it, it will take some time.
@@ -24,6 +24,25 @@ Status:
 - **Planned**: Give us some time, we will come to this feature.
 
 If you have any feature requests, comments, ideas - feel free to contact us :)
+
+Cloning This Project
+================
+This project uses currently a submodule. Depending on your git version you might need to do the following:
+
+Clone this project via: 
+```shell
+git clone --recursive https://github.com/iml130/firos.git
+# If the Folder scripts/include/FiwareObjectConverter is still empty do:
+git submodule update --init --recursive
+```
+or
+```shell
+git clone https://github.com/iml130/firos.git
+git submodule update --init --recursive
+```
+
+
+The `FiwareObejctConverter` is our own `Python-Object<->Fiware-JSON`-Converter. 
 
 Installing FIROS
 ================
@@ -46,7 +65,7 @@ Installation
 
 3.  Clone the FIROS git repository into your ROS workspace.
 
-   `git clone https://github.com/ikergune/firos`
+   `git clone --recursive https://github.com/iml130/firos.git`
 
 4.  Build the FIROS package with the following commands. This will create a devel and build folder under your workspace.
 
@@ -88,10 +107,11 @@ FIROS will use an environment's configuration based this value, but there can be
 -   *interface*: Network configuration of the card in use
     -   *public*: Public IP. Do not forget to redirect the proper ports in your network
     -   *wlan0, et0, tun0*, etc: Different network interface configuration.
+    - If you experience problems with the public interface, feel free to set the interface-name directly, like *wlan0*, *enp0*, *eth0*. etc.. 
 -   *log_level*: It represents the verbosity of the logging system for FIROS. Available options are as follows: *"NONE", "INFO", "DEBUG" ,"WARNING", "ERROR"* and *"CRITICAL"*
 
 Here is an example of a *config.json* file for a *local* environment:
-``` javascript
+``` json
 {
   "environment": "local",
 
@@ -100,7 +120,7 @@ Here is an example of a *config.json* file for a *local* environment:
         "port": 10100
     },
     "contextbroker": {
-        "address"   : "192.168.43.159",
+        "address"   : "192.168.0.101",
         "port"      : 1026,
         "subscription": {
           "throttling": "PT0S",
@@ -120,17 +140,19 @@ robotdescriptions.json
 
 Robots may have some public files so users can understand some characteristics or even use their devices. All the references contained in this file can be published on the Context Broker; to do so, just follow the next example:
 
-``` javascript
-"turtle1": {
-    "descriptions": [
-        "http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch",
-        "http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
-    ]
-},"youbot": {
-    "descriptions": [
-        "http://wiki.ros.org/ROS/Tutorials/UnderstandingServicesParams",
-        "http://wiki.ros.org/ROS/Tutorials/UsingRqtconsoleRoslaunch"
-    ]
+``` json
+{
+    "turtle1": {
+        "descriptions": [
+            "http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch",
+            "http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
+        ]
+    },"youbot": {
+        "descriptions": [
+            "http://wiki.ros.org/ROS/Tutorials/UnderstandingServicesParams",
+            "http://wiki.ros.org/ROS/Tutorials/UsingRqtconsoleRoslaunch"
+        ]
+    }
 }
 ```
 
@@ -140,14 +162,16 @@ whitelist.json
 Everytime FIROS is launched or whenever it gets a notification about a new robot being connected, it looks the available *topics* on the robot. this configuration file contains a list of allowed robots and topics to be connected to this particular instance of FIROS. It also defines whether the topic is a *publisher*, when FIROS transmits data to it, or a *subscriber* in case FIROS should be listening to any incoming information on that topic.
 Names corresponding to both *robots* and *topics* can also be *regular expressions* avoiding the '^' at the beginning and '$' at the end. Here is an example:
 
-``` javascript
-"turtle\\w+": {
-    "publisher": ["cmd_vel"],
-    "subscriber": ["pose"]
-},
-"robot\\w+": {
-    "publisher": ["cmd_vel.*teleop", ".*move_base/goal", ".*move_base/cancel"],
-    "subscriber": [".*move_base/result"]
+``` json
+{
+	"turtle\\w+": {
+		"publisher": ["cmd_vel"],
+		"subscriber": ["pose"]
+	},
+	"robot\\w+": {
+		"publisher": ["cmd_vel.*teleop", ".*move_base/goal", ".*move_base/cancel"],
+		"subscriber": [".*move_base/result"]
+	}
 }
 ```
 
@@ -156,35 +180,65 @@ robots.json
 
 It is also possible to force some robot connections. This is done by adding the robot name, its topics and roles to the *robots.json* file. The role parameter must be the same as the on in the *whitelist.json* file and each topic must also contain a *type* parameter to define its role. The next file is an example of this configuration:
 
-``` javascript
-"robot1":{
-    "topics": {
-        "cmd_vel_mux/input/teleop": {
-            "msg": "geometry_msgs.msg.Twist",
-            "type": "publisher"
-        },
-        "move_base/goal": {
-            "msg": "move_base_msgs.msg.MoveBaseActionGoal",
-            "type": "publisher"
-        },
-        "move_base/result": {
-            "msg": "move_base_msgs.msg.MoveBaseActionResult",
-            "type": "subscriber"
+``` json
+{
+    "robot1":{
+        "topics": {
+            "cmd_vel_mux/input/teleop": {
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+            },
+            "move_base/goal": {
+                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
+                "type": "publisher"
+            },
+            "move_base/result": {
+                "msg": "move_base_msgs.msg.MoveBaseActionResult",
+                "type": "subscriber"
+            }
+        }
+    },"turtle1":{
+        "topics": {
+            "cmd_vel": {
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+            },
+            "pose": {
+                "msg": "turtlesim.msg.Pose",
+                "type": "subscriber"
+            }
         }
     }
-},"turtle1":{
-    "topics": {
-        "cmd_vel": {
-            "msg": "geometry_msgs.msg.Twist",
-            "type": "publisher"
-        },
-        "pose": {
-            "msg": "turtlesim.msg.Pose",
-            "type": "subscriber"
-        }
-    }
- }
+}
 ```
+
+The `type`s Publish and Subscribe are always from Context Broker's point of view. If subscribed, the framework pushes ROS-Information to the Context-Broker. ROS-Messages to the robots are sent by the `type` publish, if a new Message has been sent to the Context-Broker. Thus a communication betweeen robots can be established through the Context-Broker. Even Other Non-ROS-Application can control robots via the Context-Broker.
+
+Here is an Example-Configuration between the communication of `turtlesim`
+on *Machine1* and `teleop_twist_keyboard` on *Machine2*:
+
+```json
+Machine1:
+{
+	"turtle1": {
+		"topics": {
+			"cmd_vel": {
+				"msg": "geometry_msgs.msg.Twist",
+				"type": "publisher"
+			}
+}
+Machine2:
+{
+	"turtle1": {
+		"topics": {
+			"cmd_vel": {
+				"msg": "geometry_msgs.msg.Twist",
+				"type": "Subscriber"
+			}
+}
+
+```
+
 
 Getting Topic Types
 ===================
@@ -221,16 +275,18 @@ In this case, `turtle1` is publishing data on `/turtle1/pose`, so FIROS can list
 
 So we can deduce the slice of *robots.json* related to `turtle1`:
 
-``` javascript
-"turtle1":{
-    "topics": {
-        "cmd_vel": {
-            "msg": "geometry_msgs.msg.Twist",
-            "type": "publisher"
-        },
-        "pose": {
-            "msg": "turtlesim.msg.Pose",
-            "type": "subscriber"
+``` json
+{
+    "turtle1":{
+        "topics": {
+            "cmd_vel": {
+                "msg": "geometry_msgs.msg.Twist",
+                "type": "publisher"
+            },
+            "pose": {
+                "msg": "turtlesim.msg.Pose",
+                "type": "subscriber"
+            }
         }
     }
 }
@@ -265,7 +321,7 @@ GET /robots
 
 Get robots handled by FIROS with their corresponding *topics*. Each *topic* contains the `name`, `type`, `role` and `structure`:
 
-``` javascript
+``` json
 [
     {
         "name": "turtle1",
@@ -309,57 +365,94 @@ GET /robot/NAME
 
 Get the data published by the robot on Context Broker. It builds a query using the *NAME*, what will return data using the following structure:
 
-``` javascript
+``` json
 [
-    {
-        "id": "turtle1",
-        "type": "ROBOT",
-        "attributes": [
-            {
-                "type": "COMMAND",
-                "name": "COMMAND",
-                "value": [
-                    "pose"
-                ]
-            },
-            {
-                "type": "DescriptionData",
-                "name": "descriptions",
-                "value": "http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch||http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
-            },
-            {
-                "type": "turtlesim.msg.Pose",
-                "name": "pose",
-                "value": {
-                    "FIROSstamp": 1424423606.27683,
-                    "linear_velocity": 0,
-                    "theta": 0,
-                    "y": 5.544444561004639,
-                    "x": 5.885244369506836,
-                    "angular_velocity": 0
-                }
-            },
-            {
-                "type": "geometry_msgs.msg.Twist",
-                "name": "cmd_vel",
-                "value": {
-                    "FIROSstamp": 1424423604309,
-                    "linear": {
-                        "y": 0,
-                        "x": 0,
-                        "z": 0
-                    },
-                    "angular": {
-                        "y": 0,
-                        "x": 0,
-                        "z": 0
-                    }
-                }
+   {
+      "attributes":[
+         {
+            "type":"COMMAND",
+            "name":"COMMAND",
+            "value":[
+               "pose"
+            ]
+         },
+         {
+            "type":"DescriptionData",
+            "name":"descriptions",
+            "value":"http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch||http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
+         },
+         {
+            "type":"turtlesim.msg.Pose",
+            "name":"pose",
+            "value":{
+               "firosstamp":{
+                  "type":"number",
+                  "value":"1539856575.3397"
+               },
+               "angular_velocity":{
+                  "type":"number",
+                  "value":"0.0",
+                  "metadata":{
+                     "dataType":{
+                        "type":"dataType",
+                        "value":"float32"
+                     }
+                  }
+               },
+               "linear_velocity":{
+                  "type":"number",
+                  "value":"0.0",
+                  "metadata":{
+                     "dataType":{
+                        "type":"dataType",
+                        "value":"float32"
+                     }
+                  }
+               },
+               "theta":{
+                  "type":"number",
+                  "value":"0.0",
+                  "metadata":{
+                     "dataType":{
+                        "type":"dataType",
+                        "value":"float32"
+                     }
+                  }
+               },
+               "y":{
+                  "type":"number",
+                  "value":"5.544444561004639",
+                  "metadata":{
+                     "dataType":{
+                        "type":"dataType",
+                        "value":"float32"
+                     }
+                  }
+               },
+               "x":{
+                  "type":"number",
+                  "value":"11.088889122009277",
+                  "metadata":{
+                     "dataType":{
+                        "type":"dataType",
+                        "value":"float32"
+                     }
+                  }
+               },
+               "type":"dict",
+               "id":"dict03b1a6b3-230e-495d-9b68-4309a11b8b29"
             }
-        ]
-    }
+         }
+      ],
+      "type":"ROBOT",
+      "id":"turtle1"
+   }
 ]
 ```
+
+
+# Currently untested POST-Operationes:
+These Operations might work, but are not tested currently.
 
 POST /FIROS
 -----------
@@ -381,7 +474,7 @@ POST /whitelist/write
 
 This API overwrites or creates entries in the robot *whitelist*. This can be done by sending the following data:
 
-``` javascript
+``` json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -400,7 +493,7 @@ EXAMPLE:
 
 Take this *whitelist.json* as a starting point:
 
-``` javascript
+``` json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -411,7 +504,7 @@ Take this *whitelist.json* as a starting point:
 
 Now, the following command is sent:
 
-``` javascript
+``` json
 POST /whitelist/write
 {
     "turtle\\w+": {
@@ -423,7 +516,7 @@ POST /whitelist/write
 
 The resulting *whitelist* will be as follows:
 
-``` javascript
+``` json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel2"],
@@ -437,7 +530,7 @@ POST /whitelist/remove
 
 This API removes elements from the *whitelist*. The format is as follows:
 
-``` javascript
+``` json
 {
     "turtle\\w+": {
         "publisher": [],
@@ -454,7 +547,7 @@ EXAMPLE:
 
 Take this *whitelist.json* as a starting point:
 
-``` javascript
+``` json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -469,7 +562,7 @@ Take this *whitelist.json* as a starting point:
 
 Now, the following json is sent:
 
-``` javascript
+``` json
 POST /whitelist/remove
 {
     "turtle\\w+": {
@@ -485,7 +578,7 @@ POST /whitelist/remove
 
 The resulting *whitelist* will look as follows:
 
-``` javascript
+``` json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -506,99 +599,12 @@ This API restores the *whitelist* file to its initial state.
 Ent-to-end tests
 ================
 
-In order to test if firos is publishing into ContextBroker you can run the following command:
+In order to test if firos is publishing into ContextBroker you can simply open up any browser and enter the following in the adress-line:
+> CONTEXTBROKER_IP:CB_PORT/v2/entities
 
-``` bash
-~$ rostopic pub -1 s1 std_msgs/String "data: 'test'"  __ns:=end_end_test
-```
+If the Context-Broker returns a page with content, then everything is working.
 
-And then:
-
-``` bash
-~$ (curl contextbroker_ip:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-        "entities": [
-                {
-                        "type": "ROBOT",
-                        "isPattern": "true",
-                        "id": "end_end_test"
-                }
-        ],
-        "attributes": [
-                "s1"
-        ]
-}
-EOF
-```
-
-If everything went right you'll get something like this:
-
-``` javascript
-{
-        "contextResponses": [
-                {
-                        "contextElement": {
-                                "attributes": [
-                                        {
-                                                "name": "s1",
-                                                "type": "std_msgs.msg.String",
-                                                "value": "{%27firosstamp%27: 1443020619.58971, %27data%27: %27test%27}"
-                                        }
-                                ],
-                                "id": "end_end_test",
-                                "isPattern": "false",
-                                "type": "ROBOT"
-                        },
-                        "statusCode": {
-                                "code": "200",
-                                "reasonPhrase": "OK"
-                        }
-                }
-        ]
-}
-```
-
-Notifications from ContextBroker to firos can be tested by running the following command in one terminal...
-
-``` bash
-rostopic echo /end_end_test/p1
-```
-
-... and the following command in another terminal:
-
-``` bash
-~$ (curl contextbroker_ip:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-          "contextElements": [
-                  {
-                          "type": "ROBOT",
-                          "isPattern": "false",
-                          "id": "end_end_test",
-                          "attributes": [
-                          {
-                                  "name": "p1",
-                                  "type": "std_msgs.msg.String",
-                                  "value": "{%27data%27: %27`echo $RANDOM`%27}"
-                          },
-                          {
-                                  "name": "COMMAND",
-                                  "type": "COMMAND",
-                                  "value": ["p1"]
-                          }
-                          ]
-                  }
-          ],
-          "updateAction": "APPEND"
-}
-EOF
-```
-
-If everything went ok, in the first terminal you'll see something like this:
-
-``` bash
-data: random_number
----
-```
+For more Context-Broker-Operations visit [this site](https://fiware-orion.readthedocs.io/en/master/user/walkthrough_apiv2/index.html)
 
 License
 =======
