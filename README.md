@@ -614,5 +614,5 @@ Firos is licensed under [MIT License](https://opensource.org/licenses/MIT).
 Contributors
 =======
 
-Dominik Lux
+Dominik Lux  
 Peter Detzner
