@@ -13,7 +13,7 @@ We have some ideas what we would like to change in FIROS. The following table sh
 
 | # | Feature            | Description                                                                                       | Status            |
 |---|--------------------|---------------------------------------------------------------------------------------------------|-------------------|
-| 1 | ObjectConverter    | Our own, more efficient and easier to use Object<>Fiware Converter                                | Development |
+| 1 | FiwareObjectConverter    | Our own, more efficient and easier to use Object<>Fiware Converter                                | Development |
 | 2 | NGSI v1->v2     | Currently NGSIv1 is supported, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Planned           |
 | 3 | Incremental Update | Currently FIROS is updating the whole entity. We want to update only the required attributes to have a more efficient communication and minimize the communication...                                                                                                  | Planned           |
 
