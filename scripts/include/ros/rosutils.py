@@ -14,6 +14,11 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+__author__ = "Dominik Lux"
+__credits__ = ["Peter Detzner"]
+__maintainer__ = "Dominik Lux"
+__version__ = "0.0.1a"
+__status__ = "Developement"
 
 def ros2Obj(msgInstance):
     ## \brief Map a Ros Object to dict
@@ -34,8 +39,13 @@ def obj2Ros(obj, msgInstance):
     # \param Ros Object instance
     if hasattr(msgInstance, '__slots__'):
         for key in msgInstance.__slots__:
-            if key in obj:
+            if hasattr(obj, key):
+                setattr(msgInstance, key, obj2Ros(getattr(obj, key), getattr(msgInstance, key)))
+            elif type(obj) is dict and key in obj:
                 setattr(msgInstance, key, obj2Ros(obj[key], getattr(msgInstance, key)))
+            # TODO DL Remove?
+            # if key in obj:
+            #     setattr(msgInstance, key, obj2Ros(obj[key], getattr(msgInstance, key)))
     else:
         if type(obj) is dict:
             raise Exception("Not a primitive")

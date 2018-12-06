@@ -14,6 +14,13 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+__author__ = "Dominik Lux"
+__credits__ = ["Peter Detzner"]
+__maintainer__ = "Dominik Lux"
+__version__ = "0.0.1a"
+__status__ = "Developement"
+
+
 import json
 import time
 import rospy
@@ -22,6 +29,8 @@ import urllib2
 from include.logger import Log
 from include.constants import INDEX_CONTEXTBROKER, DATA_CONTEXTBROKER, SEPARATOR_CHAR
 from include.pubsub.iPubSub import Ipublisher
+
+from ...FiwareObjectConverter import objectFiwareConverter
 
 PUBLISH_FREQUENCY = 250
 posted_history = {}
@@ -66,6 +75,11 @@ def _publish(context_id, datatype, attributes, connection, sendCommand=True):
     # \param entity type
     # \param entity attributes
     # \param context broker to send to
+
+    ## Explicitly ignore the rosmsg which is posted!firef
+    if context_id is "rosmsg":
+        return
+
     if context_id not in posted_history:
         posted_history[context_id] = {}
     commands = []
@@ -77,7 +91,10 @@ def _publish(context_id, datatype, attributes, connection, sendCommand=True):
         if (current - posted_history[context_id][attribute["name"]]) > PUBLISH_FREQUENCY:
             commands.append(attribute["name"])
             attr2Send.append(attribute)
+
+
             posted_history[context_id][attribute["name"]] = current
+    
 
     if len(commands) > 0:
         if(sendCommand):
@@ -98,17 +115,24 @@ def _publish(context_id, datatype, attributes, connection, sendCommand=True):
             "updateAction": "APPEND"
         }
 
-        url = "http://{}:{}/NGSI10/updateContext".format(connection["ADDRESS"], connection["PORT"])
+        # url = "http://{}:{}/NGSI10/updateContext".format(connection["ADDRESS"], connection["PORT"]) #DL TODO remove?
+        
+        url = "http://{}:{}/v1/updateContext".format(connection["ADDRESS"], connection["PORT"])
         data_json = json.dumps(data)
+
+
         try:
+            # TODO TODO DL change to v2/ID/attrs or other NGSIv2 APIs, so native JSON TYpes can be supported.
+            # Currently NGSIv1 is used and 'stringifies' every native json-Type into a String. Errors can occur by Back-Conversion
+            # Here the source: https://fiware-orion.readthedocs.io/en/1.3.0/user/structured_attribute_valued/
             request = urllib2.Request(url, data_json, {'Content-Type': 'application/json', 'Accept': 'application/json'})
             response = urllib2.urlopen(request)
-            response_body = json.loads(response.read())
+            response_body = json.loads(response.read()) # JSON Payload
             response.close()
 
             if "errorCode" in response_body:
                 rospy.logerr("Error sending data to Context Broker:")
                 rospy.logerr(response_body["errorCode"]["details"])
-        except Exception as ex:
-            Log("ERROR", ex.reason)
+        except Exception,  ex:
+            Log("ERROR", str(ex))
             return None

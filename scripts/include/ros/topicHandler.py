@@ -14,9 +14,16 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+__author__ = "Dominik Lux"
+__credits__ = ["Peter Detzner"]
+__maintainer__ = "Dominik Lux"
+__version__ = "0.0.1a"
+__status__ = "Developement"
+
 import os
 import json
 import rospy
+import time
 
 
 from include.logger import Log
@@ -30,6 +37,8 @@ from include.ros.dependencies.third_party import *
 # PubSub Handlers
 from include.pubsub.pubSubFactory import PublisherFactory, SubscriberFactory
 
+from ..FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
+
 import std_msgs.msg
 
 CloudSubscriber = SubscriberFactory.create()
@@ -40,6 +49,7 @@ TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topi
 ROBOT_TOPICS = {}
 robot_data = {}
 subscribers = []
+topic_DataTypeDefinition = {} # filled in loadMsgHandlers with infos about the concrete Datatype, 
 
 
 def loadMsgHandlers(robot_data):
@@ -75,10 +85,19 @@ def loadMsgHandlers(robot_data):
                     theclass = LibLoader.loadFromSystem(topic['msg'])
                 extra["type"] = _topic_name
 
+            # Creating Python-Specific JSON of the data (TODO add metadata exact types!)
+            jsonObj = ObjectFiwareConverter.obj2Fiware(ros2Definition(theclass()))
+            # Back Conversion to JSON-conform-Object (no data-loss), because this Project still treats it like an Object
+            jsonObj = json.loads(jsonObj)
+            # Here _topic_name is the actual dataType which we are converting!
+            # ros2Definition returns a dict containing key (variable) to value (precise Datatype)
+            topic_DataTypeDefinition[_topic_name] = ros2Definition(theclass())
+
+
             msg_types[_topic_name] = {
                 "name": _topic_name,
                 "type": "rosmsg",
-                "value": json.dumps(ros2Definition(theclass())).replace('"', SEPARATOR_CHAR)
+                "value": jsonObj
             }
 
             if topic["type"].lower() == "publisher":
@@ -171,8 +190,21 @@ def _callback(data, args):
     topic = str(args['topic'])
     datatype = ROBOT_TOPICS[robot]["subscriber"][topic]["msg"]
     contextType = DEFAULT_CONTEXT_TYPE
-    content = []
-    content.append(CloudPublisher.createContent(topic, datatype, ros2Obj(data)))
+    
+    # dataType of topic
+    # Setting firostimestamp
+    tempData = ros2Obj(data)
+    tempData['firosstamp'] = time.time()
+    # Creating Python-Specific JSON of the data (TODO add metadata exact types!)
+    tempData = ObjectFiwareConverter.obj2Fiware(tempData, ind=0, dataTypeDict=topic_DataTypeDefinition[datatype], ignorePythonMetaData=True) 
+    # Back Conversion to JSON-conform-Object (no data-loss), because this Project still treats it like an Object
+    tempData = json.loads(tempData)
+
+    content = [{
+        'type' : datatype,
+        'name' : topic,
+        'value': tempData
+    }]
     CloudPublisher.publish(robot, contextType, content)
 
 

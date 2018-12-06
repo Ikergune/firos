@@ -14,6 +14,12 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+__author__ = "Dominik Lux"
+__credits__ = ["Peter Detzner"]
+__maintainer__ = "Dominik Lux"
+__version__ = "0.0.1a"
+__status__ = "Developement"
+
 import re
 import cgi
 import json
@@ -27,6 +33,8 @@ from include.ros.rosutils import ros2Definition
 from include.ros.rosConfigurator import RosConfigurator, setWhiteList
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers, ROBOT_TOPICS
 from include.pubsub.pubSubFactory import SubscriberFactory, QueryBuilderFactory
+
+from ..FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 
 CloudSubscriber = SubscriberFactory.create()
 CloudQueryBulder = QueryBuilderFactory.create()
@@ -89,6 +97,7 @@ def postParams(request):
         return cgi.parse_qs(request.rfile.read(length), keep_blank_values=1)
     elif ctype == 'application/json':
         json_data = request.rfile.read(int(request.headers['Content-Length']))
+
         return json.loads(json_data)
     else:
         return {}
@@ -115,6 +124,7 @@ def onTopic(request, action):
     try:
         contexts = postParams(request)
         contexts = contexts['contextResponses']
+        
         for context in contexts:
             if context['statusCode']['code'] == "200":
                 robot = context['contextElement']
@@ -129,11 +139,21 @@ def onTopic(request, action):
                 for topic in robot['attributes']:
                     if topic["name"] != "descriptions" and topic["name"] in commands:
                         value = CloudSubscriber.parseData(topic['value'])
-                        if (topic["name"] not in TOPIC_TIMESTAMPS[robotName]) or ("firosstamp" in value and TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]) or ("firosstamp" not in value):
-                            if "firosstamp" in value:
+                        # Back-Conversion with ObjectFiwareConverter
+                        tmp_json_str = json.dumps(value)
+                        kv = TypeValue()
+                        ObjectFiwareConverter.fiware2Obj(tmp_json_str, kv, setAttr=True, useMetadata=False)
+                        if (topic["name"] not in TOPIC_TIMESTAMPS[robotName]) or (hasattr(kv, "firosstamp") and TOPIC_TIMESTAMPS[robotName][topic["name"]] != getattr(kv, "firosstamp")) or (not hasattr(kv, "firosstamp")):
+                            if hasattr(kv, "firosstamp"):
                                 TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
                                 # value.remove(value["firosstamp"])
-                            TopicHandler.publish(robotName, topic['name'], value)
+                            TopicHandler.publish(robotName, topic['name'], kv)
+                        # DL TODO Remove?
+                        # if (topic["name"] not in TOPIC_TIMESTAMPS[robotName]) or ("firosstamp" in value and TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]) or ("firosstamp" not in value):
+                        #     if "firosstamp" in value:
+                        #         TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
+                        #         # value.remove(value["firosstamp"])
+                        #     TopicHandler.publish(robotName, topic['name'], value)
     except Exception as e:
         Log("ERROR", e)
     request.send_response(200)
@@ -141,6 +161,10 @@ def onTopic(request, action):
     request.end_headers()
     request.wfile.write("Received by firos")
 
+## DL - Back Parsing Stub Class
+class TypeValue(object):
+    def __init__(self):
+        pass
 
 def onRobots(request, action):
     ## \brief Handle robot list request
@@ -184,11 +208,11 @@ def onRobotData(request, action):
         request.send_response(200)
         robot_list = []
         for context in data["contextResponses"]:
-            for attribute in context["contextElement"]["attributes"]:
-                if attribute["name"] != "COMMAND" and attribute["name"] != "descriptions":
-                    print attribute["name"]
-                    print attribute["value"]
-                    attribute["value"] = json.loads(attribute["value"].replace(SEPARATOR_CHAR, '"'))
+            # TODO DL is it necassary
+            # for attribute in context["contextElement"]["attributes"]:
+                # if attribute["name"] != "COMMAND" and attribute["name"] != "descriptions":
+                #     attribute["value"] = json.loads(attribute["value"].replace(SEPARATOR_CHAR, '"'))
+                    # attribute["value"] = json.loads(attribute["value"])
             context["contextElement"].pop("isPattern", None)
             robot_list.append(context["contextElement"])
         data = robot_list

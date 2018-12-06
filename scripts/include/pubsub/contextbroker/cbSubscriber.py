@@ -14,6 +14,12 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+__author__ = "Dominik Lux"
+__credits__ = ["Peter Detzner"]
+__maintainer__ = "Dominik Lux"
+__version__ = "0.0.1a"
+__status__ = "Developement"
+
 import os
 import json
 import time
@@ -118,8 +124,8 @@ class CbSubscriber(Isubscriber):
     def parseData(self, data):
         ## \brief Parse the received data
         # \param data
-        # print data
-        return json.loads(data.replace(SEPARATOR_CHAR, '"'))
+        # DL just return data
+        return data
 
     def deleteEntity(self, namespace, data_type, removeContext=True):
         ## \brief Delete entity from context broker
@@ -195,7 +201,7 @@ class CbSubscriber(Isubscriber):
         # \param url to request to
         # \param data to send
         # \param HTTP method (GET by default)
-        try:
+        try: 
             request = urllib2.Request(url, data, {'Content-Type': 'application/json', 'Accept': 'application/json'})
             if method is not None:
                 request.get_method = lambda: method
