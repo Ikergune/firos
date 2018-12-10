@@ -115,7 +115,7 @@ def loadMsgHandlers(robot_data):
         Log("INFO", "\n")
         CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
         Log("INFO", "Subscribed to " + robotName + "'s topics\n")
-    CloudPublisher.publishMsg(msg_types.values())
+    # CloudPublisher.publishMsg(msg_types.values())  ### --> This sends the rosmsg  TODO DL method only used here!
     MapHandler.mapPublisher()
 
 
@@ -191,13 +191,14 @@ def _callback(data, args):
     datatype = ROBOT_TOPICS[robot]["subscriber"][topic]["msg"]
     contextType = DEFAULT_CONTEXT_TYPE
     
-    # dataType of topic
     # Setting firostimestamp
     tempData = ros2Obj(data)
     tempData['firosstamp'] = time.time()
+    # tempData.__class__.__name__ = datatype  # We just assume it is an object of dataType
+    dtc = DataTypeClass(datatype, tempData)
     # Creating Python-Specific JSON of the data (TODO add metadata exact types!)
-    tempData = ObjectFiwareConverter.obj2Fiware(tempData, ind=0, dataTypeDict=topic_DataTypeDefinition[datatype], ignorePythonMetaData=True) 
-    # Back Conversion to JSON-conform-Object (no data-loss), because this Project still treats it like an Object
+    tempData = ObjectFiwareConverter.obj2Fiware(dtc, ind=0, dataTypeDict=topic_DataTypeDefinition[datatype], ignorePythonMetaData=True) 
+    
     tempData = json.loads(tempData)
 
     content = [{
@@ -206,6 +207,20 @@ def _callback(data, args):
         'value': tempData
     }]
     CloudPublisher.publish(robot, contextType, content)
+
+
+
+
+class DataTypeClass(object):
+    ## Explicitly set __name__ to the DataType!
+    # Also set all keys in dict as your own variables
+    def __init__(self, datatype_str, in_dict):
+        self.__class__.__name__ = datatype_str
+        self.__name__ = datatype_str
+        for k,v in in_dict.iteritems():
+            setattr(self, k, v)
+
+
 
 
 def robotDisconnection(data):

@@ -76,7 +76,7 @@ def _publish(context_id, datatype, attributes, connection, sendCommand=True):
     # \param entity attributes
     # \param context broker to send to
 
-    ## Explicitly ignore the rosmsg which is posted!firef
+    ## Explicitly ignore the rosmsg which is posted!
     if context_id is "rosmsg":
         return
 
@@ -119,7 +119,6 @@ def _publish(context_id, datatype, attributes, connection, sendCommand=True):
         
         url = "http://{}:{}/v1/updateContext".format(connection["ADDRESS"], connection["PORT"])
         data_json = json.dumps(data)
-
 
         try:
             # TODO TODO DL change to v2/ID/attrs or other NGSIv2 APIs, so native JSON TYpes can be supported.
