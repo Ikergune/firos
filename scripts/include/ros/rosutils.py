@@ -46,6 +46,12 @@ def obj2Ros(obj, msgInstance):
             # TODO DL Remove?
             # if key in obj:
             #     setattr(msgInstance, key, obj2Ros(obj[key], getattr(msgInstance, key)))
+    elif type(msgInstance) is list:
+        # case: it is an array/list of a specific type
+        # TODO DL do they always have the same length?
+        for i in range(len(msgInstance)):
+            msgInstance[i] = obj2Ros(obj[i], msgInstance[i])
+    
     else:
         if type(obj) is dict:
             raise Exception("Not a primitive")
