@@ -27,7 +27,6 @@ from include.constants import MAP_SERVER_PORT, ROSBRIDGE_PORT
 MAP_SERVER_PROCESS = None
 
 mapserver_path = os.path.dirname(os.path.abspath(__file__)).replace("include", "")
-print(mapserver_path)
 start_command = "node mapserver.js " + str(MAP_SERVER_PORT) + " " + str(ROSBRIDGE_PORT)
 
 

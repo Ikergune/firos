@@ -17,10 +17,12 @@
 import os
 import re
 import imp
+import importlib
 
 regex = re.compile(ur'^(.*)(\b.msg\b)(.*)$')
 
-
+# TODO DL , loadFromFile and loadFromSystem is only used by Topic Handler
+#           load3rdParty might be replaced by obj2ros?
 class LibLoader:
     @staticmethod
     def loadFromFile(filepath):
@@ -29,10 +31,10 @@ class LibLoader:
         mod_name, file_ext = os.path.splitext(os.path.split(filepath)[-1])
 
         if file_ext.lower() == '.py':
-            py_mod = imp.load_source(mod_name, filepath)
+            py_mod = importlib.import_module(mod_name, package=filepath)
 
         elif file_ext.lower() == '.pyc':
-            py_mod = imp.load_compiled(mod_name, filepath)
+            py_mod = importlib.import_module(mod_name, package=filepath)
 
         return py_mod
 
@@ -54,23 +56,9 @@ class LibLoader:
             module_name = str(matches.group(1)) + str(matches.group(2))
             modules = str(matches.group(3)).split(".")
             modules = modules[1: len(modules)]
-            module = __import__(module_name, globals(), locals(), [module_name.split('.')[-1]])
+            module = importlib.import_module(module_name)
+
+            
             for name in modules:
                 module = getattr(module, name)
         return module
-
-
-def generateRosDependencies():
-    directories = os.environ["ROS_PACKAGE_PATH"].split(":")
-    imports = """from include.logger import Log\n\n"""
-    imports = """unloaded = 0\nlibs=[]\n"""
-    for directory in directories:
-        if os.path.isdir(directory):
-            for folder in os.listdir(directory):
-                if "msg" in folder:
-                    imports += """try:\n    import {}.msg\nexcept Exception:\n    unloaded += 1\n    libs.append('{}')\n""".format(folder, folder)
-    imports += "Log('WARNING', str(unloaded) + ' libraries not loaded: ' + str(libs))"
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ros", "dependencies", "generated.py")
-    f = open(path, 'w')
-    f.write(imports)
-    f.close()

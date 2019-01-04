@@ -27,21 +27,21 @@ from urlparse import urlparse, parse_qs
 from BaseHTTPServer import BaseHTTPRequestHandler
 
 from include.logger import Log
-from include.constants import SEPARATOR_CHAR, DEFAULT_CONTEXT_TYPE
 from include.confManager import getRobots
 from include.ros.rosutils import ros2Definition
 from include.ros.rosConfigurator import RosConfigurator, setWhiteList
-from include.ros.topicHandler import TopicHandler, loadMsgHandlers, ROBOT_TOPICS
-from include.pubsub.pubSubFactory import SubscriberFactory, QueryBuilderFactory
+from include.ros.topicHandler import TopicHandler, loadMsgHandlers, ROBOT_TOPICS # TODO DL Refactor!
+from include.contextbroker.cbSubscriber import CbSubscriber
+from include.contextbroker.cbQueryBuilder import CbQueryBuilder
 
-from ..FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
+from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 
-CloudSubscriber = SubscriberFactory.create()
-CloudQueryBulder = QueryBuilderFactory.create()
+CloudSubscriber = CbSubscriber()
+CloudQueryBulder = CbQueryBuilder()
 
 TOPIC_TIMESTAMPS = {}
 
-
+# TODO DL refactor!
 class RequestHandler(BaseHTTPRequestHandler):
     ## \brief FIROS http request handler
     def do_GET(self):
@@ -117,54 +117,55 @@ def getAction(path, method):
 ###############################################################################
 
 
-def onTopic(request, action):
-    ## \brief Handle topic reception
-    # \param client request
-    # \param action
-    try:
-        contexts = postParams(request)
-        contexts = contexts['contextResponses']
-        
-        for context in contexts:
-            if context['statusCode']['code'] == "200":
-                robot = context['contextElement']
-                robotName = robot['id']
-                if robotName not in TOPIC_TIMESTAMPS:
-                    TOPIC_TIMESTAMPS[robotName] = {}
-                for topic in robot['attributes']:
-                    if topic["name"] == "COMMAND":
-                        commands = topic["value"]
-                        robot['attributes'].remove(topic)
-                        break
-                for topic in robot['attributes']:
-                    if topic["name"] != "descriptions" and topic["name"] in commands:
-                        value = CloudSubscriber.parseData(topic['value'])
-                        # Back-Conversion with ObjectFiwareConverter
-                        tmp_json_str = json.dumps(value)
-                        kv = TypeValue()
-                        ObjectFiwareConverter.fiware2Obj(tmp_json_str, kv, setAttr=True, useMetadata=False)
-                        if (topic["name"] not in TOPIC_TIMESTAMPS[robotName]) or (hasattr(kv, "firosstamp") and TOPIC_TIMESTAMPS[robotName][topic["name"]] != getattr(kv, "firosstamp")) or (not hasattr(kv, "firosstamp")):
-                            if hasattr(kv, "firosstamp"):
-                                TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
-                                # value.remove(value["firosstamp"])
-                            TopicHandler.publish(robotName, topic['name'], kv)
-                        # DL TODO Remove?
-                        # if (topic["name"] not in TOPIC_TIMESTAMPS[robotName]) or ("firosstamp" in value and TOPIC_TIMESTAMPS[robotName][topic["name"]] != value["firosstamp"]) or ("firosstamp" not in value):
-                        #     if "firosstamp" in value:
-                        #         TOPIC_TIMESTAMPS[robotName][topic["name"]] = value["firosstamp"]
-                        #         # value.remove(value["firosstamp"])
-                        #     TopicHandler.publish(robotName, topic['name'], value)
-    except Exception as e:
-        Log("ERROR", e)
+### TODO DL Request Mapping -> Handles new Information from Context Broker!
+
+def requestFromCB(request, action):
+    # This method is called, when we receive a request from CB.
+    # Get Data 
+    receivedData = postParams(request)
+    data = receivedData['data'][0] # Specific to NGSIv2 
+    jsonData = json.dumps(data)
+    topics = data.keys() # Convention Topic-Names are the attributes by an JSON Object, except: type, id
+
+
+    for topic in topics:
+        if topic != 'id' and topic != 'type':
+            dataStruct = buildTypeStruct(data[topic])
+            obj = CloudSubscriber.receivedData(data['id'], topic, jsonData)
+            
+            TopicHandler.publishDirect(data['id'], topic, getattr(obj, topic), dataStruct)
+
     request.send_response(200)
     request.send_header('Content-type', 'text/plain')
     request.end_headers()
     request.wfile.write("Received by firos")
 
-## DL - Back Parsing Stub Class
-class TypeValue(object):
-    def __init__(self):
-        pass
+
+def buildTypeStruct(obj):
+    # This generates a Struct always containing a Type (Ros-Message) and its Value (maybe more Ros-Messages or empty)
+    # Recursively retreive all types!
+    s = {}
+    if 'value' in obj and 'type' in obj and "." in obj['type'] : # searching for a point to get ROS-Message-Types, see Fiware-Object-Converter
+        s['type'] = obj['type']
+        objval = obj['value'] 
+        s['value'] = {}
+
+        for k in objval:
+            if 'type' in objval[k] and 'value' in objval[k] and objval[k]['type'] == 'array': # Check if we got an Array-Type value
+                l = []
+                for klist in objval[k]['value']:
+                    l.append(buildTypeStruct(klist))
+                s['value'][k] = l
+            else:
+                s['value'][k] = buildTypeStruct(objval[k])
+
+    return s
+
+
+def onTopic(request, action):
+    # TODO DL refactor, its only a Wrapper!
+    requestFromCB(request, action)
+ 
 
 def onRobots(request, action):
     ## \brief Handle robot list request
@@ -208,11 +209,6 @@ def onRobotData(request, action):
         request.send_response(200)
         robot_list = []
         for context in data["contextResponses"]:
-            # TODO DL is it necassary
-            # for attribute in context["contextElement"]["attributes"]:
-                # if attribute["name"] != "COMMAND" and attribute["name"] != "descriptions":
-                #     attribute["value"] = json.loads(attribute["value"].replace(SEPARATOR_CHAR, '"'))
-                    # attribute["value"] = json.loads(attribute["value"])
             context["contextElement"].pop("isPattern", None)
             robot_list.append(context["contextElement"])
         data = robot_list
@@ -242,8 +238,6 @@ def onDisConnect(request, action):
     robot_name = pathParams(request, action["regexp"])[0]
     Log("INFO", "Disconnecting robot" + robot_name)
     if robot_name in ROBOT_TOPICS:
-        CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
-        CloudSubscriber.disconnect(robot_name, True)
         for topic in ROBOT_TOPICS[robot_name]["publisher"]:
             ROBOT_TOPICS[robot_name]["publisher"][topic]["publisher"].unregister()
         for topic in ROBOT_TOPICS[robot_name]["subscriber"]:

@@ -19,10 +19,10 @@ import urllib2
 
 from include.logger import Log
 from include.constants import DATA_CONTEXTBROKER
-from include.pubsub.iPubSub import IqueryBuilder
 
 
-class CbQueryBuilder(IqueryBuilder):
+class CbQueryBuilder(object):
+    # TODO DL used in requestHandler
     ## \brief Query data to context broker
     def findById(self, entity_id, data_type="ROBOT", isPattern=False):
         ## \brief Get entity data from context broker
