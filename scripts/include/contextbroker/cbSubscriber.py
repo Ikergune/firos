@@ -23,100 +23,142 @@ __status__ = "Developement"
 import time
 import thread
 import requests
+import json
 
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
-
-from include.constants import *
+from include.constants import DATA_CONTEXTBROKER, IP, SERVER_PORT
 from include.logger import Log
 
 
-class CbSubscriber(object):
-    ## \brief Context broker subscription handler
-    subscriptions = {} # TODO  DL remove?
-    subscriptionThreads = {}
-    subscriptionIds = {}
-    refresh_thread = None
+CB_BASE_URL = "http://{}:{}".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
+FIROS_NOTIFY_URL = "http://{}:{}/firos".format(IP, SERVER_PORT)                                    # TODO DL HTTP?
 
-    def subscribeToCB(self, robotID, topic):
-        # If not already subscribed, start a new thread which handles the subscription
+class CbSubscriber(object):
+    ''' The CbSubscriber handles the subscriptions on the ContextBroker.
+        Only the url CONTEXT_BROKER / v2 / subcriptions  is used here!
+        As on CbPublisher on shutdown all subscriptions are deleted form 
+        ContextBroker. 
+
+        this Objects also converts the received data from ContextBroker
+        back into a Python-Object. 
+
+        Here each topic of an robot is subscribed seperately.
+
+        THIS IS THE ONLY FILE WHICH OPERATES ON /v2/subscriptions
+    '''
+
+    # Saves the subscriptions IDs returned from ContextBroker.
+    # Follwoing Structure: subscriptionIds[ROBOT_ID][TOPIC] returns a sub-Id in String
+    subscriptionIds = {}
+
+    def subscribeToCB(self, robotID, topicList):
+        ''' This method starts for each topic an own thread, which handles the subscription
+
+            robotID: The string of the robotID
+            topicList: A list of topics, corresponding to the robotID
+        '''
+        # If not already subscribed, start a new thread which handles the subscription for each topic for an robot.
         # And only If the topic list is not empty!
-        if robotID not in self.subscriptions and topic:
-            Log("INFO", "Subscribing on context broker to " + robotID + " and topics: " + str(topic))
-            self.subscriptionThreads[robotID] = thread.start_new_thread(self.subscribeThread, (robotID, topic))
-            #Start Thread via subscription
+        if robotID not in self.subscriptionIds and topicList:
+            Log("INFO", "Subscribing on Context-Broker to " + robotID + " and topics: " + str(topicList))
+            self.subscriptionIds[robotID] = {}
+            for topic in topicList:
+                thread.start_new_thread(self.subscribeThread, (robotID, topic)) #Start Thread via subscription         
 
 
     def unsubscribeALLFromCB(self):
-        suburl = "http://{}:{}".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
+        ''' Simply unsubscribed from all tracked subscriptions
+        '''
         for robotID in self.subscriptionIds:
-            response = requests.delete(suburl + self.subscriptionIds[robotID])
-        # TODO DL Error Handling!
+            for topic in self.subscriptionIds[robotID]:
+                response = requests.delete(CB_BASE_URL + self.subscriptionIds[robotID][topic])
+                self._checkResponse(response, subID=self.subscriptionIds[robotID][topic])
 
 
-    def subscribeThread(self, robotID, topicList):
-        # Subscribe New, Unsubscribe old and sleep. If time has passed re-do!
-        suburl = "http://{}:{}".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
-        
+    def subscribeThread(self, robotID, topic):
+        ''' A Subscription-Thread. It Life-Cycle is as follows:
+            -> Subscribe -> Delete old Subs-ID -> Save new Subs-ID -> Wait ->
+
+            robotID: A string corresponding to the robotID
+            topic: The Topic (string) to subscribe to.
+        '''
         while True:
             # Subscribe
-            jsonData = self.subscribeJSONGenerator(robotID, topicList)
-            response = requests.post(suburl + "/v2/subscriptions", data=jsonData, headers={'Content-Type': 'application/json'})
+            jsonData = self.subscribeJSONGenerator(robotID, topic)
+            response = requests.post(CB_BASE_URL + "/v2/subscriptions", data=jsonData, headers={'Content-Type': 'application/json'})
+            self._checkResponse(response, created=True, robTop=(robotID, topic))
+
             newSubID = response.headers['Location'] # <- get subscription-ID
 
             # Unsubscribe
-            if robotID in self.subscriptionIds:
-                response = requests.delete(suburl + self.subscriptionIds[robotID])
-            self.subscriptionIds[robotID] = newSubID
+            if robotID in self.subscriptionIds and topic in self.subscriptionIds[robotID]:
+                response = requests.delete(CB_BASE_URL + self.subscriptionIds[robotID][topic])
+                self._checkResponse(response, subID=self.subscriptionIds[robotID][topic])
+                
+            # Save new ID
+            self.subscriptionIds[robotID][topic] = newSubID
 
-            #Sleep
+            # Wait
             time.sleep(290) # sleep TODO DL from config loaded seconds
-            Log("INFO", "Refreshing Subscription for " + robotID + " and topics: " + str(topicList))
-            
-            
-            # TODO DL Error Handling!
+            Log("INFO", "Refreshing Subscription for " + robotID + " and topics: " + str(topic))
 
 
+    def subscribeJSONGenerator(self, robotID, topic):
+        ''' This method returns the correct JSON-format to subscribe to the ContextBroker. 
+            The Expiration-Date/Throttle and Type of robots is retreived here via configuration (TODO DL)
 
-    def subscribeJSONGenerator(self, robotID, topicList):
-        # This method generates the JSON for the 'v2/subscriptions'-API of Orion CB
+            robotID: The String of the Robot-Id.
+            topic: The actual topic to subscribe to.
+        '''
+        # This struct correspondes to following JSON-format:
+        # https://fiware-orion.readthedocs.io/en/master/user/walkthrough_apiv2/index.html#subscriptions
         struct =  {
             "subject": {
                 "entities": [
                     {
                     "id": str(robotID),
-                    "type": "ROBOT"  # Type is currently always a robot! #TODO DL load from cfg 
+                    "type": "ROBOT"  # TODO DL load via Configuration 
                     }
                 ],
                 "condition": {
-                    "attrs": topicList
+                    "attrs": [str(topic)]
                 }
             },
             "notification": {
             "http": {
-                "url": "http://{}:{}/firos".format(IP, SERVER_PORT) # TODO DL HTTP?
+                "url": FIROS_NOTIFY_URL 
             },
-            "attrs": topicList
+            "attrs": [str(topic)]
             },
-            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + 300)) # TODO DL set expire in Config, ISO 8601,  300 secs
+            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + 300)) # TODO DL load via Configuration, ISO 8601
             # "throttling": 5  # TODO DL Maybe throttle?
             }
         return json.dumps(struct)
 
 
+    def convertReceivedDataFromCB(self, jsonData):
+        ''' This parses the Input Back into a TypeValue-object via the 
+            Object-Converter. This method is here to uniform the Obejct-Conversions 
+            in CbPublisher and CbSubscriber
 
-    def receivedData(self, robotID, topic, jsonData):
-    # parse the Input and let the TopicHandler (TODO DL remove from there)
-    # publish the data back into ROS
+            topic:    The topic, which should be converted. 
+                      the topic should have "id", "type" and "TOPIC" in it
+        '''
         kv = self.TypeValue()
         ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetadata=False)
         return kv
 
-    ## DL - Back Parsing Stub Class
-    class TypeValue(object):
-        def __init__(self):
-            pass
 
-    # TODO DL remove wrapper!
-    def subscribe(self, namespace, data_type, robot):
-        # unused -> data_type
-        self.subscribeToCB(namespace, robot["publisher"].keys())
+    class TypeValue(object):
+        ''' A Stub-Object to parse the received data
+        '''
+
+
+    def _checkResponse(self, response, robTop=None, subID=None, created=False):
+        ''' RESPONSE TODO DL
+        '''
+        if not response.ok:
+            if created:
+                Log("ERROR", "Could not create subscription for Robot {} and topic {} in Context-Broker".format(robTop[0], robTop[1]))
+            else:
+                Log("WARNING", "Could not delete subscription {} from Context-Broker".format(subID))

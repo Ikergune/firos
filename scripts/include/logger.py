@@ -67,7 +67,6 @@ def Log(level, *args):
             if level == 'CRITICAL':
                 _logger.critical(text)
             elif level == 'ERROR':
-                print "error" + text
                 _logger.error(text)
             elif level == 'WARNING':
                 _logger.warning(text)

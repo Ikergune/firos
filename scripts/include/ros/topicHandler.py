@@ -22,6 +22,7 @@ __status__ = "Developement"
 
 import os
 import rospy
+import importlib
 
 
 from include.logger import Log
@@ -29,7 +30,6 @@ from include.constants import DEFAULT_QUEUE_SIZE, DEFAULT_CONTEXT_TYPE
 from include.libLoader import LibLoader
 
 from include.ros.rosConfigurator import RosConfigurator
-from include.ros.rosutils import ros2Definition, obj2RosViaStruct
 from include.ros.dependencies.third_party import *
 
 # PubSub Handlers
@@ -49,6 +49,9 @@ ROBOT_TOPICS = {}
 robot_data = {}
 subscribers = []
 topic_DataTypeDefinition = {} # filled in loadMsgHandlers with infos about the concrete Datatype, 
+
+# Actual ROS-classes used for instanciateROSMessage
+ROS_MESSAGE_CLASSES = {}
 
 
 def loadMsgHandlers(robot_data):
@@ -105,7 +108,8 @@ def loadMsgHandlers(robot_data):
                 }
 
         Log("INFO", "\n")
-        CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
+        # CloudSubscriber.subscribe(robotName, DEFAULT_CONTEXT_TYPE, ROBOT_TOPICS[robotName])
+        CloudSubscriber.subscribeToCB(str(robotName), ROBOT_TOPICS[robotName]["publisher"].keys())
         Log("INFO", "Subscribed to " + robotName + "'s topics\n")
 
 
@@ -124,7 +128,7 @@ class TopicHandler:
         if robotID in ROBOT_TOPICS and topic in ROBOT_TOPICS[robotID]["publisher"]:
             instance = ROBOT_TOPICS[robotID]["publisher"][topic]
             if instance["class"]._type.replace("/", ".") == dataStruct['type']: # check if received and expected type are equal!
-                newMsg = obj2RosViaStruct(obj, dataStruct)  # TODO DL  Refactor ROBOT_TOPICS       
+                newMsg = instanciateROSMessage(obj, dataStruct)  # TODO DL  Refactor ROBOT_TOPICS       
                 if "publisher" in instance:
                     instance["publisher"].publish(newMsg)
 
@@ -144,11 +148,85 @@ class TopicHandler:
 
 def _publishToCBRoutine(data, args):
     # this Routine is executed on every received ROS-Message
+    # TODO DL topic_DataTypeDefinition can be omitted via ROS_MESSAGE_CLASSES
     robot = str(args['robot'])
     topic = str(args['topic'])
     datatype = ROBOT_TOPICS[robot]["subscriber"][topic]["msg"]
 
-    CloudPublisher.publishToCB(robot, topic, datatype, data, topic_DataTypeDefinition[datatype])
+    CloudPublisher.publishToCB(robot, topic, data, topic_DataTypeDefinition[datatype])
+
+
+
+
+
+#TODO Testing
+def instanciateROSMessage(obj, dataStruct):
+    ''' This method instanciates via obj and dataStruct the actual ROS-Message like
+        "geometry_msgs.Twist". Explicitly it loads the ROS-Message-class (if not already done)
+        with the dataStruct["type"] if given and recursively sets all attributes of the Message. 
+    '''
+    # Check if type and value in datastruct, if not we default to a priimitive value
+    if 'type' in dataStruct and 'value' in dataStruct:
+        
+        # Load Message-Class only once!
+        if dataStruct['type'] not in ROS_MESSAGE_CLASSES:
+            msgType = dataStruct['type'].split(".") # see Fiware-Object-Coverter, explicit Types of ROS-Messages are retreived from there 
+            moduleLoader = importlib.import_module(msgType[0] + ".msg")
+            msgClass = getattr(moduleLoader, msgType[1])
+            ROS_MESSAGE_CLASSES[dataStruct['type']] = msgClass
+        #Instanciate Message
+        instance = ROS_MESSAGE_CLASSES[dataStruct['type']]()
+
+
+        for attr in ROS_MESSAGE_CLASSES[dataStruct['type']].__slots__:
+            # For each attribute in Message
+            if attr in obj and attr in dataStruct['value']:
+                # Check iff obj AND dataStruct contains attr
+                if type(dataStruct['value'][attr]) is list:
+                    l =[]
+                    for it in range(len(dataStruct['value'][attr])):
+                        l.append(instanciateROSMessage(obj[attr][it], dataStruct['value'][attr][it]))
+                    setattr(instance, attr, l)
+                else:
+                    setattr(instance, attr, instanciateROSMessage(obj[attr], dataStruct['value'][attr]))
+        return instance
+    else:
+        # Struct is {}:
+        if type(obj) is dict:
+            # if it is still a dict, convert into an Object with attributes
+            t = Temp()
+            for k in obj:
+                setattr(t, k, obj[k])
+            return t
+        else:
+            # something more simple (int, long, float), return it
+            return obj
+
+            
+class Temp(object):
+    ''' A Temp-object, to convert from a Dictionary into an object with attributes.
+    '''
+    pass
+
+
+# TODO DL are Definitions still somewhere used?
+def ros2Definition(msgInstance):
+    ## \brief Generate Ros object definition
+    # \param ROS Object instance
+    obj = {}
+    for key, t in zip(msgInstance.__slots__, msgInstance._slot_types):
+        attr = getattr(msgInstance, key)
+        if hasattr(attr, '__slots__'):
+            obj[key] = ros2Definition(attr)
+        else:
+            obj[key] = t
+    return obj
+
+
+
+
+
+
 
 
 
@@ -161,8 +239,6 @@ def robotDisconnection(data):
     robot_name = data.data
     Log("INFO", "Disconnected robot: " + robot_name)
     if robot_name in ROBOT_TOPICS:
-        # CloudSubscriber.deleteEntity(robot_name, DEFAULT_CONTEXT_TYPE)
-        # CloudSubscriber.disconnect(robot_name, True)
         for topic in ROBOT_TOPICS[robot_name]["publisher"]:
             ROBOT_TOPICS[robot_name]["publisher"][topic]["publisher"].unregister()
         for topic in ROBOT_TOPICS[robot_name]["subscriber"]:

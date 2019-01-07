@@ -28,7 +28,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 
 from include.logger import Log
 from include.confManager import getRobots
-from include.ros.rosutils import ros2Definition
+from include.ros.topicHandler import ros2Definition
 from include.ros.rosConfigurator import RosConfigurator, setWhiteList
 from include.ros.topicHandler import TopicHandler, loadMsgHandlers, ROBOT_TOPICS # TODO DL Refactor!
 from include.contextbroker.cbSubscriber import CbSubscriber
@@ -131,7 +131,7 @@ def requestFromCB(request, action):
     for topic in topics:
         if topic != 'id' and topic != 'type':
             dataStruct = buildTypeStruct(data[topic])
-            obj = CloudSubscriber.receivedData(data['id'], topic, jsonData)
+            obj = CloudSubscriber.convertReceivedDataFromCB(jsonData)
             
             TopicHandler.publishDirect(data['id'], topic, getattr(obj, topic), dataStruct)
 

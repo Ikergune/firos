@@ -25,6 +25,7 @@ class CbQueryBuilder(object):
     # TODO DL used in requestHandler
     ## \brief Query data to context broker
     def findById(self, entity_id, data_type="ROBOT", isPattern=False):
+        # TODO DL change to v2, maybe not working?
         ## \brief Get entity data from context broker
         # \param entity name (can be regular expression)
         # \param entity type
