@@ -28,9 +28,8 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 
 from include.logger import Log
 from include.confManager import getRobots
-from include.ros.topicHandler import ros2Definition
 from include.ros.rosConfigurator import RosConfigurator, setWhiteList
-from include.ros.topicHandler import TopicHandler, loadMsgHandlers, ROBOT_TOPICS # TODO DL Refactor!
+from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, ROS_PUBLISHER, ROS_SUBSCRIBER, ROS_TOPIC_TYPE
 from include.contextbroker.cbSubscriber import CbSubscriber
 from include.contextbroker.cbQueryBuilder import CbQueryBuilder
 
@@ -133,7 +132,7 @@ def requestFromCB(request, action):
             dataStruct = buildTypeStruct(data[topic])
             obj = CloudSubscriber.convertReceivedDataFromCB(jsonData)
             
-            TopicHandler.publishDirect(data['id'], topic, getattr(obj, topic), dataStruct)
+            RosTopicHandler.publish(data['id'], topic, getattr(obj, topic), dataStruct)
 
     request.send_response(200)
     request.send_header('Content-type', 'text/plain')
@@ -187,7 +186,7 @@ def onRobots(request, action):
                 topic_data["structure"] = topic["msg"]
             else:
                 topic_data["type"] = topic["msg"]
-                topic_data["structure"] = ros2Definition(ROBOT_TOPICS[robot_name][topic["type"]][topic_name]["class"]())
+                topic_data["structure"] = ros2Definition(ROS_TOPIC_TYPE[topic_name]())
             robot_data["topics"].append(topic_data)
         data.append(robot_data)
     request.send_response(200)
@@ -196,6 +195,17 @@ def onRobots(request, action):
     request.end_headers()
     request.wfile.write(json.dumps(data))
 
+def ros2Definition(msgInstance):
+    ## \brief Generate Ros object definition
+    # \param ROS Object instance
+    obj = {}
+    for key, t in zip(msgInstance.__slots__, msgInstance._slot_types):
+        attr = getattr(msgInstance, key)
+        if hasattr(attr, '__slots__'):
+            obj[key] = ros2Definition(attr)
+        else:
+            obj[key] = t
+    return obj
 
 def onRobotData(request, action):
     ## \brief Handle robot info request
@@ -237,11 +247,15 @@ def onDisConnect(request, action):
     # \param action
     robot_name = pathParams(request, action["regexp"])[0]
     Log("INFO", "Disconnecting robot" + robot_name)
-    if robot_name in ROBOT_TOPICS:
-        for topic in ROBOT_TOPICS[robot_name]["publisher"]:
-            ROBOT_TOPICS[robot_name]["publisher"][topic]["publisher"].unregister()
-        for topic in ROBOT_TOPICS[robot_name]["subscriber"]:
-            ROBOT_TOPICS[robot_name]["subscriber"][topic]["subscriber"].unregister()
+
+    if robot_name in ROS_PUBLISHER:
+        for topic in ROS_PUBLISHER:
+            ROS_PUBLISHER[robot_name][topic].unregister()
+        RosConfigurator.removeRobot(robot_name)
+    
+    if robot_name in ROS_SUBSCRIBER:
+        for topic in ROS_SUBSCRIBER:
+            ROS_SUBSCRIBER[robot_name][topic].unregister()
         RosConfigurator.removeRobot(robot_name)
     request.send_response(200)
     request.end_headers()

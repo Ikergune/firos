@@ -40,7 +40,7 @@ from include.logger import Log
 from include.mapServer import MapServer
 from include.server.firosServer import FirosServer
 
-from include.ros.topicHandler import TopicHandler, loadMsgHandlers, connectionListeners
+from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, createConnectionListeners
 from include.rcm import topicManager
 
 # Main function.
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     else:
         def signal_handler(signal, frame):
             Log("INFO", ('\nExiting from the application'))
-            TopicHandler.unregisterAll()
+            RosTopicHandler.unregisterAll()
             topicManager.removeListeners()
             server.close()
             Log("INFO", ('\nExit'))
@@ -85,7 +85,7 @@ if __name__ == '__main__':
         Log("INFO", "---------------------------------\n")
 
         loadMsgHandlers(confManager.getRobots(True, True))
-        connectionListeners()
+        createConnectionListeners()
         topicManager.setListeners()
 
         MapServer.load()
