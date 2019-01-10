@@ -49,7 +49,8 @@ TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topi
 ROS_PUBLISHER = {}
 ROS_SUBSCRIBER = {}
 
-# Topics in ROS do only have one data-type!
+# Topics in ROS do only have one data-type! 
+# (There might be an Exception to this if the topic gets deregistered, this is currently ignored)
 # We use this here to load the type of an topic and the dictionary rep. only once!
 ROS_TOPIC_TYPE = {}  
 ROS_TOPIC_AS_DICT ={}
@@ -284,7 +285,6 @@ def createConnectionListeners():
     subscribers.append(rospy.Subscriber("firos/connect", std_msgs.msg.String, _robotConnection))
 
 
-## TODO DL they might not work!
 def robotDisconnection(data):
     ''' Unregisters from a given robotID by a ROBOT
 
@@ -296,17 +296,19 @@ def robotDisconnection(data):
     if robotID in ROS_PUBLISHER:
         for topic in ROS_PUBLISHER[robotID]:
             ROS_PUBLISHER[robotID][topic].unregister()
+        del ROS_PUBLISHER[robotID]
 
     if robotID in ROS_SUBSCRIBER:
         for topic in ROS_SUBSCRIBER[robotID]:
             ROS_SUBSCRIBER[robotID][topic].unregister()
+        del ROS_SUBSCRIBER[robotID]
 
 
 def _robotConnection(data):
-    ''' Inserts a Robot into the topicHandler by using
-        RosConfigurator
+    ''' This resets firos into its original state
 
-        data: The String that was sent by firos? TODO DL
+        TODO DL reset, instead of connect?
+        TODO DL Add real connect for only one Robot?
     '''
     robot_name = data.data
     Log("INFO", "Connected robot: " + robot_name)
