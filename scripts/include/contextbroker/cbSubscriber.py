@@ -155,10 +155,17 @@ class CbSubscriber(object):
 
 
     def _checkResponse(self, response, robTop=None, subID=None, created=False):
-        ''' RESPONSE TODO DL
+        ''' If a not good response from ContextBroker is received, the error will be printed.
+    
+            response: The response from ContextBroker
+            robTop:   A string Tuple (robotId, topic), for the curretn robot/topic
+            subID:    The Subscription ID string, which should get deleted
+            created:  Creation or Deletion of a subscription (bool)
         '''
         if not response.ok:
             if created:
-                Log("ERROR", "Could not create subscription for Robot {} and topic {} in Context-Broker".format(robTop[0], robTop[1]))
+                Log("ERROR", "Could not create subscription for Robot {} and topic {} in Context-Broker :".format(robTop[0], robTop[1]))
+                Log("ERROR", response.content)
             else:
-                Log("WARNING", "Could not delete subscription {} from Context-Broker".format(subID))
+                Log("WARNING", "Could not delete subscription {} from Context-Broker :".format(subID))
+                Log("WARNING", response.content)

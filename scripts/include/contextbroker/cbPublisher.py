@@ -139,8 +139,11 @@ class CbPublisher(object):
         '''
         if not response.ok:
             if attrAction == 0:
-                Log("WARNING", "Could not create Entitiy/Robot {} in Contextbroker. Maybe it already exists?".format(topEnt))
+                Log("WARNING", "Could not create Entitiy/Robot {} in Contextbroker :".format(topEnt))
+                Log("WARNING", response.content)
             elif attrAction == 1:
-                Log("ERROR", "Cannot update attributes in Contextbroker for topic: {}".format(topEnt))
+                Log("ERROR", "Cannot update attributes in Contextbroker for topic: {} :".format(topEnt))
+                Log("ERROR", response.content)
             else:
-                Log("WARNING", "Could not delete Entitiy/Robot {} in Contextbroker.".format(topEnt))
+                Log("WARNING", "Could not delete Entitiy/Robot {} in Contextbroker :".format(topEnt))
+                Log("WARNING", response.content)

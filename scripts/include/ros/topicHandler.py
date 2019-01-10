@@ -61,6 +61,9 @@ subscribers = []
 # An entry is the ._type-Attribute of the ROS-Messages ('/' is replaced by '.')
 ROS_MESSAGE_CLASSES = {}
 
+# If shutdown is signaled, do stop posting ROS-Messages to the ContextBroker
+SHUTDOWN_SIGNAL = False
+
 
 def loadMsgHandlers(robot_data):
     ''' This method initializes The Publisher and Subscriber for ROS and 
@@ -136,13 +139,15 @@ def loadMsgHandlers(robot_data):
 def _publishToCBRoutine(data, args):
     ''' This routine is executed on every received (subscribed) message on ROS.
         It just wraps it content and publishes the data via the cbPublisher.publishToCB
+        Here we explicitly check at the SHUTDOWN_SIGNAL. if it is set, we stop publishing
 
         data: data received from ROS
         args: additional arguments we set prior
     '''
-    robot = args['robot']
-    topic = args['topic'] # Retreiving additional Infos, which were set on initialization
-    CloudPublisher.publishToCB(robot, topic, data, ROS_TOPIC_AS_DICT[topic])
+    if not SHUTDOWN_SIGNAL:
+        robot = args['robot']
+        topic = args['topic'] # Retreiving additional Infos, which were set on initialization
+        CloudPublisher.publishToCB(robot, topic, data, ROS_TOPIC_AS_DICT[topic])
 
 
 
@@ -151,6 +156,8 @@ class RosTopicHandler:
         just maps the publish Routine to the cbPublisher (for the requestHandler) and
         by shutdown removes and deletes all Subscriptions/created Entities (for core)
     '''
+
+
     
     @staticmethod
     def publish(robotID, topic, convertedData, dataStruct):
@@ -173,10 +180,14 @@ class RosTopicHandler:
 
     @staticmethod
     def unregisterAll():
-        ''' Unregister all subscriptions on ContextBroker,
-            deletes all created Entities on Context Broker and
-            unregisters subscriptions from ROS
+        global SHUTDOWN_SIGNAL
+        ''' First set the SHUTDOWN_SIGNAL, then
+            unregister all subscriptions on ContextBroker,
+            delete all created Entities on Context Broker and
+            unregister subscriptions from ROS
         '''
+        SHUTDOWN_SIGNAL = True
+
         CloudSubscriber.unsubscribeALLFromCB()
         CloudPublisher.unpublishALLFromCB()
 
