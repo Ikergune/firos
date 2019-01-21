@@ -311,14 +311,14 @@ Calling this topic with an empty string will make FIROS connect to new robots in
 -----------------
 
 Disconnecting robots from FIROS is possible by simply calling this topic with the robot name.
-`/FIROS/disconnect turtle1`
+`/FIROS/disconnect/turtle1`
 
 API
 ===
 
 FIROS has several REST entry points that are used for connecting with the context broker or getting data from FIROS.
 
-You can find FIROS api at http://docs.firos.apiary.io/#
+You can find FIROS api at http://docs.firos.apiary.io/# (OLD)
 
 GET /robots
 -----------
@@ -367,96 +367,70 @@ Get robots handled by FIROS with their corresponding *topics*. Each *topic* cont
 GET /robot/NAME
 ---------------
 
-Get the data published by the robot on Context Broker. It builds a query using the *NAME*, what will return data using the following structure:
+Gets the data which is published/subscribed by the robot in the Context-Broker. Here the contents of the Context Broker is shown.
 
-``` json
-[
-   {
-      "attributes":[
-         {
-            "type":"COMMAND",
-            "name":"COMMAND",
-            "value":[
-               "pose"
-            ]
-         },
-         {
-            "type":"DescriptionData",
-            "name":"descriptions",
-            "value":"http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch||http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
-         },
-         {
-            "type":"turtlesim.msg.Pose",
-            "name":"pose",
-            "value":{
-               "firosstamp":{
-                  "type":"number",
-                  "value":"1539856575.3397"
-               },
-               "angular_velocity":{
-                  "type":"number",
-                  "value":"0.0",
-                  "metadata":{
-                     "dataType":{
-                        "type":"dataType",
-                        "value":"float32"
-                     }
-                  }
-               },
-               "linear_velocity":{
-                  "type":"number",
-                  "value":"0.0",
-                  "metadata":{
-                     "dataType":{
-                        "type":"dataType",
-                        "value":"float32"
-                     }
-                  }
-               },
-               "theta":{
-                  "type":"number",
-                  "value":"0.0",
-                  "metadata":{
-                     "dataType":{
-                        "type":"dataType",
-                        "value":"float32"
-                     }
-                  }
-               },
-               "y":{
-                  "type":"number",
-                  "value":"5.544444561004639",
-                  "metadata":{
-                     "dataType":{
-                        "type":"dataType",
-                        "value":"float32"
-                     }
-                  }
-               },
-               "x":{
-                  "type":"number",
-                  "value":"11.088889122009277",
-                  "metadata":{
-                     "dataType":{
-                        "type":"dataType",
-                        "value":"float32"
-                     }
-                  }
-               },
-               "type":"dict",
-               "id":"dict03b1a6b3-230e-495d-9b68-4309a11b8b29"
+Here as an example: the content of `turtlesim` with its publishing topic `pose`:
+
+```json
+{
+    "id":"turtle1",
+    "type":"ROBOT",
+    "descriptions":{
+        "type":"array",
+        "value":[
+        {
+            "type":"string",
+            "value":"http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch"
+        },
+        {
+            "type":"string",
+            "value":"http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
+        }
+        ],
+        "metadata":{
+
+        }
+    },
+    "pose":{
+        "type":"turtlesim.Pose",
+        "value":{
+        "y":{
+            "type":"number",
+            "value":5.544444561
+        },
+        "x":{
+            "type":"number",
+            "value":5.544444561
+        },
+        "linear_velocity":{
+            "type":"number",
+            "value":0
+        },
+        "theta":{
+            "type":"number",
+            "value":0
+        },
+        "angular_velocity":{
+            "type":"number",
+            "value":0
+        }
+        },
+        "metadata":{
+            "dataType":{
+                "type":"dataType",
+                "value":{
+                    "y":"float32",
+                    "x":"float32",
+                    "linear_velocity":"float32",
+                    "theta":"float32",
+                    "angular_velocity":"float32"
+                }
             }
-         }
-      ],
-      "type":"ROBOT",
-      "id":"turtle1"
-   }
-]
+        }
+    }
+}
 ```
 
-
-# Currently untested POST-Operationes:
-These Operations might work, but are not tested currently.
 
 POST /FIROS
 -----------
@@ -472,6 +446,11 @@ POST /robot/diconnect/NAME
 --------------------------
 
 This API forces FIROS to disconnect from the robot specified by the *NAME* parameter. It will also delete any connection and entity associated to the particular robot on the Context Broker.
+
+
+Currently untested POST-Operationes:
+----
+These Operations might work, but are not tested currently.
 
 POST /whitelist/write
 ---------------------
