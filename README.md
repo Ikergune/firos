@@ -14,8 +14,9 @@ We have some ideas what we would like to change in FIROS. The following table sh
 | # | Feature            | Description                                                                                       | Status            |
 |---|--------------------|---------------------------------------------------------------------------------------------------|-------------------|
 | 1 | FiwareObjectConverter    | Our own, more efficient and easier to use Object<>Fiware Converter. There are some small flaws in converting objects, which is related to the NGSv1.                                | Beta |
-| 2 | NGSI v1->v2     | Currently NGSIv1 is supported, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Development           |
-| 3 | Incremental Update | Currently FIROS is updating the whole entity. We want to update only the required attributes to have a more efficient communication and minimize the communication...                                                                                                  | Development           |
+| 2 | Nested Custom ROS Msg    | At the moment it is not possible to have a nested ROS-Msg, with an array of an own object -> More details: [Issue 1](https://github.com/iml130/firos/issues/1 ) | Beta (Done) |
+| 3 | NGSI v1->v2     | Currently NGSIv1 is supported, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Done           |
+| 4 | Incremental Update | Currently FIROS is updating the whole entity. We want to update only the required attributes to have a more efficient communication and minimize the communication...                                                                                                  | Done           |
 
 Status:
 - **Development**: We are working on it, it will take some time.
@@ -43,6 +44,9 @@ git submodule update --init --recursive
 
 
 The `FiwareObejctConverter` is our own `Python-Object<->Fiware-JSON`-Converter. 
+
+Also, make sure you are using the correct version of the submodule.
+You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 
 Installing FIROS
 ================
@@ -616,3 +620,7 @@ Contributors
 
 Dominik Lux  
 Peter Detzner
+
+Presentations
+=======
+Firos-Helping Robots to be Context Aware ([Slideshare](https://de.slideshare.net/FI-WARE/fiware-global-summit-firos-helping-robots-to-be-context-aware), 28.11.2018 Fiware Global Summit, Malaga)
