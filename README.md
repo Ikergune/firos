@@ -17,6 +17,8 @@ We have some ideas what we would like to change in FIROS. The following table sh
 | 2 | Nested Custom ROS Msg    | At the moment it is not possible to have a nested ROS-Msg, with an array of an own object -> More details: [Issue 1](https://github.com/iml130/firos/issues/1 ) | Beta (Done) |
 | 3 | NGSI v1->v2     | Currently NGSIv1 is supported, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Done           |
 | 4 | Incremental Update | Currently FIROS is updating the whole entity. We want to update only the required attributes to have a more efficient communication and minimize the communication...                                                                                                  | Done           |
+| 5 | Unit Tests | The whole code is currently untested.                                                                                               | Development    |
+
 
 Status:
 - **Development**: We are working on it, it will take some time.
