@@ -26,12 +26,13 @@ import requests
 import json
 
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
-from include.constants import DATA_CONTEXTBROKER, IP, SERVER_PORT
+# from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT, MAP_SERVER_ADRESS, MAP_SERVER_PORT, CB_SUB_REFRESH, CB_SUB_LENGTH
+from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT, MAP_SERVER_ADRESS, MAP_SERVER_PORT, CB_SUB_LENGTH, CB_SUB_REFRESH
 from include.logger import Log
 
 
-CB_BASE_URL = "http://{}:{}".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
-FIROS_NOTIFY_URL = "http://{}:{}/firos".format(IP, SERVER_PORT)                                    # TODO DL HTTP?
+CB_BASE_URL = "http://{}:{}".format(CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT)
+FIROS_NOTIFY_URL = "http://{}:{}/firos".format(MAP_SERVER_ADRESS, MAP_SERVER_PORT)                                    # TODO DL HTTP?
 
 class CbSubscriber(object):
     ''' The CbSubscriber handles the subscriptions on the ContextBroker.
@@ -99,7 +100,7 @@ class CbSubscriber(object):
             self.subscriptionIds[robotID][topic] = newSubID
 
             # Wait
-            time.sleep(290) # sleep TODO DL from config loaded seconds
+            time.sleep(int(CB_SUB_LENGTH * CB_SUB_REFRESH)) # sleep TODO DL from config loaded seconds
             Log("INFO", "Refreshing Subscription for " + robotID + " and topics: " + str(topic))
 
 
@@ -130,7 +131,7 @@ class CbSubscriber(object):
             },
             "attrs": [str(topic)]
             },
-            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + 300)) # TODO DL load via Configuration, ISO 8601
+            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + CB_SUB_LENGTH)) # TODO DL load via Configuration, ISO 8601
             # "throttling": 5  # TODO DL Maybe throttle?
             }
         return json.dumps(struct)

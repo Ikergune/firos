@@ -21,7 +21,7 @@ import socket
 import rostopic
 import rosgraph
 
-from include.constants import NODE_NAME
+from include.constants import ROS_NODE_NAME
 
 # map_regex = re.compile(ur'^.*\/(map)[\/]*$')
 map_regex = re.compile(ur'^.*\/(map).*$')
@@ -201,7 +201,7 @@ def _isInFiros(topic_name, list2Check, nodes):
     if topic_name not in list2Check:
         return False
     for node in list2Check[topic_name]:
-        if node == "/" + NODE_NAME:
+        if node == "/" + ROS_NODE_NAME:
             using = True
             break
 

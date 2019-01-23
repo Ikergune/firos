@@ -20,16 +20,15 @@ __maintainer__ = "Dominik Lux"
 __version__ = "0.0.1a"
 __status__ = "Developement"
 
-import os
 import json
 import requests
 
 from include.logger import Log
-from include.constants import DATA_CONTEXTBROKER
+from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT, PATH
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 
 
-CB_BASE_URL = "http://{}:{}/v2/entities/".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
+CB_BASE_URL = "http://{}:{}/v2/entities/".format(CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT)
 CB_HEADER = {'Content-Type': 'application/json'}
 
 class CbPublisher(object):
@@ -117,9 +116,7 @@ class CbPublisher(object):
 
             robotID: The Robot-Id-String
         '''
-        # TODO DL no hardcoded reference to files!
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        json_path = current_path.replace("scripts/include/contextbroker", "config/robotdescriptions.json")
+        json_path = PATH + "/robotdescriptions.json"
         description_data = json.load(open(json_path))
         
         # Check if a robotID has descriptions

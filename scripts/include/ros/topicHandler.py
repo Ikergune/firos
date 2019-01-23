@@ -25,7 +25,7 @@ import rospy
 import importlib
 
 from include.logger import Log
-from include.constants import DEFAULT_QUEUE_SIZE
+from include.constants import ROS_SUB_QUEUE_SIZE, ROS_NODE_NAME
 from include.libLoader import LibLoader
 from include.ros.rosConfigurator import RosConfigurator
 from include.ros.dependencies.third_party import *
@@ -128,7 +128,7 @@ def loadMsgHandlers(robot_data):
                 if robotID not in ROS_PUBLISHER:
                     ROS_PUBLISHER[robotID] = {}
 
-                ROS_PUBLISHER[robotID][topic] = rospy.Publisher(robotID + "/" + topic, theclass, queue_size=DEFAULT_QUEUE_SIZE)
+                ROS_PUBLISHER[robotID][topic] = rospy.Publisher(robotID + "/" + topic, theclass, queue_size=ROS_SUB_QUEUE_SIZE)
         
         # After initializing ROS-PUB/SUBs, intitialize ContextBroker-Subscriber based on ROS-Publishers for each robot
         if robotID in ROS_PUBLISHER:
@@ -257,7 +257,7 @@ def rosMsg2Dict(rosClassInstance):
     ''' Generating a dictionary out of the instance of a
         ROS-Message
 
-        rosClassInstance: an actual instance of the ROS-Message (vales will be omitted)
+        rosClassInstance: an actual instance of the ROS-Message (values will be omitted)
     '''
     obj = {}
     for key, t in zip(rosClassInstance.__slots__, rosClassInstance._slot_types):
@@ -278,11 +278,11 @@ def createConnectionListeners():
     ''' This creates the following listeners for firos in ROS for robot-creation 
         and -removal and maps them to the methods below:
 
-        /firos/connect    --> std_msgs/String
-        /firos/disconnect --> std_msgs/String
+        /ROS_NODE_NAME/connect    --> std_msgs/String
+        /ROS_NODE_NAME/disconnect --> std_msgs/String
     '''
-    subscribers.append(rospy.Subscriber("firos/disconnect", std_msgs.msg.String, robotDisconnection))
-    subscribers.append(rospy.Subscriber("firos/connect", std_msgs.msg.String, _robotConnection))
+    subscribers.append(rospy.Subscriber(ROS_NODE_NAME + "/disconnect", std_msgs.msg.String, robotDisconnection))
+    subscribers.append(rospy.Subscriber(ROS_NODE_NAME +"/connect", std_msgs.msg.String, _robotConnection))
 
 
 def robotDisconnection(data):

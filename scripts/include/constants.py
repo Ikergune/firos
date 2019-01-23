@@ -19,71 +19,94 @@ import json
 import urllib2
 import netifaces
 
+from core import FIROS_CONF_PATH
 
-def setConfiguration():
+
+
+def setConfiguration(path):
     try:
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        json_path = current_path.replace("scripts/include", "config/config.json")
-        data = json.load(open(json_path))
+        data = json.load(open(path + "/config.json"))
         return data[data["environment"]]
     except:
         return {}
 
 configured = False
 
+# All Constants with their default value!
+PATH = None
+
+LOGLEVEL = "INFO"
+INTERFACE = "public"
+
+MAP_SERVER_ADRESS = None
+MAP_SERVER_PORT = 10100
+ROSBRIDGE_PORT = 9090
+CONTEXTBROKER_ADRESS = None
+CONTEXTBROKER_PORT = None
+
+CB_THROTTLING = 0
+CB_SUB_LENGTH = 300             # In Seconds!
+CB_SUB_REFRESH = 0.9            # After 90% of time is exceeded
+CB_CONTEXT_TYPE = "ROBOT"   
+
+ROS_NODE_NAME = "firos"
+ROS_SUB_QUEUE_SIZE = 10 
+
+
+
 if not configured:
     configured = True
-    configData = setConfiguration()
-    INTERFACE = configData["interface"] if "interface" in configData else "public"
-    LOGLEVEL = configData["log_level"] if "log_level" in configData else "INFO"
+    PATH = FIROS_CONF_PATH[0]
+    print PATH
+
+    configData = setConfiguration(PATH)
+
+    if "interface" in configData:
+        INTERFACE = configData["interface"]
+    
+    if "log_level" in configData:
+        LOGLEVEL = configData["log_level"]
+
+    if "server" in configData and "port" in configData["server"]:
+        MAP_SERVER_PORT = configData["server"]["port"]
+
+    try:
+        CONTEXTBROKER_ADRESS = configData["contextbroker"]["address"]
+        CONTEXTBROKER_PORT = configData["contextbroker"]["port"]
+    except:
+        print "TODO DL"
+
+    if "contextbroker" in configData and "subscription" in configData["contextbroker"]:
+        # Configuration for Subscription
+        subConfig = configData["contextbroker"]["subscription"]
+        if "throttling" in subConfig:
+            CB_THROTTLING = subConfig["throttling"]
+        
+        if "subscription_length" in subConfig:
+            CB_SUB_LENGTH = subConfig["subscription_length"]
+        
+        if "subscription_refresh_delay" in subConfig:
+            CB_SUB_REFRESH = subConfig["subscription_refresh_delay"]
 
 
-SERVER_PORT = configData["server"]["port"]
-if("index" in configData["contextbroker"]):
-    INDEX_CONTEXTBROKER = {
-        "ADDRESS": configData["contextbroker"]["index"]["address"],
-        "PORT": configData["contextbroker"]["index"]["port"],
-    }
+    if "node_name" in configData:
+        ROS_NODE_NAME = configData["node_name"]
+    
+    if "ros_subscriber_queue" in configData:
+        ROS_SUB_QUEUE_SIZE = configData["ros_subscriber_queue"]
 
-    DATA_CONTEXTBROKER = {
-        "ADDRESS": configData["contextbroker"]["data"]["address"],
-        "PORT": configData["contextbroker"]["data"]["port"],
-    }
-else:
-    INDEX_CONTEXTBROKER = {
-        "ADDRESS": configData["contextbroker"]["address"],
-        "PORT": configData["contextbroker"]["port"],
-    }
+    if "cb_type" in configData:
+        CB_CONTEXT_TYPE = configData["cb_type"]
 
-    DATA_CONTEXTBROKER = {
-        "ADDRESS": configData["contextbroker"]["address"],
-        "PORT": configData["contextbroker"]["port"],
-    }
 
-# THROTTLING = "PT1S"
-THROTTLING = configData["contextbroker"]["subscription"]["throttling"]
-SUBSCRIPTION_LENGTH = configData["contextbroker"]["subscription"]["subscription_length"]
-SUBSCRIPTION_REFRESH_DELAY = configData["contextbroker"]["subscription"]["subscription_refresh_delay"]
+    if INTERFACE == "public":
+        MAP_SERVER_ADRESS = urllib2.urlopen('http://ip.42.pl/raw').read()
+    else:
+        netifaces.ifaddresses(INTERFACE)
+        MAP_SERVER_ADRESS = netifaces.ifaddresses(INTERFACE)[2][0]['addr']
 
-SEPARATOR_CHAR = "%27"
+    if "rosbridge_port" in configData:
+        ROSBRIDGE_PORT = configData["rosbridge_port"]
 
-# ROS CONFIG
-NODE_NAME = "firos"
-DEFAULT_CONTEXT_TYPE = "ROBOT"
-DEFAULT_QUEUE_SIZE = 10
 
-if INTERFACE == "public":
-    IP = urllib2.urlopen('http://ip.42.pl/raw').read()
-else:
-    netifaces.ifaddresses(INTERFACE)
-    IP = netifaces.ifaddresses(INTERFACE)[2][0]['addr']
 
-if "map_server_port" in configData:
-    MAP_SERVER_PORT = configData["map_server_port"]
-else:
-    MAP_SERVER_PORT = None
-
-if "rosbridge_port" in configData:
-    ROSBRIDGE_PORT = configData["rosbridge_port"]
-else:
-    ROSBRIDGE_PORT = 9090

@@ -33,12 +33,12 @@ from include.confManager import getRobots
 from include.ros.rosConfigurator import RosConfigurator, setWhiteList
 from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, ROS_PUBLISHER, ROS_SUBSCRIBER, ROS_TOPIC_AS_DICT
 from include.contextbroker.cbSubscriber import CbSubscriber
-from include.constants import DATA_CONTEXTBROKER
+from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT
 
 CloudSubscriber = CbSubscriber() # Only the Conversion method is used here TODO DL
 
 # Only used to query information from Context-Broker
-CB_BASE_URL = "http://{}:{}/v2/entities/".format(DATA_CONTEXTBROKER["ADDRESS"], DATA_CONTEXTBROKER["PORT"])
+CB_BASE_URL = "http://{}:{}/v2/entities/".format(CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT)
 
 
 

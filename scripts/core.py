@@ -26,45 +26,77 @@
 # logwarn
 
 # Import required Python code.
+import json
+import os
 import sys
 import copy
 import rospy
 import signal
+import argparse
 
-from setup import launchSetup
-
-from include.constants import *
-
-from include import confManager
-from include.logger import Log
-from include.mapServer import MapServer
-from include.server.firosServer import FirosServer
-
-from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, createConnectionListeners
-from include.rcm import topicManager
+current_path = os.path.dirname(os.path.abspath(__file__))
+FIROS_CONF_PATH = [current_path + "/../config"]
 
 # Main function.
 if __name__ == '__main__':
+    # Input Parsing
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-P', action='store', dest='port', help='Set the Port of the Firos-Server')
+    parser.add_argument('--conf', action='store', dest='conf_Fold', help='Set the config-Folder for Firos')
+    parser.add_argument('--ros-port', action='store', dest='ros_port', help='Set the ROS-Port for Firos')
+    parser.add_argument('--ros-node-name', action='store', dest='ros_node_name', help='Set the ROS-Node-Name')
+    parser.add_argument('--loglevel', action='store', dest='loglevel', help='Set the LogLevel (INFO, WARNING, ERROR,  CRITICAL)')
 
-    Log("INFO", "Initializing ROS node: " + NODE_NAME)
-    rospy.init_node(NODE_NAME)
+                    
+    # Get Input
+    results = parser.parse_args()
+    
+
+
+    if results.conf_Fold is not None:
+        current_path = os.getcwd()
+        FIROS_CONF_PATH[0] = current_path + "/" + results.conf_Fold
+        # TODO DL This re-assignment is currently not working!
+
+
+    # Importing firos specific scripts
+    from setup import launchSetup
+    from include import constants as c
+
+    from include import confManager
+    from include.logger import Log
+    from include.mapServer import MapServer
+    from include.server.firosServer import FirosServer
+
+    from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, createConnectionListeners
+    from include.rcm import topicManager
+
+
+
+
+    if results.port is not None and type(results.port) is int:
+        c.MAP_SERVER_PORT = results.port
+            
+    if results.ros_port is not None and type(results.ros_port) is int:
+        c.ROSBRIDGE_PORT = results.ros_port
+    
+    if results.ros_node_name is not None and type(results.ros_node_name) is str:
+        c.ROS_NODE_NAME = results.ros_node_name
+
+    if results.loglevel is not None and type(results.loglevel) is int:
+        c.LOGLEVEL = results.loglevel
+
+
+    Log("INFO", "Initializing ROS node: " + c.ROS_NODE_NAME)
+    rospy.init_node(c.ROS_NODE_NAME)
     Log("INFO", "Initialized")
 
-    port = None
 
-    args = copy.deepcopy(sys.argv)
-    args.pop(0)
 
-    for i in range(len(args)-1):
-        if args[i].upper() == "-P":
-            i = i + 1
-            port = int(args[i])
 
-    if port is None:
-        port = SERVER_PORT
 
     try:
-        server = FirosServer("0.0.0.0", port)
+        server = FirosServer("0.0.0.0", c.MAP_SERVER_PORT)
     except Exception as ex:
         sys.stderr.write('CB_COMMUNICATION_FAILED')
         exit(1)
@@ -92,3 +124,4 @@ if __name__ == '__main__':
 
         Log("INFO", "\nPress Ctrl+C to Exit\n")
         server.start()
+

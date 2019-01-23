@@ -4,7 +4,7 @@ import std_msgs.msg
 
 from firos.srv import FIROS_Info
 from firos.msg import Robot_Event, CB_Event
-from include.constants import DEFAULT_QUEUE_SIZE
+from include.constants import ROS_SUB_QUEUE_SIZE, ROS_NODE_NAME
 from include.ros.topicHandler import robotDisconnection, loadMsgHandlers
 from include.rcm.rcmutils import getRobotConfig
 
@@ -12,7 +12,7 @@ rcm_listener = None
 firos_connect_listener = None
 firos_disconnect_listener = None
 robot_topics_service = rospy.ServiceProxy('/firos_info', FIROS_Info)
-cb_publisher = rospy.Publisher("/firos/cb_event", CB_Event, queue_size=DEFAULT_QUEUE_SIZE)
+cb_publisher = rospy.Publisher("/" + ROS_NODE_NAME +  "/cb_event", CB_Event, queue_size=ROS_SUB_QUEUE_SIZE)
 
 
 def getRobotTopics(robot_name):
@@ -66,8 +66,8 @@ def setListeners():
     global firos_disconnect_listener
     global firos_connect_listener
     rcm_listener = rospy.Subscriber("/rcm/robot_event", Robot_Event, onRcmEvent, {})
-    firos_disconnect_listener = rospy.Subscriber("firos/disconnect", std_msgs.msg.String, onDisconnect)
-    firos_connect_listener = rospy.Subscriber("firos/connect", std_msgs.msg.String, onConnect)
+    firos_disconnect_listener = rospy.Subscriber(ROS_NODE_NAME + "/disconnect", std_msgs.msg.String, onDisconnect)
+    firos_connect_listener = rospy.Subscriber(ROS_NODE_NAME + "/connect", std_msgs.msg.String, onConnect)
 
 
 def removeListeners():
