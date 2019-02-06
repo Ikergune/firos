@@ -9,15 +9,18 @@ This project is a fork from Ikergunes FIROS package (https://github.com/Ikergune
 
 Roadmap/ Changes
 ================
-We have some ideas what we would like to change in FIROS. The following table shows the current features we are working on and what is actually planned.
+We have some ideas what we would like to change in FIROS. There are already some ideas implemented. The following table shows the current features we are working on and what is actually planned:
 
 | # | Feature            | Description                                                                                       | Status            |
 |---|--------------------|---------------------------------------------------------------------------------------------------|-------------------|
-| 1 | FiwareObjectConverter    | Our own, more efficient and easier to use Object<>Fiware Converter. There are some small flaws in converting objects, which is related to the NGSv1.                                | Beta |
-| 2 | Nested Custom ROS Msg    | At the moment it is not possible to have a nested ROS-Msg, with an array of an own object -> More details: [Issue 1](https://github.com/iml130/firos/issues/1 ) | Beta (Done) |
-| 3 | NGSI v1->v2     | Currently NGSIv1 is supported, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Done           |
-| 4 | Incremental Update | Currently FIROS is updating the whole entity. We want to update only the required attributes to have a more efficient communication and minimize the communication...                                                                                                  | Done           |
-| 5 | Unit Tests | The whole code is currently untested.                                                                                               | Development    |
+| 1 | FiwareObjectConverter | Our own, more efficient and easier to use Object<>Fiware -Converter. There are some small flaws in converting objects, which is related to the NGSv1-API. | Beta |
+| 2 | Nested Custom ROS Msg | It is not possible to convert a nested ROS-Msg, with an array of an own object -> More details: [Issue 1](https://github.com/iml130/firos/issues/1 ) | Beta (Done) |
+| 3 | NGSI v1->v2     | NGSIv1 is used in FIROS, we are changing the NGSIv1 (Orion support is depricated) to NGSIv2 | Done |
+| 4 | Incremental Update | FIROS is also updating the whole entity. We want to update only the required attributes to have a more efficient communication (NGSIv2) | Done |
+| 5 | Unit Tests | The whole code is currently untested. We will create Tests and checks to guarantee expected behaviour | Development    |
+| 6 | Dockerize it | A Docker will be composed on some Point for an easier integration. | Planned |
+| 7 | Continoues Integration (CI) | It is easier to run an automated pipeline for Unit-Testing, Deployment, etc.. FIROS will also have badges as other projects! | Planned |
+| 8 | Documetation | Currently only this Readme.md is available. It is not practical to just leave it as is. We will add more howTo's and information about FIROS soon! | Development |
 
 
 Status:
@@ -28,18 +31,22 @@ Status:
 
 If you have any feature requests, comments, ideas - feel free to contact us :)
 
+
+THIS INFORMATION IS CURRENTLY OUT OF DATE!
+=====
+
 Cloning This Project
 ================
-This project uses currently a submodule. Depending on your git version you might need to do the following:
+This project uses a submodule. Depending on your git version you might need to do the following:
 
 Clone this project via: 
-```shell
+```sh
 git clone --recursive https://github.com/iml130/firos.git
-# If the Folder scripts/include/FiwareObjectConverter is still empty do:
+# If the Folder firos/include/FiwareObjectConverter is still empty do:
 git submodule update --init --recursive
 ```
 or
-```shell
+```sh
 git clone https://github.com/iml130/firos.git
 git submodule update --init --recursive
 ```
@@ -50,7 +57,7 @@ The `FiwareObejctConverter` is our own `Python-Object<->Fiware-JSON`-Converter.
 Also, make sure you are using the correct version of the submodule.
 You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
 
-Installing FIROS
+Installing FIROS via `catkin_make`
 ================
 
 Requirements
@@ -58,7 +65,6 @@ Requirements
 
 -   Ubuntu
 -   Python 2.7 or greater
--   Nodejs v0.10 or greater
 -   ROS Hydro or greater <http://wiki.ros.org/es/ROS/Installation>
 
 Installation
@@ -67,49 +73,48 @@ Installation
 1.  Make sure you have set your working space (http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment)
 2.  Open a Terminal and navigate to the ROS workspace you want to use. If you just followed the ROS environment tutorial, it will be ~/catkin_ws.
 
-   `cd ~/catkin_ws/src`
+   >cd ~/catkin_ws/src
 
 3.  Clone the FIROS git repository into your ROS workspace.
 
-   `git clone --recursive https://github.com/iml130/firos.git`
+   >git clone --recursive https://github.com/iml130/FIROS.git
 
 4.  Build the FIROS package with the following commands. This will create a devel and build folder under your workspace.
 
-   `cd ~/catkin_ws`  
-   `catkin_make`
+   >cd ~/catkin_ws
+   >catkin_make
 
 5.  For convenience, you may wish to source your setup.sh script from your .bashrc so that your environment is ready as soon as you log in. e.g. 
 
-   `echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc`
+   >echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
-6.  Execute "source devel/setup.bash" to allow the current command line instance to use FIROS
+   If you don't want to edit you `.bashrc`, you can also just execute:
 
-FIROS is now installed in your robot! 
+   >source ~/catkin_ws/devel/setup.bash
 
-**Important Note:** The first time FIROS is launched it will ask you for root permissions to install it's dependencies
+6.  Execute "source devel/setup.bash" to allow the current command line instance to setup the sources you have inside yout `catkin_ws`
 
+FIROS is now ready to be used!
 
 Configuring FIROS
 =================
 
-FIROS has several configuration files located at *src/firos/config*.
+FIROS has several configuration files located at *src/FIROS/config*.
 
 config.json
 -----------
 
 This file contains the configuration related to FIROS launching environment. Here is a description of each parameter:
 
--   *environment*: These parameters take care of the *local*, *development* and *production* environment configurations by setting up the `*context broker's IP*, *port* and *FIROS rest apis' port*. 
-FIROS will use an environment's configuration based this value, but there can be as many environments as you want.
--   *server*: It contains information related to the FIROS server
-	- *port*: The port in which FIROS is listening. If you want to let access outside of your local network, you might want to redirect that port on your router.
+-   *environment*: This parameter distinguishes which configuration set inside this json should be used. FIROS will use an environment's configuration based this value, but there can be as many environments as you want.
+-   *server*: This contains the Port of the FirosServer (The Port, where the `GET`- and `POST`-Operations can be executed)
 -   *contextbroker*: Contains information related to the Context broker configuration
-    -   *address*: Context broker's IP address
+    -   *address*: Context broker's (IP-) address
     -   *port*: Context broker's port
     -   *subscription*: Context broker's subscription information
-        -   *throttling*: The update frequency at which the Context Broker sends updates to the robot.
-        -   *subscription_length*: The subscription expiration time
-        -   *subscription_refresh_delay*: The subscription refresh rate in days in order to avoid its expiration
+        -   *throttling*: The throttling in seconds. The contextbroker sends another update of the entity after the `throttling`-seconds have passed
+        -   *subscription_length*: The subscription expiration time (in seconds)
+        -   *subscription_refresh_delay*: The subscription refresh delay (between 0 and 1) to re-subscribe to the contextbroker -> After *subscription_length* * *subscription_refresh_delay* seconds the subscription is refreshed.
 -   *interface*: Network configuration of the card in use
     -   *public*: Public IP. Do not forget to redirect the proper ports in your network
     -   *wlan0, et0, tun0*, etc: Different network interface configuration.
@@ -129,9 +134,9 @@ Here is an example of a *config.json* file for a *local* environment:
         "address"   : "192.168.0.101",
         "port"      : 1026,
         "subscription": {
-          "throttling": "PT0S",
-          "subscription_length": "P1M",
-          "subscription_refresh_delay": 20
+          "throttling": "3", 
+          "subscription_length": "300",
+          "subscription_refresh_delay": 0.9
         }
     },
     "log_level": "INFO",
@@ -218,7 +223,7 @@ It is also possible to force some robot connections. This is done by adding the 
 }
 ```
 
-The `type`s Publish and Subscribe are always from Context Broker's point of view. If subscribed, the framework pushes ROS-Information to the Context-Broker. ROS-Messages to the robots are sent by the `type` publish, if a new Message has been sent to the Context-Broker. Thus a communication betweeen robots can be established through the Context-Broker. Even Other Non-ROS-Application can control robots via the Context-Broker.
+The `type`'s Publish and Subscribe are always from Context Broker's point of view. If subscribed, the framework pushes ROS-Information to the Context-Broker. ROS-Messages to the robots are sent to the contextbroker by the `type` publish. Thus a communication betweeen robots can be established through the Context-Broker. Even Other Non-ROS-Application can control robots via the Context-Broker.
 
 Here is an Example-Configuration between the communication of `turtlesim`
 on *Machine1* and `teleop_twist_keyboard` on *Machine2*:
@@ -320,7 +325,7 @@ API
 
 FIROS has several REST entry points that are used for connecting with the context broker or getting data from FIROS.
 
-You can find FIROS api at http://docs.firos.apiary.io/# (OLD)
+You can find FIROS api at http://docs.FIROS.apiary.io/# (OLD)
 
 GET /robots
 -----------
@@ -434,7 +439,7 @@ Here as an example: the content of `turtlesim` with its publishing topic `pose`:
 ```
 
 
-POST /FIROS
+POST /firos
 -----------
 
 This API handles the subscription data of the context broker. 
@@ -584,7 +589,7 @@ This API restores the *whitelist* file to its initial state.
 Ent-to-end tests
 ================
 
-In order to test if firos is publishing into ContextBroker you can simply open up any browser and enter the following in the adress-line:
+In order to test if FIROS is publishing into ContextBroker you can simply open up any browser and enter the following in the adress-line:
 > CONTEXTBROKER_IP:CB_PORT/v2/entities
 
 If the Context-Broker returns a page with content, then everything is working.
@@ -594,7 +599,7 @@ For more Context-Broker-Operations visit [this site](https://fiware-orion.readth
 License
 =======
 
-Firos is licensed under [MIT License](https://opensource.org/licenses/MIT).
+FIROS is licensed under [MIT License](https://opensource.org/licenses/MIT).
 
 Contributors
 =======
@@ -604,4 +609,4 @@ Peter Detzner
 
 Presentations
 =======
-Firos-Helping Robots to be Context Aware ([Slideshare](https://de.slideshare.net/FI-WARE/fiware-global-summit-firos-helping-robots-to-be-context-aware), 28.11.2018 Fiware Global Summit, Malaga)
+FIROS-Helping Robots to be Context Aware ([Slideshare](https://de.slideshare.net/FI-WARE/fiware-global-summit-FIROS-helping-robots-to-be-context-aware), 28.11.2018 Fiware Global Summit, Malaga)
