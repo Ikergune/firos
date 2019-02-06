@@ -135,7 +135,6 @@ def loadMsgHandlers(robot_data):
                 ROS_PUBLISHER[robotID][topic] = rospy.Publisher(robotID + "/" + topic, theclass, queue_size=C.ROS_SUB_QUEUE_SIZE)
         
         # After initializing ROS-PUB/SUBs, intitialize ContextBroker-Subscriber based on ROS-Publishers for each robot
-        print ROS_PUBLISHER
         if robotID in ROS_PUBLISHER:
             CloudSubscriber.subscribeToCB(str(robotID), ROS_PUBLISHER[robotID].keys())
             Log("INFO", "\n")

@@ -53,7 +53,6 @@ class Constants:
         if not cls.configured:
             configured = True
             cls.PATH = path
-            print cls.PATH # TODO DL print
 
             configData = cls.setConfiguration(path)
 
@@ -70,26 +69,26 @@ class Constants:
                 cls.CONTEXTBROKER_ADRESS = configData["contextbroker"]["address"]
                 cls.CONTEXTBROKER_PORT = configData["contextbroker"]["port"]
             except:
-                print "TODO DL"
+                raise Exception("No Context-Broker specified!")
 
             if "contextbroker" in configData and "subscription" in configData["contextbroker"]:
                 # Configuration for Subscription
                 subConfig = configData["contextbroker"]["subscription"]
                 if "throttling" in subConfig:
-                    cls.CB_THROTTLING = subConfig["throttling"]
+                    cls.CB_THROTTLING = int(subConfig["throttling"])
                 
                 if "subscription_length" in subConfig:
-                    cls.CB_SUB_LENGTH = subConfig["subscription_length"]
+                    cls.CB_SUB_LENGTH = int(subConfig["subscription_length"])
                 
                 if "subscription_refresh_delay" in subConfig:
-                    cls.CB_SUB_REFRESH = subConfig["subscription_refresh_delay"]
+                    cls.CB_SUB_REFRESH = float(subConfig["subscription_refresh_delay"])
 
 
             if "node_name" in configData:
                 cls.ROS_NODE_NAME = configData["node_name"]
             
             if "ros_subscriber_queue" in configData:
-                cls.ROS_SUB_QUEUE_SIZE = configData["ros_subscriber_queue"]
+                cls.ROS_SUB_QUEUE_SIZE = int(configData["ros_subscriber_queue"])
 
             if "cb_type" in configData:
                 cls.CB_CONTEXT_TYPE = configData["cb_type"]

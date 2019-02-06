@@ -34,8 +34,6 @@ import rospy
 import signal
 import argparse
 
-
-
 from include.constants import Constants as C
 
 # Main function.
@@ -52,22 +50,24 @@ if __name__ == '__main__':
     # Get Input
     results = parser.parse_args()
     
+    # At first determine the config-Folder location (either in firos/config or customly set)
     current_path = os.path.dirname(os.path.abspath(__file__))
     conf_path = current_path + "/../config"
     if results.conf_Fold is not None:
         current_path = os.getcwd()
         conf_path= current_path + "/" + results.conf_Fold
-        # TODO DL This re-assignment is currently not working!
 
+
+
+    # Initialize global variables (Constants.py)
     C.init(conf_path)
 
 
     # Importing firos specific scripts
     from setup import launchSetup
 
-
     from include import confManager
-    from include.logger import Log 
+    from include.logger import Log, initLog
     from include.mapServer import MapServer
     from include.server.firosServer import FirosServer
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     from include.rcm.topicManager import TopicManager
 
 
-
+    # Overwrite global variables with command line arguments (iff set)
     if results.port is not None:
         C.MAP_SERVER_PORT = int(results.port)
             
@@ -88,14 +88,14 @@ if __name__ == '__main__':
     if results.loglevel is not None:
         C.LOGLEVEL = results.loglevel
 
-
+    
+    # Starting Up!
+    initLog()
     Log("INFO", "Initializing ROS node: " + C.ROS_NODE_NAME)
     rospy.init_node(C.ROS_NODE_NAME)
     Log("INFO", "Initialized")
 
 
-
-    print C.ROS_NODE_NAME
     toMa = TopicManager()
 
     try:

@@ -24,17 +24,6 @@ _logger = logging.getLogger('firos_logger')
 
 SYSLOG_ADDRESS = '/dev/log'
 
-if C.LOGLEVEL == 'CRITICAL':
-    _logger.setLevel(logging.CRITICAL)
-elif C.LOGLEVEL == 'ERROR':
-    _logger.setLevel(logging.ERROR)
-elif C.LOGLEVEL == 'WARNING':
-    _logger.setLevel(logging.WARNING)
-elif C.LOGLEVEL == 'DEBUG':
-    _logger.setLevel(logging.DEBUG)
-elif C.LOGLEVEL == 'INFO':
-    _logger.setLevel(logging.INFO)
-
 PRIORITIES = {
     'CRITICAL': 5,
     'ERROR': 3,
@@ -42,17 +31,35 @@ PRIORITIES = {
     'DEBUG': 1,
     'INFO': 0
 }
-if C.LOGLEVEL == "NONE":
-    _levelId = -1
-else:
-    _levelId = PRIORITIES[C.LOGLEVEL]
 
-if os.path.exists(SYSLOG_ADDRESS):
-    handler = logging.handlers.SysLogHandler(address=SYSLOG_ADDRESS)
-    _logger.addHandler(handler)
-else:
-    handler = None
+_levelId = None
+handler = None
 
+def initLog():
+    ''' Sets _levelID and handler
+    '''
+    global _levelId, handler
+    if C.LOGLEVEL == 'CRITICAL':
+        _logger.setLevel(logging.CRITICAL)
+    elif C.LOGLEVEL == 'ERROR':
+        _logger.setLevel(logging.ERROR)
+    elif C.LOGLEVEL == 'WARNING':
+        _logger.setLevel(logging.WARNING)
+    elif C.LOGLEVEL == 'DEBUG':
+        _logger.setLevel(logging.DEBUG)
+    elif C.LOGLEVEL == 'INFO':
+        _logger.setLevel(logging.INFO)
+
+    if C.LOGLEVEL == "NONE":
+        _levelId = -1
+    else:
+        _levelId = PRIORITIES[C.LOGLEVEL]
+
+    if os.path.exists(SYSLOG_ADDRESS):
+        handler = logging.handlers.SysLogHandler(address=SYSLOG_ADDRESS)
+        _logger.addHandler(handler)
+    else:
+        handler = None
 
 def Log(level, *args):
     ## \brief Logging function

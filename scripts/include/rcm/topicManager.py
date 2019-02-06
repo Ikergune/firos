@@ -4,7 +4,7 @@ import std_msgs.msg
 
 from firos.srv import FIROS_Info
 from firos.msg import Robot_Event, CB_Event
-from include.constants import Constants as C #ROS_SUB_QUEUE_SIZE, ROS_NODE_NAME
+from include.constants import Constants as C 
 from include.ros.topicHandler import robotDisconnection, loadMsgHandlers
 from include.rcm.rcmutils import getRobotConfig
 

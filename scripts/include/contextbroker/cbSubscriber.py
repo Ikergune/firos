@@ -26,7 +26,6 @@ import requests
 import json
 
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
-# from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT, MAP_SERVER_ADRESS, MAP_SERVER_PORT, CB_SUB_REFRESH, CB_SUB_LENGTH
 from include.constants import Constants as C
 from include.logger import Log
 
@@ -109,13 +108,13 @@ class CbSubscriber(object):
             self.subscriptionIds[robotID][topic] = newSubID
 
             # Wait
-            time.sleep(int(C.CB_SUB_LENGTH * C.CB_SUB_REFRESH)) # sleep TODO DL from config loaded seconds
+            time.sleep(int(C.CB_SUB_LENGTH * C.CB_SUB_REFRESH)) # sleep Length * Refresh-Rate (where 0 < Refresh-Rate < 1)
             Log("INFO", "Refreshing Subscription for " + robotID + " and topics: " + str(topic))
 
 
     def subscribeJSONGenerator(self, robotID, topic):
         ''' This method returns the correct JSON-format to subscribe to the ContextBroker. 
-            The Expiration-Date/Throttle and Type of robots is retreived here via configuration (TODO DL)
+            The Expiration-Date/Throttle and Type of robots is retreived here via configuration
 
             robotID: The String of the Robot-Id.
             topic: The actual topic to subscribe to.
@@ -127,7 +126,7 @@ class CbSubscriber(object):
                 "entities": [
                     {
                     "id": str(robotID),
-                    "type": "ROBOT"  # TODO DL load via Configuration 
+                    "type": C.CB_CONTEXT_TYPE
                     }
                 ],
                 "condition": {
@@ -140,8 +139,8 @@ class CbSubscriber(object):
             },
             "attrs": [str(topic)]
             },
-            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + C.CB_SUB_LENGTH)) # TODO DL load via Configuration, ISO 8601
-            # "throttling": 5  # TODO DL Maybe throttle?
+            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + C.CB_SUB_LENGTH)), # ISO 8601
+            "throttling": C.CB_THROTTLING  
             }
         return json.dumps(struct)
 

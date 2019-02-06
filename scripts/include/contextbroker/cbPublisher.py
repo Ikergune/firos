@@ -66,10 +66,10 @@ class CbPublisher(object):
         # if struct not initilized, intitilize it even on ContextBroker!
         if robotID not in self.posted_history:
             self.posted_history[robotID] = {}
-            self.posted_history[robotID]['type'] = 'ROBOT'
+            self.posted_history[robotID]['type'] = C.CB_CONTEXT_TYPE
             self.posted_history[robotID]['id'] = robotID
             # Intitialize Entitiy/Robot-Construct on ContextBroker
-            jsonStr = ObjectFiwareConverter.obj2Fiware(self.posted_history[robotID], ind=0,  ignorePythonMetaData=True) 
+            jsonStr = ObjectFiwareConverter.obj2Fiware(self.posted_history[robotID], ind=0,  ignorePythonMetaData=True)
             response = requests.post(self.CB_BASE_URL, data=jsonStr, headers=self.CB_HEADER)
             self._responseCheck(response, attrAction=0, topEnt=robotID)
 
