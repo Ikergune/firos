@@ -68,7 +68,6 @@ if __name__ == '__main__':
 
     from include import confManager
     from include.logger import Log, initLog
-    from include.mapServer import MapServer
     from include.server.firosServer import FirosServer
 
     from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, createConnectionListeners, initPubAndSub
@@ -101,8 +100,7 @@ if __name__ == '__main__':
     try:
         server = FirosServer("0.0.0.0", C.MAP_SERVER_PORT)
     except Exception as ex:
-        sys.stderr.write('CB_COMMUNICATION_FAILED')
-        exit(1)
+        raise Exception("Unable to create a FirosServer")
     else:
         def signal_handler(signal, frame):
             Log("INFO", ('\nExiting from the application'))
@@ -123,8 +121,6 @@ if __name__ == '__main__':
         initPubAndSub()
         loadMsgHandlers(confManager.getRobots(True, True))
         createConnectionListeners()
-
-        maSe = MapServer()
 
         Log("INFO", "\nPress Ctrl+C to Exit\n")
         server.start()
