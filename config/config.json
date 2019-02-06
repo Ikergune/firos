@@ -9,8 +9,8 @@
         "address"   : "192.168.43.159",
         "port"      : 1026,
         "subscription": {
-          "throttling": "PT0S",
-          "subscription_length": "P1D",
+          "throttling": 0,
+          "subscription_length": 300,
           "subscription_refresh_delay": 0.5
         }
     },
@@ -32,8 +32,8 @@
         "port"      : 1026
       },
       "subscription": {
-        "throttling": "PT0S",
-        "subscription_length": "P1D",
+        "throttling": 0,
+        "subscription_length": 300,
         "subscription_refresh_delay": 0.5
       }
     },
@@ -49,8 +49,8 @@
         "address"   : "192.168.4.70",
         "port"      : 1026,
         "subscription": {
-          "throttling": "PT0S",
-          "subscription_length": "P1D",
+          "throttling": 0,
+          "subscription_length": 300,
           "subscription_refresh_delay": 0.5
         }
     },
@@ -68,8 +68,8 @@
         "address"   : "192.168.4.70",
         "port"      : 1026,
         "subscription": {
-          "throttling": "PT0S",
-          "subscription_length": "P1D",
+          "throttling": 0,
+          "subscription_length": 300,
           "subscription_refresh_delay": 0.5
         }
     },
@@ -87,8 +87,8 @@
         "address"   : "0.0.0.0",
         "port"      : 1026,
         "subscription": {
-          "throttling": "PT0S",
-          "subscription_length": "P1D",
+          "throttling": 0,
+          "subscription_length": 300,
           "subscription_refresh_delay": 0.5
         }
     },
@@ -106,8 +106,8 @@
         "address"   : "0.0.0.0",
         "port"      : 1026,
         "subscription": {
-          "throttling": "PT0S",
-          "subscription_length": "P1M",
+          "throttling": 0,
+          "subscription_length": 300,
           "subscription_refresh_delay": 20
         }
     },
