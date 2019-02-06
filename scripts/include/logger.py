@@ -18,21 +18,21 @@ import os
 import logging
 import logging.handlers
 
-from include.constants import LOGLEVEL
+from include.constants import Constants as C
 
 _logger = logging.getLogger('firos_logger')
 
 SYSLOG_ADDRESS = '/dev/log'
 
-if LOGLEVEL == 'CRITICAL':
+if C.LOGLEVEL == 'CRITICAL':
     _logger.setLevel(logging.CRITICAL)
-elif LOGLEVEL == 'ERROR':
+elif C.LOGLEVEL == 'ERROR':
     _logger.setLevel(logging.ERROR)
-elif LOGLEVEL == 'WARNING':
+elif C.LOGLEVEL == 'WARNING':
     _logger.setLevel(logging.WARNING)
-elif LOGLEVEL == 'DEBUG':
+elif C.LOGLEVEL == 'DEBUG':
     _logger.setLevel(logging.DEBUG)
-elif LOGLEVEL == 'INFO':
+elif C.LOGLEVEL == 'INFO':
     _logger.setLevel(logging.INFO)
 
 PRIORITIES = {
@@ -42,10 +42,10 @@ PRIORITIES = {
     'DEBUG': 1,
     'INFO': 0
 }
-if LOGLEVEL == "NONE":
+if C.LOGLEVEL == "NONE":
     _levelId = -1
 else:
-    _levelId = PRIORITIES[LOGLEVEL]
+    _levelId = PRIORITIES[C.LOGLEVEL]
 
 if os.path.exists(SYSLOG_ADDRESS):
     handler = logging.handlers.SysLogHandler(address=SYSLOG_ADDRESS)

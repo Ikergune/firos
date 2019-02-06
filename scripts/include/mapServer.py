@@ -22,33 +22,31 @@ import getpass
 import subprocess
 from threading import Thread
 
-from include.constants import MAP_SERVER_PORT, ROSBRIDGE_PORT
+from include.constants import Constants as C
 
 MAP_SERVER_PROCESS = None
 
-mapserver_path = os.path.dirname(os.path.abspath(__file__)).replace("include", "")
-start_command = "node mapserver.js " + str(MAP_SERVER_PORT) + " " + str(ROSBRIDGE_PORT)
-
-
 class MapServer:
-    @staticmethod
-    def load():
+    def __init__(self):
         ## \brief Starts Map server thread
-        MapThread = Thread(target=_launchMapServer)
+        self.mapserver_path = os.path.dirname(os.path.abspath(__file__)).replace("include", "")
+        self.start_command = "node mapserver.js " + str(C.MAP_SERVER_PORT) + " " + str(C.ROSBRIDGE_PORT)
+
+        MapThread = Thread(target=self._launchMapServer)
         MapThread.daemon = True
         MapThread.start()
 
 
-def _launchMapServer():
-    ## \brief If map_server is configured launches it
-    if(MAP_SERVER_PORT):
-        # if not os.path.exists(os.path.join(mapserver_path, 'node_modules')):
-        #     text = "---------------------------------------------------------------------------------------\n"
-        #     text += "---------------------------------------------------------------------------------------\n"
-        #     text += "FIROS is going to install mapserver's dependencies, to do this it will need root access\n"
-        #     text += "---------------------------------------------------------------------------------------\n"
-        #     text += "---------------------------------------------------------------------------------------"
-        #     print text
-        #     os.system("cd {} && sudo npm install && sudo chown -R {} node_modules".format(mapserver_path, getpass.getuser()))
-        # subprocess.Popen(["node", mapserver_path + "mapserver.js", str(MAP_SERVER_PORT), str(ROSBRIDGE_PORT)])
-        pass
+    def _launchMapServer(self):
+        ## \brief If map_server is configured launches it
+        if(C.MAP_SERVER_PORT):
+            # if not os.path.exists(os.path.join(mapserver_path, 'node_modules')):
+            #     text = "---------------------------------------------------------------------------------------\n"
+            #     text += "---------------------------------------------------------------------------------------\n"
+            #     text += "FIROS is going to install mapserver's dependencies, to do this it will need root access\n"
+            #     text += "---------------------------------------------------------------------------------------\n"
+            #     text += "---------------------------------------------------------------------------------------"
+            #     print text
+            #     os.system("cd {} && sudo npm install && sudo chown -R {} node_modules".format(mapserver_path, getpass.getuser()))
+            # subprocess.Popen(["node", mapserver_path + "mapserver.js", str(MAP_SERVER_PORT), str(ROSBRIDGE_PORT)])
+            pass

@@ -24,12 +24,11 @@ import json
 import requests
 
 from include.logger import Log
-from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT, PATH
+from include.constants import Constants as C
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 
 
-CB_BASE_URL = "http://{}:{}/v2/entities/".format(CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT)
-CB_HEADER = {'Content-Type': 'application/json'}
+
 
 class CbPublisher(object):
     ''' The CbPublisher handles the Enities on CONTEXT_BROKER / v2 / entities .
@@ -44,6 +43,13 @@ class CbPublisher(object):
     # Keeps track of the posted Content on the ContextBroker
     # via posted_history[ROBOT_ID][TOPIC] 
     posted_history = {}
+    CB_HEADER = {'Content-Type': 'application/json'}
+    CB_BASE_URL = None
+
+    def __init__(self):
+        ''' Lazy Initialization of CB_BASE_URL
+        '''
+        self.CB_BASE_URL = "http://{}:{}/v2/entities/".format(C.CONTEXTBROKER_ADRESS, C.CONTEXTBROKER_PORT)
 
     def publishToCB(self, robotID, topic, rawMsg, msgDefintionDict):
         ''' This is the actual publish-Routine which updates and creates Entities on the
@@ -64,7 +70,7 @@ class CbPublisher(object):
             self.posted_history[robotID]['id'] = robotID
             # Intitialize Entitiy/Robot-Construct on ContextBroker
             jsonStr = ObjectFiwareConverter.obj2Fiware(self.posted_history[robotID], ind=0,  ignorePythonMetaData=True) 
-            response = requests.post(CB_BASE_URL, data=jsonStr, headers=CB_HEADER)
+            response = requests.post(self.CB_BASE_URL, data=jsonStr, headers=self.CB_HEADER)
             self._responseCheck(response, attrAction=0, topEnt=robotID)
 
         if topic not in self.posted_history[robotID]:
@@ -98,7 +104,7 @@ class CbPublisher(object):
 
 
         # Update attribute on ContextBroker
-        response = requests.post(CB_BASE_URL + robotID + "/attrs", data=partJsonStr, headers=CB_HEADER)
+        response = requests.post(self.CB_BASE_URL + robotID + "/attrs", data=partJsonStr, headers=self.CB_HEADER)
         self._responseCheck(response, attrAction=1, topEnt=topic)
 
 
@@ -106,7 +112,7 @@ class CbPublisher(object):
         ''' Removes all previously tracked Entities/Robots on ContextBroker
         '''
         for robotID in self.posted_history:
-            response = requests.delete(CB_BASE_URL + robotID)
+            response = requests.delete(self.CB_BASE_URL + robotID)
             self._responseCheck(response, attrAction=2, topEnt=robotID)
         
         
@@ -116,7 +122,7 @@ class CbPublisher(object):
 
             robotID: The Robot-Id-String
         '''
-        json_path = PATH + "/robotdescriptions.json"
+        json_path = C.PATH + "/robotdescriptions.json"
         description_data = json.load(open(json_path))
         
         # Check if a robotID has descriptions

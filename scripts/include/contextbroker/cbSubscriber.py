@@ -27,12 +27,11 @@ import json
 
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 # from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT, MAP_SERVER_ADRESS, MAP_SERVER_PORT, CB_SUB_REFRESH, CB_SUB_LENGTH
-from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT, MAP_SERVER_ADRESS, MAP_SERVER_PORT, CB_SUB_LENGTH, CB_SUB_REFRESH
+from include.constants import Constants as C
 from include.logger import Log
 
 
-CB_BASE_URL = "http://{}:{}".format(CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT)
-FIROS_NOTIFY_URL = "http://{}:{}/firos".format(MAP_SERVER_ADRESS, MAP_SERVER_PORT)                                    # TODO DL HTTP?
+
 
 class CbSubscriber(object):
     ''' The CbSubscriber handles the subscriptions on the ContextBroker.
@@ -51,6 +50,16 @@ class CbSubscriber(object):
     # Saves the subscriptions IDs returned from ContextBroker.
     # Follwoing Structure: subscriptionIds[ROBOT_ID][TOPIC] returns a sub-Id in String
     subscriptionIds = {}
+
+    CB_BASE_URL = None
+    FIROS_NOTIFY_URL = None
+
+    def __init__(self):
+        ''' Lazy Initialization of CB_BASE_URL and FIROS_NOTIFY_URL
+        '''
+        self.CB_BASE_URL = "http://{}:{}".format(C.CONTEXTBROKER_ADRESS, C.CONTEXTBROKER_PORT)
+        self.FIROS_NOTIFY_URL = "http://{}:{}/firos".format(C.MAP_SERVER_ADRESS, C.MAP_SERVER_PORT)
+
 
     def subscribeToCB(self, robotID, topicList):
         ''' This method starts for each topic an own thread, which handles the subscription
@@ -72,7 +81,7 @@ class CbSubscriber(object):
         '''
         for robotID in self.subscriptionIds:
             for topic in self.subscriptionIds[robotID]:
-                response = requests.delete(CB_BASE_URL + self.subscriptionIds[robotID][topic])
+                response = requests.delete(self.CB_BASE_URL + self.subscriptionIds[robotID][topic])
                 self._checkResponse(response, subID=self.subscriptionIds[robotID][topic])
 
 
@@ -86,21 +95,21 @@ class CbSubscriber(object):
         while True:
             # Subscribe
             jsonData = self.subscribeJSONGenerator(robotID, topic)
-            response = requests.post(CB_BASE_URL + "/v2/subscriptions", data=jsonData, headers={'Content-Type': 'application/json'})
+            response = requests.post(self.CB_BASE_URL + "/v2/subscriptions", data=jsonData, headers={'Content-Type': 'application/json'})
             self._checkResponse(response, created=True, robTop=(robotID, topic))
 
             newSubID = response.headers['Location'] # <- get subscription-ID
 
             # Unsubscribe
             if robotID in self.subscriptionIds and topic in self.subscriptionIds[robotID]:
-                response = requests.delete(CB_BASE_URL + self.subscriptionIds[robotID][topic])
+                response = requests.delete(self.CB_BASE_URL + self.subscriptionIds[robotID][topic])
                 self._checkResponse(response, subID=self.subscriptionIds[robotID][topic])
                 
             # Save new ID
             self.subscriptionIds[robotID][topic] = newSubID
 
             # Wait
-            time.sleep(int(CB_SUB_LENGTH * CB_SUB_REFRESH)) # sleep TODO DL from config loaded seconds
+            time.sleep(int(C.CB_SUB_LENGTH * C.CB_SUB_REFRESH)) # sleep TODO DL from config loaded seconds
             Log("INFO", "Refreshing Subscription for " + robotID + " and topics: " + str(topic))
 
 
@@ -127,11 +136,11 @@ class CbSubscriber(object):
             },
             "notification": {
             "http": {
-                "url": FIROS_NOTIFY_URL 
+                "url": self.FIROS_NOTIFY_URL 
             },
             "attrs": [str(topic)]
             },
-            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + CB_SUB_LENGTH)) # TODO DL load via Configuration, ISO 8601
+            "expires": time.strftime("%Y-%m-%dT%H:%M:%S.00Z", time.gmtime(time.time() + C.CB_SUB_LENGTH)) # TODO DL load via Configuration, ISO 8601
             # "throttling": 5  # TODO DL Maybe throttle?
             }
         return json.dumps(struct)

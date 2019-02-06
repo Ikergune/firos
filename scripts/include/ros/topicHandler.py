@@ -25,7 +25,7 @@ import rospy
 import importlib
 
 from include.logger import Log
-from include.constants import ROS_SUB_QUEUE_SIZE, ROS_NODE_NAME
+from include.constants import Constants as C 
 from include.libLoader import LibLoader
 from include.ros.rosConfigurator import RosConfigurator
 from include.ros.dependencies.third_party import *
@@ -36,10 +36,6 @@ from include.contextbroker.cbSubscriber import CbSubscriber
 
 # this Message is needed, for the Listeners on connect on disconnect
 import std_msgs.msg
-
-
-CloudSubscriber = CbSubscriber()
-CloudPublisher = CbPublisher()
 
 # TODO DL see loadMsgHandlers
 TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topics")
@@ -65,6 +61,14 @@ ROS_MESSAGE_CLASSES = {}
 # If shutdown is signaled, do stop posting ROS-Messages to the ContextBroker
 SHUTDOWN_SIGNAL = False
 
+
+CloudSubscriber = None
+CloudPublisher = None
+
+def initPubAndSub():
+    global CloudPublisher, CloudSubscriber
+    CloudSubscriber = CbSubscriber()
+    CloudPublisher = CbPublisher()
 
 def loadMsgHandlers(robot_data):
     ''' This method initializes The Publisher and Subscriber for ROS and 
@@ -128,9 +132,10 @@ def loadMsgHandlers(robot_data):
                 if robotID not in ROS_PUBLISHER:
                     ROS_PUBLISHER[robotID] = {}
 
-                ROS_PUBLISHER[robotID][topic] = rospy.Publisher(robotID + "/" + topic, theclass, queue_size=ROS_SUB_QUEUE_SIZE)
+                ROS_PUBLISHER[robotID][topic] = rospy.Publisher(robotID + "/" + topic, theclass, queue_size=C.ROS_SUB_QUEUE_SIZE)
         
         # After initializing ROS-PUB/SUBs, intitialize ContextBroker-Subscriber based on ROS-Publishers for each robot
+        print ROS_PUBLISHER
         if robotID in ROS_PUBLISHER:
             CloudSubscriber.subscribeToCB(str(robotID), ROS_PUBLISHER[robotID].keys())
             Log("INFO", "\n")
@@ -281,8 +286,8 @@ def createConnectionListeners():
         /ROS_NODE_NAME/connect    --> std_msgs/String
         /ROS_NODE_NAME/disconnect --> std_msgs/String
     '''
-    subscribers.append(rospy.Subscriber(ROS_NODE_NAME + "/disconnect", std_msgs.msg.String, robotDisconnection))
-    subscribers.append(rospy.Subscriber(ROS_NODE_NAME +"/connect", std_msgs.msg.String, _robotConnection))
+    subscribers.append(rospy.Subscriber(C.ROS_NODE_NAME + "/disconnect", std_msgs.msg.String, robotDisconnection))
+    subscribers.append(rospy.Subscriber(C.ROS_NODE_NAME +"/connect", std_msgs.msg.String, _robotConnection))
 
 
 def robotDisconnection(data):

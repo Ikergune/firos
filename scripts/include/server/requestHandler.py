@@ -33,14 +33,9 @@ from include.confManager import getRobots
 from include.ros.rosConfigurator import RosConfigurator, setWhiteList
 from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, ROS_PUBLISHER, ROS_SUBSCRIBER, ROS_TOPIC_AS_DICT
 from include.contextbroker.cbSubscriber import CbSubscriber
-from include.constants import CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT
+from include.constants import Constants as C 
 
 CloudSubscriber = CbSubscriber() # Only the Conversion method is used here TODO DL
-
-# Only used to query information from Context-Broker
-CB_BASE_URL = "http://{}:{}/v2/entities/".format(CONTEXTBROKER_ADRESS, CONTEXTBROKER_PORT)
-
-
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -211,7 +206,10 @@ def onRobotData(request, action):
         and also return the same status_code
     '''
     partURL =request.path[7:] # Depends on prefix '/robot/'
-    response = requests.get(CB_BASE_URL + partURL)
+
+    # Only used to query information from Context-Broker
+    cb_base_url = "http://{}:{}/v2/entities/".format(C.CONTEXTBROKER_ADRESS, C.CONTEXTBROKER_PORT)
+    response = requests.get(cb_base_url + partURL)
     request.send_response(response.status_code)
     request.send_header('Content-Type', 'application/json')
     request.end_headers()

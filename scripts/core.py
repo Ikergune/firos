@@ -34,8 +34,9 @@ import rospy
 import signal
 import argparse
 
-current_path = os.path.dirname(os.path.abspath(__file__))
-FIROS_CONF_PATH = [current_path + "/../config"]
+
+
+from include.constants import Constants as C
 
 # Main function.
 if __name__ == '__main__':
@@ -51,52 +52,54 @@ if __name__ == '__main__':
     # Get Input
     results = parser.parse_args()
     
-
-
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    conf_path = current_path + "/../config"
     if results.conf_Fold is not None:
         current_path = os.getcwd()
-        FIROS_CONF_PATH[0] = current_path + "/" + results.conf_Fold
+        conf_path= current_path + "/" + results.conf_Fold
         # TODO DL This re-assignment is currently not working!
+
+    C.init(conf_path)
 
 
     # Importing firos specific scripts
     from setup import launchSetup
-    from include import constants as c
+
 
     from include import confManager
-    from include.logger import Log
+    from include.logger import Log 
     from include.mapServer import MapServer
     from include.server.firosServer import FirosServer
 
-    from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, createConnectionListeners
-    from include.rcm import topicManager
+    from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, createConnectionListeners, initPubAndSub
+    from include.rcm.topicManager import TopicManager
 
 
 
-
-    if results.port is not None and type(results.port) is int:
-        c.MAP_SERVER_PORT = results.port
+    if results.port is not None:
+        C.MAP_SERVER_PORT = int(results.port)
             
-    if results.ros_port is not None and type(results.ros_port) is int:
-        c.ROSBRIDGE_PORT = results.ros_port
+    if results.ros_port is not None:
+        C.ROSBRIDGE_PORT = int(results.ros_port)
     
-    if results.ros_node_name is not None and type(results.ros_node_name) is str:
-        c.ROS_NODE_NAME = results.ros_node_name
+    if results.ros_node_name is not None:
+        C.ROS_NODE_NAME = results.ros_node_name
 
-    if results.loglevel is not None and type(results.loglevel) is int:
-        c.LOGLEVEL = results.loglevel
+    if results.loglevel is not None:
+        C.LOGLEVEL = results.loglevel
 
 
-    Log("INFO", "Initializing ROS node: " + c.ROS_NODE_NAME)
-    rospy.init_node(c.ROS_NODE_NAME)
+    Log("INFO", "Initializing ROS node: " + C.ROS_NODE_NAME)
+    rospy.init_node(C.ROS_NODE_NAME)
     Log("INFO", "Initialized")
 
 
 
-
+    print C.ROS_NODE_NAME
+    toMa = TopicManager()
 
     try:
-        server = FirosServer("0.0.0.0", c.MAP_SERVER_PORT)
+        server = FirosServer("0.0.0.0", C.MAP_SERVER_PORT)
     except Exception as ex:
         sys.stderr.write('CB_COMMUNICATION_FAILED')
         exit(1)
@@ -104,7 +107,7 @@ if __name__ == '__main__':
         def signal_handler(signal, frame):
             Log("INFO", ('\nExiting from the application'))
             RosTopicHandler.unregisterAll()
-            topicManager.removeListeners()
+            toMa.removeListeners()
             server.close()
             Log("INFO", ('\nExit'))
             sys.exit(0)
@@ -116,11 +119,12 @@ if __name__ == '__main__':
         Log("INFO", "\nStarting Firos...")
         Log("INFO", "---------------------------------\n")
 
+        #Topic Handler Routine:
+        initPubAndSub()
         loadMsgHandlers(confManager.getRobots(True, True))
         createConnectionListeners()
-        topicManager.setListeners()
 
-        MapServer.load()
+        maSe = MapServer()
 
         Log("INFO", "\nPress Ctrl+C to Exit\n")
         server.start()

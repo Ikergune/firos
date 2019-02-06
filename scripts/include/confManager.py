@@ -14,13 +14,13 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import os
 import json
 import copy
 import traceback
 
 from include.logger import Log
 from include.ros.rosConfigurator import RosConfigurator
+from include.constants import Constants as C
 
 
 def getRobots(refresh=False, withJson=True):
@@ -55,8 +55,7 @@ def getRobots(refresh=False, withJson=True):
 def getRobotsByJson():
     ## \brief Get robots in the JSON file
     try:
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        json_path = current_path.replace("scripts/include", "config/robots.json")
+        json_path = C.PATH + "/robots.json"
         return json.load(open(json_path))
     except:
         return {}

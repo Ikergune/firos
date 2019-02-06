@@ -21,7 +21,7 @@ import socket
 import rostopic
 import rosgraph
 
-from include.constants import ROS_NODE_NAME
+from include.constants import Constants as C
 
 # map_regex = re.compile(ur'^.*\/(map)[\/]*$')
 map_regex = re.compile(ur'^.*\/(map).*$')
@@ -175,8 +175,7 @@ def setWhiteList(additions, deletions, restore=False):
     global mem_whitelist
     if mem_whitelist is None:
         try:
-            current_path = os.path.dirname(os.path.abspath(__file__))
-            json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
+            json_path = C.PATH + "/whitelist.json"
             mem_whitelist = json.load(open(json_path))
         except:
             mem_whitelist = {}
@@ -201,7 +200,7 @@ def _isInFiros(topic_name, list2Check, nodes):
     if topic_name not in list2Check:
         return False
     for node in list2Check[topic_name]:
-        if node == "/" + ROS_NODE_NAME:
+        if node == "/" + C.ROS_NODE_NAME:
             using = True
             break
 
@@ -218,8 +217,7 @@ def getWhiteLists():
 def _getWhiteList(pubsub):
     try:
         if mem_whitelist is None:
-            current_path = os.path.dirname(os.path.abspath(__file__))
-            json_path = current_path.replace("scripts/include/ros", "config/whitelist.json")
+            json_path = C.PATH + "/whitelist.json"
             data = json.load(open(json_path))
         else:
             data = mem_whitelist
