@@ -20,7 +20,7 @@ We have some ideas what we would like to change in FIROS. There are already some
 | 5 | Unit Tests | The whole code is currently untested. We will create Tests and checks to guarantee expected behaviour | Development    |
 | 6 | Dockerize it | A Docker will be composed on some Point for an easier integration. | Planned |
 | 7 | Continoues Integration (CI) | It is easier to run an automated pipeline for Unit-Testing, Deployment, etc.. FIROS will also have badges as other projects! | Planned |
-| 8 | Documetation | Currently only this Readme.md is available. It is not practical to just leave it as is. We will add more howTo's and information about FIROS soon! | Development |
+| 8 | Documentation | Currently only this Readme.md is available. It is not practical to just leave it as is. We will add more howTo's and information about FIROS soon! | Development |
 
 
 Status:
@@ -31,9 +31,6 @@ Status:
 
 If you have any feature requests, comments, ideas - feel free to contact us :)
 
-
-THIS INFORMATION IS CURRENTLY OUT OF DATE!
-=====
 
 Cloning This Project
 ================
@@ -134,8 +131,8 @@ Here is an example of a *config.json* file for a *local* environment:
         "address"   : "192.168.0.101",
         "port"      : 1026,
         "subscription": {
-          "throttling": "3", 
-          "subscription_length": "300",
+          "throttling": 3, 
+          "subscription_length": 300,
           "subscription_refresh_delay": 0.9
         }
     },
@@ -449,7 +446,7 @@ POST /robot/connect
 
 This API makes FIROS connecting to new robots in case their names and topics match the ones allowed on the *whitelist.json*
 
-POST /robot/diconnect/NAME
+POST /robot/disconnect/NAME
 --------------------------
 
 This API forces FIROS to disconnect from the robot specified by the *NAME* parameter. It will also delete any connection and entity associated to the particular robot on the Context Broker.
