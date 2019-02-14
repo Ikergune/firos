@@ -5,7 +5,7 @@ FIROS is a tool that helps connecting robots to the cloud. For this purpose it u
 
 FIROS works as a translator between the robotics field and the cloud world, transforming ROS messages into NGSI to publish them in the cloud, and vice versa.
 
-This project is a fork from the **outdated** [Ikergunes FIROS package](https://github.com/Ikergune/firos)). 
+This project is a fork from the **outdated** [Ikergunes FIROS package](https://github.com/Ikergune/firos). 
 
 Roadmap/ Changes
 ================
