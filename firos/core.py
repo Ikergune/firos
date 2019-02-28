@@ -38,6 +38,20 @@ from include.constants import Constants as C
 
 # Main function.
 if __name__ == '__main__':
+
+    # If launched via roslaunch, we get addtional parameters
+    rosLaunch_name = None
+    for i in range(len(sys.argv)):
+        if "__name:=" in sys.argv[i]:
+            rosLaunch_name = sys.argv.pop(i)[8:]
+            break
+    for i in range(len(sys.argv)):
+        if "__log:=" in sys.argv[i]:
+            # We can omit this
+            sys.argv.pop(i)[7:]
+            break
+
+
     # Input Parsing
     parser = argparse.ArgumentParser()
     parser.add_argument('-P', action='store', dest='port', help='Set the Port of the Firos-Server')
@@ -81,7 +95,9 @@ if __name__ == '__main__':
     if results.ros_port is not None:
         C.ROSBRIDGE_PORT = int(results.ros_port)
     
-    if results.ros_node_name is not None:
+    if rosLaunch_name is not None:
+        C.ROS_NODE_NAME = rosLaunch_name
+    elif results.ros_node_name is not None:
         C.ROS_NODE_NAME = results.ros_node_name
 
     if results.loglevel is not None:
