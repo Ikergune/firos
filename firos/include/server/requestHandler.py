@@ -24,9 +24,14 @@ import re
 import cgi
 import json
 import requests
-
-from urlparse import urlparse, parse_qs
-from BaseHTTPServer import BaseHTTPRequestHandler
+try:
+    # Python 3
+    from urllib.parse import urlparse, parse_qs
+    from http.server import BaseHTTPRequestHandler
+except ImportError:
+    # Pyrhon 2
+    from BaseHTTPServer import BaseHTTPRequestHandler
+    from urlparse import urlparse, parse_qs
 
 from include.logger import Log
 from include.confManager import getRobots

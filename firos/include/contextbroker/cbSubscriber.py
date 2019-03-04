@@ -21,9 +21,14 @@ __version__ = "0.0.1a"
 __status__ = "Developement"
 
 import time
-import thread
 import requests
 import json
+try:
+    # Python 3
+    import _thread as thread
+except ImportError:
+    # Pyrhon 2
+    import thread
 
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 from include.constants import Constants as C

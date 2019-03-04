@@ -19,7 +19,8 @@ import re
 import imp
 import importlib
 
-regex = re.compile(ur'^(.*)(\b.msg\b)(.*)$')
+# TODO DL ur'' was replaced by r'' 
+regex = re.compile(r'^(.*)(\b.msg\b)(.*)$')
 
 # TODO DL , loadFromFile and loadFromSystem is only used by Topic Handler
 #           load3rdParty might be replaced by obj2ros?

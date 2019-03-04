@@ -16,8 +16,13 @@
 
 import os
 import json
-import urllib2
 import netifaces
+try:
+    # Python 3
+    from urllib.request import urlopen
+except ImportError:
+    # Pyrhon 2
+    from urllib2 import urlopen
 
 class Constants:
     configured = False
@@ -95,7 +100,7 @@ class Constants:
 
 
             if cls.INTERFACE == "public":
-                cls.MAP_SERVER_ADRESS = urllib2.urlopen('http://ip.42.pl/raw').read()
+                cls.MAP_SERVER_ADRESS = urlopen('http://ip.42.pl/raw').read()
             else:
                 netifaces.ifaddresses(cls.INTERFACE)
                 cls.MAP_SERVER_ADRESS = netifaces.ifaddresses(cls.INTERFACE)[2][0]['addr']

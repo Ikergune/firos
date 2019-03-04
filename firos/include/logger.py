@@ -77,4 +77,4 @@ def Log(level, *args):
                 _logger.error(text)
             elif level == 'WARNING':
                 _logger.warning(text)
-        print text
+        print(text)
