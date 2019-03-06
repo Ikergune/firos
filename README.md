@@ -83,7 +83,7 @@ Installation
 
 5.  For convenience, you may wish to source your setup.sh script from your .bashrc so that your environment is ready as soon as you log in. e.g. 
 
-   >echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+   >echo "source ~/catkin_ws/devel/setup.bash" > ~/.bashrc
 
    If you don't want to edit you `.bashrc`, you can also just execute:
 
