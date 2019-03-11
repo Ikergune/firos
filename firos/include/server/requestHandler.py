@@ -28,13 +28,11 @@ try:
     # Python 3
     from urllib.parse import urlparse, parse_qs
     from http.server import BaseHTTPRequestHandler
-    p3 = True
 
 except ImportError:
     # Pyrhon 2
     from BaseHTTPServer import BaseHTTPRequestHandler
     from urlparse import urlparse, parse_qs
-    p3 = False
 
 from include.logger import Log
 from include.confManager import getRobots
