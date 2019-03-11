@@ -159,7 +159,7 @@ class CbSubscriber(object):
                       the topic should have "id", "type" and "TOPIC" in it
         '''
         kv = self.TypeValue()
-        ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetadata=False)
+        ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetaData=False)
         return kv
 
 

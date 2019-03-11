@@ -28,10 +28,13 @@ try:
     # Python 3
     from urllib.parse import urlparse, parse_qs
     from http.server import BaseHTTPRequestHandler
+    p3 = True
+
 except ImportError:
     # Pyrhon 2
     from BaseHTTPServer import BaseHTTPRequestHandler
     from urlparse import urlparse, parse_qs
+    p3 = False
 
 from include.logger import Log
 from include.confManager import getRobots
@@ -83,7 +86,7 @@ def getPostParams(request):
     ''' Returns from the given request its parameters which were 
         posted prior. 
     '''
-    ctype, pdict = cgi.parse_header(request.headers.getheader('content-type'))
+    ctype, pdict = cgi.parse_header(request.headers.get('content-type'))
     if ctype == 'multipart/form-data':
         return cgi.parse_multipart(request.rfile, pdict)
     elif ctype == 'application/x-www-form-urlencoded':
