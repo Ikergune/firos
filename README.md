@@ -7,6 +7,12 @@ FIROS works as a translator between the robotics field and the cloud world, tran
 
 This project is a fork from the **outdated** [Ikergunes FIROS package](https://github.com/Ikergune/firos). 
 
+| :books: [Documentation](https://github.com/iml130/firos/blob/master/doc/index.md) | :dart: [Roadmap](https://github.com/iml130/firos/blob/master/doc/roadmap.md) |
+| -------------------------------------------------------- |  -------------------------------------------------------------------------------------------- |
+
+
+
+
 Roadmap/ Changes
 ================
 We have some ideas what we would like to change in FIROS. There are already some ideas implemented. The following table shows the current features we are working on and what is actually planned:
