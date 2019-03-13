@@ -1,0 +1,19 @@
+site_name: FRIOS
+docs_dir: doc/
+site_dir: html
+markdown_extensions: [toc,fenced_code]
+use_directory_urls: false
+theme: readthedocs
+nav:
+    - Home: index.md
+    - Getting Started: start.md
+    - User & Programmers Manual: 
+        - Introduction: user/introduction.md
+        - Interfaces: user/interfaces.md
+        - API Walkthrough: user/api.md 
+    - Installation & Administration:
+        - Introduction: install/introduction.md
+        - Installation: install/install.md
+        - Deinstallation: install/deinstall.md
+        - Upgrading from previous versions: install/upgrade.md
+    - Deprecated Functionality: deprecated.md
