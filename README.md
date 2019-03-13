@@ -1,18 +1,10 @@
 # FIROS
 
 [![FIWARE Robotics](https://nexus.lab.fiware.org/static/badges/chapters/robotics.svg)](https://www.fiware.org/developers/catalogue/)
-[![License: MIT](https://img.shields.io/github/license/iml130/firos.svg)](https://opensource.org/licenses/MIT)
-
-<!--[![Docker badge](https://img.shields.io/docker/pulls/fiware/sigfox-iotagent.svg)](https://hub.docker.com/r/fiware/firos/)-->
-
-[![](https://img.shields.io/badge/tag-firos-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware+ros)
+[![License: MIT](https://img.shields.io/github/license/iml130/firos.svg)](https://opensource.org/licenses/MIT)<!--[![Docker badge](https://img.shields.io/docker/pulls/fiware/sigfox-iotagent.svg)](https://hub.docker.com/r/fiware/firos/)--> [![](https://img.shields.io/badge/tag-firos-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware+ros)
 <br/> [![Documentation badge](https://img.shields.io/readthedocs/firos.svg)](https://firos.rtfd.io)
-[![Build badge](https://img.shields.io/travis/iml130/firos.svg)](https://travis-ci.org/iml130/firos/)
-
-<!--
-[![Coverage Status](https://coveralls.io/repos/github/iml130/firos/badge.svg?branch=master)](https://coveralls.io/github/iml130/firos?branch=master)-->
-
-![Status](https://nexus.lab.fiware.org/repository/raw/public/badges/statuses/incubating.svg)
+[![Build badge](https://img.shields.io/travis/iml130/firos.svg)](https://travis-ci.org/iml130/firos/)<!--
+[![Coverage Status](https://coveralls.io/repos/github/iml130/firos/badge.svg?branch=master)](https://coveralls.io/github/iml130/firos?branch=master)--> ![Status](https://nexus.lab.fiware.org/repository/raw/public/badges/statuses/incubating.svg)
 
 FIROS is a tool that helps connecting robots to the cloud. For this purpose it uses the
 [Robot Operating System (ROS)](http://www.ros.org/) and the
