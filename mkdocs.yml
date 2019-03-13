@@ -1,19 +1,29 @@
-site_name: FRIOS
+site_name: FIROS
+site_url: https://firos.readthedocs.org
+repo_url: https://github.com/iml130/firos.git
+site_description: FIROS
 docs_dir: doc/
 site_dir: html
-markdown_extensions: [toc,fenced_code]
+markdown_extensions: [toc, fenced_code]
 use_directory_urls: false
 theme: readthedocs
-nav:
+extra_css:
+  [
+    "https://fiware.org/style/fiware_readthedocs.css",
+    "https://fiware.org/style/fiware_readthedocs_iot.css",
+  ]
+
+# google_analytics: ['UA-XXXXXX-2', 'firos.readthedocs.io']
+
+pages:
     - Home: index.md
-    - Getting Started: start.md
-    - User & Programmers Manual: 
-        - Introduction: user/introduction.md
-        - Interfaces: user/interfaces.md
-        - API Walkthrough: user/api.md 
+    # - Getting Started: start.md
+    # - User & Programmers Manual: 
+        # - Introduction: user/introduction.md
+        # - Interfaces: user/interfaces.md
+        # - API Walkthrough: user/api.md 
     - Installation & Administration:
-        - Introduction: install/introduction.md
-        - Installation: install/install.md
-        - Deinstallation: install/deinstall.md
-        - Upgrading from previous versions: install/upgrade.md
-    - Deprecated Functionality: deprecated.md
+        - Installation: Installation.md
+        - Configuration: Configuration-Files.md
+        - Example: Turtlesim-Example.md
+    # - Deprecated Functionality: deprecated.md
