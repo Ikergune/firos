@@ -40,7 +40,7 @@ class Constants:
     CB_THROTTLING = 0
     CB_SUB_LENGTH = 300             # In Seconds!
     CB_SUB_REFRESH = 0.9            # After 90% of time is exceeded
-    CB_CONTEXT_TYPE = "ROBOT"   
+    CONTEXT_TYPE = "ROBOT"   
 
     ROS_NODE_NAME = "firos"
     ROS_SUB_QUEUE_SIZE = 10 
@@ -76,6 +76,27 @@ class Constants:
             except:
                 raise Exception("No Context-Broker specified!")
 
+            if "node_name" in configData:
+                cls.ROS_NODE_NAME = configData["node_name"]
+            
+            if "ros_subscriber_queue" in configData:
+                cls.ROS_SUB_QUEUE_SIZE = int(configData["ros_subscriber_queue"])
+
+            if "context_type" in configData:
+                cls.CONTEXT_TYPE = configData["context_type"]
+
+
+            if cls.INTERFACE == "public":
+                cls.MAP_SERVER_ADRESS = urlopen('http://ip.42.pl/raw').read()
+            else:
+                netifaces.ifaddresses(cls.INTERFACE)
+                cls.MAP_SERVER_ADRESS = netifaces.ifaddresses(cls.INTERFACE)[2][0]['addr']
+
+            if "rosbridge_port" in configData:
+                cls.ROSBRIDGE_PORT = configData["rosbridge_port"]
+
+
+            ### ContextBroker Section
             if "contextbroker" in configData and "subscription" in configData["contextbroker"]:
                 # Configuration for Subscription
                 subConfig = configData["contextbroker"]["subscription"]
@@ -88,25 +109,6 @@ class Constants:
                 if "subscription_refresh_delay" in subConfig:
                     cls.CB_SUB_REFRESH = float(subConfig["subscription_refresh_delay"])
 
-
-            if "node_name" in configData:
-                cls.ROS_NODE_NAME = configData["node_name"]
-            
-            if "ros_subscriber_queue" in configData:
-                cls.ROS_SUB_QUEUE_SIZE = int(configData["ros_subscriber_queue"])
-
-            if "cb_type" in configData:
-                cls.CB_CONTEXT_TYPE = configData["cb_type"]
-
-
-            if cls.INTERFACE == "public":
-                cls.MAP_SERVER_ADRESS = urlopen('http://ip.42.pl/raw').read()
-            else:
-                netifaces.ifaddresses(cls.INTERFACE)
-                cls.MAP_SERVER_ADRESS = netifaces.ifaddresses(cls.INTERFACE)[2][0]['addr']
-
-            if "rosbridge_port" in configData:
-                cls.ROSBRIDGE_PORT = configData["rosbridge_port"]
 
 
 

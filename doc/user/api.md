@@ -1,11 +1,20 @@
-#Introduction
- 
-Welcome to Module's User & Programmers Manual Guide!
-
-Any feedback on this document is highly welcome, including bug reports, typos or stuff you think should be included but is not. Please send the feedback through email to: module@l4ms.eu. Thanks in advance!
-
 # How to call an service
-...
+TODO 
+
+FIROS-API:
+```text
+/connect
+/disconnect #reset
+/disconnect/NAME
+/robots
+/robot/NAME
+
+#untested
+/whitelist/write
+/whitelist/remove
+/whitelist/restore
+```
+
 # Examples
 ## Service 1
 ## Service 2

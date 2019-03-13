@@ -131,7 +131,7 @@ class CbSubscriber(object):
                 "entities": [
                     {
                     "id": str(robotID),
-                    "type": C.CB_CONTEXT_TYPE
+                    "type": C.CONTEXT_TYPE
                     }
                 ],
                 "condition": {
