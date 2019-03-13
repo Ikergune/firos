@@ -15,13 +15,15 @@ publish and subscribe on it. If a contextbroker is not available you can quickly
 After you have set up ROS and created a catkin-workspace you can finally clone this repository and create the FIROS-Node
 as follows:
 
-> cd "catkin_workspace_base_directory"/src
+```bash
+cd "catkin_workspace_base_directory"/src
 
-> git clone --recursive https://github.com/iml130/firos.git
+git clone --recursive https://github.com/iml130/firos.git
 
-> cd "catkin_workspace_base_directory"
+cd "catkin_workspace_base_directory"
 
-> catkin_make
+catkin_make
+```
 
 **Note**:
 
