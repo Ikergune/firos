@@ -273,3 +273,21 @@ In order to test if FIROS is publishing into ContextBroker you can simply open u
 If the Context-Broker returns a page with content, then everything is working.
 
 For more Context-Broker-Operations visit [this site](https://fiware-orion.readthedocs.io/en/master/user/walkthrough_apiv2/index.html)
+
+
+FIROS Topics
+============
+
+FIROS is listening to 2 topics in order to handle robot connections.
+
+/FIROS/connect
+--------------
+
+Calling this topic with an empty string will make FIROS connect to new robots in case their names and topics match the ones allowed on the *whitelist.json*
+
+
+/FIROS/disconnect
+-----------------
+
+Disconnecting robots from FIROS is possible by simply calling this topic with the robot name.
+`/FIROS/disconnect/turtle1`
