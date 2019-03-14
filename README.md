@@ -3,21 +3,16 @@ FIROS
 
 FIROS is a tool that helps connecting robots to the cloud. For this purpose it uses the [Robot Operating System (ROS)]( http://www.ros.org/) and the [FIWARE  Context Broker](http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) as a way to publish and listen robot's data.
 
-FIROS works as a translator between the robotics field and the cloud world, transforming ROS messages into NGSI to publish them in the cloud, and vice versa.
+FIROS works as a translator between the robotics field and the cloud world, transforming ROS messages into NGSIv2 to publish them in the cloud, and vice versa. The following figure depicts the integration of FIROS inside the FIWARE platform.
+
+![alt text](https://github.com/iml130/firos/blob/master/doc/firos.png "FIROS Integration")
+
 
 This project is a fork from the **outdated** [Ikergunes FIROS package](https://github.com/Ikergune/firos). We have made a lot of changes - basically nothing is at it was.
 
 | :books: [Documentation](https://github.com/iml130/firos/blob/master/doc/index.md) | :dart: [Roadmap](https://github.com/iml130/firos/blob/master/doc/roadmap.md) |
 | -------------------------------------------------------- |  -------------------------------------------------------------------------------------------- |
-
-FIWARE Integration
-================
-The following figure depicts the integration of FIROS inside the FIWARE platform.
-
-![alt text](https://github.com/iml130/firos/blob/master/doc/firos.png "FIROS Integration")
-
-FIROS converts ROS topics into NGSI v2 Entities and vice versa.
-
+ 
 Roadmap/ Changes
 ================
 We have some ideas what we would like to change in FIROS. There are already some ideas implemented. The following table shows the current features we are working on and what is actually planned:
