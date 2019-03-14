@@ -10,8 +10,13 @@ This project is a fork from the **outdated** [Ikergunes FIROS package](https://g
 | :books: [Documentation](https://github.com/iml130/firos/blob/master/doc/index.md) | :dart: [Roadmap](https://github.com/iml130/firos/blob/master/doc/roadmap.md) |
 | -------------------------------------------------------- |  -------------------------------------------------------------------------------------------- |
 
+FIWARE Integration
+================
+The following figure depicts the integration of FIROS inside the FIWARE platform.
 
+![alt text](https://github.com/iml130/firos/blob/master/doc/firos.png "FIROS Integration")
 
+FIROS converts ROS topics into NGSI v2 Entities and vice versa.
 
 Roadmap/ Changes
 ================
