@@ -14,7 +14,13 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from BaseHTTPServer import HTTPServer
+
+try:
+    # Python 3
+    from http.server import HTTPServer
+except ImportError:
+    # Pyrhon 2
+    from BaseHTTPServer import HTTPServer
 
 from include.logger import Log
 
