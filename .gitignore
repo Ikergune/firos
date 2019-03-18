@@ -112,3 +112,6 @@ scripts/node_modules/**
 scripts/include/ros/topics/**
 scripts/include/ros/dependencies/thirdparty/**
 .idea
+
+package-lock.json
+node_modules/
