@@ -59,14 +59,10 @@ This is the absolute minimum configuration you need to do in order to be able to
 
 
 ## Run FIROS
-To run the FIROS-Node you first need to append the `PYTHONPATH`-Environment-Variable as follows:
-
->PYTHONPATH+=:/FULL_PATH_TO_THIS_REPO/firos/include/FiwareObjectConverter/
-
-Optionally to execute FIROS with PYTHON3 you need to add:
+**Optionally:** to execute FIROS with PYTHON3 you need to add:
 >PYTHONPATH+=:/FULL_PATH_TO_THIS_REPO/firos/include/genpy/
 
-**NOTE:** We try to omit this appending in the future, for an easier access to FIROS
+**NOTE:** We try to omit this appending in the future, for an easier access to FIROS with python3
 
 
 Then just execute:
