@@ -21,9 +21,14 @@ __version__ = "0.0.1a"
 __status__ = "Developement"
 
 import time
-import thread
 import requests
 import json
+try:
+    # Python 3
+    import _thread as thread
+except ImportError:
+    # Pyrhon 2
+    import thread
 
 from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 from include.constants import Constants as C
@@ -126,7 +131,7 @@ class CbSubscriber(object):
                 "entities": [
                     {
                     "id": str(robotID),
-                    "type": C.CB_CONTEXT_TYPE
+                    "type": C.CONTEXT_TYPE
                     }
                 ],
                 "condition": {
@@ -154,7 +159,7 @@ class CbSubscriber(object):
                       the topic should have "id", "type" and "TOPIC" in it
         '''
         kv = self.TypeValue()
-        ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetadata=False)
+        ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetaData=False)
         return kv
 
 

@@ -23,10 +23,11 @@ import rosgraph
 
 from include.constants import Constants as C
 
-# map_regex = re.compile(ur'^.*\/(map)[\/]*$')
-map_regex = re.compile(ur'^.*\/(map).*$')
-topic_regex = re.compile(ur'^\/([\w]+)\/*([\/\-\w]*)$')
-substitution_regex = re.compile(ur'^([\/\-\w]*)\/([\w]+)$')
+# TODO DL previously ur'' was used instead of r''? or ''? . Working? Refactor!
+#map_regex = re.compile(ur'^.*\/(map)[\/]*$')
+map_regex = re.compile(u'^.*\/(map).*$')
+topic_regex = re.compile(u'^\/([\w]+)\/*([\/\-\w]*)$')
+substitution_regex = re.compile(u'^([\/\-\w]*)\/([\w]+)$')
 robots = {}
 ROBO_TOPIC_REG = {}
 
@@ -222,13 +223,13 @@ def _getWhiteList(pubsub):
         else:
             data = mem_whitelist
 
-        whiteregex = ur''
+        whiteregex = u''
         for robot_name in data:
             for topic in data[robot_name][pubsub]:
                 whiteregex += '(/' + robot_name + '/' + topic + ')|'
         whiteregex = whiteregex[:-1]
         whiteregex += "$"
-        whiteregex = ur'^' + whiteregex
+        whiteregex = u'^' + whiteregex
         return whiteregex
     except:
         return None

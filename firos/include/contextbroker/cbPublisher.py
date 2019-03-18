@@ -22,6 +22,7 @@ __status__ = "Developement"
 
 import json
 import requests
+import os
 
 from include.logger import Log
 from include.constants import Constants as C
@@ -66,7 +67,7 @@ class CbPublisher(object):
         # if struct not initilized, intitilize it even on ContextBroker!
         if robotID not in self.posted_history:
             self.posted_history[robotID] = {}
-            self.posted_history[robotID]['type'] = C.CB_CONTEXT_TYPE
+            self.posted_history[robotID]['type'] = C.CONTEXT_TYPE
             self.posted_history[robotID]['id'] = robotID
             # Intitialize Entitiy/Robot-Construct on ContextBroker
             jsonStr = ObjectFiwareConverter.obj2Fiware(self.posted_history[robotID], ind=0,  ignorePythonMetaData=True)
@@ -122,9 +123,13 @@ class CbPublisher(object):
 
             robotID: The Robot-Id-String
         '''
-        json_path = C.PATH + "/robotdescriptions.json"
-        description_data = json.load(open(json_path))
         
+        json_path = C.PATH + "/robotdescriptions.json"
+
+        if not os.path.isfile(json_path):
+            return None
+        
+        description_data = json.load(open(json_path))
         # Check if a robotID has descriptions
         if robotID in description_data:
             if 'descriptions' in description_data[robotID]:

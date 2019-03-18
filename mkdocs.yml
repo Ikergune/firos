@@ -14,6 +14,8 @@ nav:
     - Installation & Administration:
         - Introduction: install/introduction.md
         - Installation: install/install.md
+        - Installation: install/configuration-files.md
+        - Installation: install/turtlesim-example.md
         - Deinstallation: install/deinstall.md
         - Upgrading from previous versions: install/upgrade.md
     - Deprecated Functionality: deprecated.md
