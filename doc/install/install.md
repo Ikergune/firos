@@ -54,7 +54,7 @@ You need to specifiy, which environment you want to use. In this example the env
 
 Just set it appropriately.
 
-This is the absolute minimum configuration you need to do in order to be able to start up FIROS. To actually publish and subscribe to ROS-Topics you should checkout [Configuration-Files](../user/configuration-files.md) or the [Turtlesim-Example](../user/turtlesim-example.md).
+This is the absolute minimum configuration you need to do in order to be able to start up FIROS. To actually publish and subscribe to ROS-Topics you should checkout [Configuration-Files](configuration-files.md) or the [Turtlesim-Example](turtlesim-example.md).
 
 
 
