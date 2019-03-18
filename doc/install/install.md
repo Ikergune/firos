@@ -48,7 +48,7 @@ FIROS won't start if you just run the node. Some basic configuration need to be 
 }
 ```
 
-You need to specifiy, which environment you want to use. In this example the environment-configuration `"mobile"` is shown but the environment-configuration `"local"` (also somewhere in this file) is used. Specify your own environment-configuration, or edit one to your needs. The values for `"contextbroker->adress"`, `"contextbroker->port"` and `"interface"` need to be set in every environment-configuration. The Information from the contextbroker can be retrieved by its configuration. If you are running a local instance, `"contextbroker->adress"` can also be set to `"localhost"`. You can retreive information about your network interface via:
+You need to specifiy, which environment you want to use. In this example the environment-configuration `"mobile"` is shown but the environment-configuration `"local"` (also somewhere in this file) is used. Specify your own environment-configuration, or edit one to your needs. The values for `"contextbroker->adress"`, `"contextbroker->port"` and `"interface"` need to be set in every environment-configuration. The Information from the contextbroker can be retrieved by its configuration. If you are running a local instance, `"contextbroker->adress"` can also be set to `"localhost"`. You can retrieve information about your network interface via:
 
 > ip link
 
@@ -97,7 +97,7 @@ This project uses a submodule. Depending on your git version you might need to d
 Clone this project via: 
 ```sh
 git clone --recursive https://github.com/iml130/firos.git
-# If the Folder firos/include/FiwareObjectConverter is still empty do:
+# If thretre Folder firos/include/FiwareObjectConverter is still empty do:
 git submodule update --init --recursive
 ```
 or
@@ -147,7 +147,7 @@ Installation
 
    >source ~/catkin_ws/devel/setup.bash
 
-6.  Execute "source devel/setup.bash" to allow the current command line instance to setup the sources you have inside yout `catkin_ws`
+6.  Execute "source devel/setup.bash" to allow the current command-line instance to setup the sources you have inside yout `catkin_ws`
 
 FIROS is now ready to be used!
 
@@ -225,7 +225,7 @@ Robots may have some public files so users can understand some characteristics o
 whitelist.json
 --------------
 
-Everytime FIROS is launched or whenever it gets a notification about a new robot being connected, it looks the available *topics* on the robot. this configuration file contains a list of allowed robots and topics to be connected to this particular instance of FIROS. It also defines whether the topic is a *publisher*, when FIROS transmits data to it, or a *subscriber* in case FIROS should be listening to any incoming information on that topic.
+Every time FIROS is launched or whenever it gets a notification about a new robot being connected, it looks the available *topics* on the robot. this configuration file contains a list of allowed robots and topics to be connected to this particular instance of FIROS. It also defines whether the topic is a *publisher*, when FIROS transmits data to it, or a *subscriber* in case FIROS should be listening to any incoming information on that topic.
 Names corresponding to both *robots* and *topics* can also be *regular expressions* avoiding the '^' at the beginning and '$' at the end. Here is an example:
 
 ``` json
@@ -309,7 +309,7 @@ Machine2:
 Getting Topic Types
 ===================
 
-There is also a way to request the topic type, which is usefull in order to add them to the previous *robots.json* file. The following example is based on the *Turtlesim* example of ROS available here <http://wiki.ros.org/turtlesim>. Here are the steps to follow:
+There is also a way to request the topic type, which is useful in order to add them to the previous *robots.json* file. The following example is based on the *Turtlesim* example of ROS available here <http://wiki.ros.org/turtlesim>. Here are the steps to follow:
 
 1.  Launch the `rostopic list` command. This will show all the registered topics.
 2.  Now that you know the name of the topic, just execute the following command: `rostopic info TOPIC_NAME`. It will result on something like this:

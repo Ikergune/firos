@@ -39,7 +39,7 @@ Here is the list of all possibilities for a configuration:
 
 | Attribute              | Value | Required |
 |------------------------|-------|:--------:|
-| "interface"            |  Can be `"public"` or another string of one of the interfaces given by `ip link` or by `ifconfig`. If set to `"public"`, the public IP-adress is set for the Map-Server (via [this](http://ip.42.pl/raw)). Otherwise the (specified) interface IP-adress is used.   | x |
+| "interface"            |  Can be `"public"` or another string of one of the interfaces given by `ip link` or by `ifconfig`. If set to `"public"`, the public IP-address is set for the Map-Server (via [this](http://ip.42.pl/raw)). Otherwise the (specified) interface IP-address is used.   | x |
 | "log_level"            |  Can be either `"INFO"` (Default), `"DEBUG"`, `"WARNING"`, `"ERROR"` or `"CRITICAL"`.      | |
 | "node_name"            |  This sets the ROS-Node-Name for this firos instance. the default is `"firos"`.     |
 | "ros_subscriber_queue" |  The queue-size of the `rospy.Publisher`. See more [here](http://wiki.ros.org/rospy/Overview/Publishers%20and%20Subscribers). Default is `10`  | |
@@ -67,7 +67,7 @@ The contextbroker configuration need to specifiy the  `"adress"` and  `"port"` a
 
 
 ## `robots.json`
-This configuration describes which information the FIROS-instance should publish to the Context-Broker and publish into the ROS-World. There are two different point of views: so we decided, that the publish-subscribe-terminology is at the Context-Brokers point of view. Here is an example to publish `turtlesim`s message/topic `pose`-information into the context Broker by subscribing to it. Accordingly, if the Context-Broker receives any Information about the `cmd_vel`, its data is published into the ROS-World:
+This configuration describes which information the FIROS-instance should publish to the Context-Broker and publish into the ROS-World. There exist two different point of views: so we decided, that the publish-subscribe-terminology is at the Context-Brokers point of view. Here is an example to publish `turtlesim`s message/topic `pose`-information into the context Broker by subscribing to it. Accordingly, if the Context-Broker receives any Information about the `cmd_vel`, its data is published into the ROS-World:
 
 ```json
 {
