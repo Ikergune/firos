@@ -1,16 +1,15 @@
-API
-===
+# API
 
 FIROS has several REST entry points that are used for connecting with the context broker or getting data from FIROS.
 
 You can find the old FIROS API [here](http://docs.FIROS.apiary.io/#) (OLD)
 
-GET /robots
------------
+## GET /robots
 
-Get robots handled by FIROS with their corresponding *topics*. Each *topic* contains the `name`, `type`, `role` and `structure`:
+Get robots handled by FIROS with their corresponding _topics_. Each _topic_ contains the `name`, `type`, `role` and
+`structure`:
 
-``` json
+```json
 [
     {
         "name": "turtle1",
@@ -44,71 +43,69 @@ Get robots handled by FIROS with their corresponding *topics*. Each *topic* cont
                 },
                 "pubsub": "publisher"
             }
-        ],
+        ]
     }
 ]
 ```
 
-GET /robot/NAME
----------------
+## GET /robot/NAME
 
-Gets the data which is published/subscribed by the robot in the Context-Broker. Here the contents of the Context Broker is shown.
+Gets the data which is published/subscribed by the robot in the Context-Broker. Here the contents of the Context Broker
+is shown.
 
 Here as an example: the content of `turtlesim` with its publishing topic `pose`:
 
 ```json
 {
-    "id":"turtle1",
-    "type":"ROBOT",
-    "descriptions":{
-        "type":"array",
-        "value":[
-        {
-            "type":"string",
-            "value":"http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch"
-        },
-        {
-            "type":"string",
-            "value":"http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
-        }
+    "id": "turtle1",
+    "type": "ROBOT",
+    "descriptions": {
+        "type": "array",
+        "value": [
+            {
+                "type": "string",
+                "value": "http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch"
+            },
+            {
+                "type": "string",
+                "value": "http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
+            }
         ],
-        "metadata":{
-
-        }
+        "metadata": {}
     },
-    "pose":{
-        "type":"turtlesim.Pose",
-        "value":{
-        "y":{
-            "type":"number",
-            "value":5.544444561
+    "pose": {
+        "type": "turtlesim.Pose",
+        "value": {
+            "y": {
+                "type": "number",
+                "value": 5.544444561
+            },
+            "x": {
+                "type": "number",
+                "value": 5.544444561
+            },
+            "linear_velocity": {
+                "type": "number",
+                "value": 0
+            },
+            "theta": {
+                "type": "number",
+                "value": 0
+            },
+            "angular_velocity": {
+                "type": "number",
+                "value": 0
+            }
         },
-        "x":{
-            "type":"number",
-            "value":5.544444561
-        },
-        "linear_velocity":{
-            "type":"number",
-            "value":0
-        },
-        "theta":{
-            "type":"number",
-            "value":0
-        },
-        "angular_velocity":{
-            "type":"number",
-            "value":0
-        }
-        },
-        "metadata":{
-            "dataType":{
-                "type":"dataType",
-                "value":{
-                    "y":"float32",
-                    "x":"float32",
-                    "linear_velocity":"float32",
-                    "theta":"float32",
-                    "angular_velocity":"float32"
+        "metadata": {
+            "dataType": {
+                "type": "dataType",
+                "value": {
+                    "y": "float32",
+                    "x": "float32",
+                    "linear_velocity": "float32",
+                    "theta": "float32",
+                    "angular_velocity": "float32"
                 }
             }
         }
@@ -116,33 +113,29 @@ Here as an example: the content of `turtlesim` with its publishing topic `pose`:
 }
 ```
 
+## POST /firos
 
-POST /firos
------------
+This API handles the subscription data of the context broker.
 
-This API handles the subscription data of the context broker. 
+## POST /robot/connect
 
-POST /robot/connect
--------------------
+This API makes FIROS connecting to new robots in case their names and topics match the ones allowed on the
+_whitelist.json_
 
-This API makes FIROS connecting to new robots in case their names and topics match the ones allowed on the *whitelist.json*
+## POST /robot/disconnect/NAME
 
-POST /robot/disconnect/NAME
---------------------------
+This API forces FIROS to disconnect from the robot specified by the _NAME_ parameter. It will also delete any connection
+and entity associated to the particular robot on the Context Broker.
 
-This API forces FIROS to disconnect from the robot specified by the *NAME* parameter. It will also delete any connection and entity associated to the particular robot on the Context Broker.
+# Currently untested POST-Operations:
 
-
-Currently untested POST-Operationes:
-----
 These Operations might work, but are not tested currently.
 
-POST /whitelist/write
----------------------
+## POST /whitelist/write
 
-This API overwrites or creates entries in the robot *whitelist*. This can be done by sending the following data:
+This API overwrites or creates entries in the robot _whitelist_. This can be done by sending the following data:
 
-``` json
+```json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -159,9 +152,9 @@ NOTE: In case you want to keep any element, it must be sent along with the ones 
 
 EXAMPLE:
 
-Take this *whitelist.json* as a starting point:
+Take this _whitelist.json_ as a starting point:
 
-``` json
+```json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -172,7 +165,7 @@ Take this *whitelist.json* as a starting point:
 
 Now, the following command is sent:
 
-``` json
+```json
 POST /whitelist/write
 {
     "turtle\\w+": {
@@ -182,9 +175,9 @@ POST /whitelist/write
 }
 ```
 
-The resulting *whitelist* will be as follows:
+The resulting _whitelist_ will be as follows:
 
-``` json
+```json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel2"],
@@ -193,12 +186,11 @@ The resulting *whitelist* will be as follows:
 }
 ```
 
-POST /whitelist/remove
-----------------------
+## POST /whitelist/remove
 
-This API removes elements from the *whitelist*. The format is as follows:
+This API removes elements from the _whitelist_. The format is as follows:
 
-``` json
+```json
 {
     "turtle\\w+": {
         "publisher": [],
@@ -213,9 +205,9 @@ This API removes elements from the *whitelist*. The format is as follows:
 
 EXAMPLE:
 
-Take this *whitelist.json* as a starting point:
+Take this _whitelist.json_ as a starting point:
 
-``` json
+```json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -230,7 +222,7 @@ Take this *whitelist.json* as a starting point:
 
 Now, the following json is sent:
 
-``` json
+```json
 POST /whitelist/remove
 {
     "turtle\\w+": {
@@ -244,9 +236,9 @@ POST /whitelist/remove
 }
 ```
 
-The resulting *whitelist* will look as follows:
+The resulting _whitelist_ will look as follows:
 
-``` json
+```json
 {
     "turtle\\w+": {
         "publisher": ["cmd_vel"],
@@ -259,9 +251,8 @@ The resulting *whitelist* will look as follows:
 }
 ```
 
-POST /whitelist/restore
------------------------
+## POST /whitelist/restore
 
-This API restores the *whitelist* file to its initial state.
+This API restores the _whitelist_ file to its initial state.
 
 Ent-to-end tests
