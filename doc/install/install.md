@@ -7,17 +7,17 @@ You might also consider to set up a [contextbroker](https://fiware-orion.readthe
 ## Cloning this Project
 After you have set up ROS and created a catkin-workspace you can finally clone this repository and create the FIROS-Node as follows:
 
-> cd "catkin_workspace_base_directory"/src
+```shell
+cd "catkin_workspace_base_directory"/src
+git clone --recursive https://github.com/iml130/firos.git
+cd "catkin_workspace_base_directory"
+catkin_make
+```
 
-> git clone --recursive https://github.com/iml130/firos.git
-
-> cd "catkin_workspace_base_directory"
-
-> catkin_make
 
 **Note**:
-* FIROS is using a git submodule (which is required to run properly). Newer versions of git can clone submodules via the `--recursive` option
-* Also check wheather your local submodule-folder (currently in `firos/include`) contains files to be sure that everything was cloned.
+*   FIROS is using a git submodule (which is required to run properly). Newer versions of git can clone submodules via the `--recursive` option
+*   Also check wheather your local submodule-folder (currently in `firos/include`) contains files to be sure that everything was cloned.
 
 
 ## Basic Configuration of FIROS
@@ -125,14 +125,14 @@ Requirements
 Installation
 ------------
 
-1.  Make sure you have set your working space (http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment)
+1.  Make sure you have set [your working space](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment)
 2.  Open a Terminal and navigate to the ROS workspace you want to use. If you just followed the ROS environment tutorial, it will be ~/catkin_ws.
 
    >cd ~/catkin_ws/src
 
 3.  Clone the FIROS git repository into your ROS workspace.
 
-   >git clone --recursive https://github.com/iml130/FIROS.git
+   >git clone --recursive git@github.com:iml130/firos.git
 
 4.  Build the FIROS package with the following commands. This will create a devel and build folder under your workspace.
 
@@ -173,7 +173,7 @@ This file contains the configuration related to FIROS launching environment. Her
 -   *interface*: Network configuration of the card in use
     -   *public*: Public IP. Do not forget to redirect the proper ports in your network
     -   *wlan0, et0, tun0*, etc: Different network interface configuration.
-    - If you experience problems with the public interface, feel free to set the interface-name directly, like *wlan0*, *enp0*, *eth0*. etc.. 
+    -   If you experience problems with the public interface, feel free to set the interface-name directly, like *wlan0*, *enp0*, *eth0*. etc.. 
 -   *log_level*: It represents the verbosity of the logging system for FIROS. Available options are as follows: *"NONE", "INFO", "DEBUG" ,"WARNING", "ERROR"* and *"CRITICAL"*
 
 Here is an example of a *config.json* file for a *local* environment:

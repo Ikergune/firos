@@ -1,6 +1,6 @@
 # Incubated FIROS Roadmap.
 
-This product is planed to become an Incubated FIWARE Generic Enabler. If you would like to learn about the overall
+This product is planned to become an Incubated FIWARE Generic Enabler. If you would like to learn about the overall
 Roadmap of FIWARE, please check section "Roadmap" on the FIWARE Catalogue.
 
 ## Introduction
