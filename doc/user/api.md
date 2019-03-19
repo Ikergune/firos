@@ -3,7 +3,7 @@ API
 
 FIROS has several REST entry points that are used for connecting with the context broker or getting data from FIROS.
 
-You can find FIROS API at http://docs.FIROS.apiary.io/# (OLD)
+You can find the old FIROS API [here](http://docs.FIROS.apiary.io/#) (OLD)
 
 GET /robots
 -----------
