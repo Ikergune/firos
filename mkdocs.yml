@@ -14,7 +14,7 @@ extra_css:
   ]
 
 
-pages:
+nav:
     - Home: index.md
     - Getting Started: start.md
     - User & Programmers Manual: 
@@ -30,3 +30,4 @@ pages:
         - Upgrading from previous versions: install/upgrade.md
     - Usage: usage.md
     - Deprecated Functionality: deprecated.md
+    - Roadmap: roadmap.md
