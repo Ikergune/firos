@@ -28,7 +28,6 @@ from include.logger import Log
 from include.constants import Constants as C 
 from include.libLoader import LibLoader
 from include.ros.rosConfigurator import RosConfigurator
-from include.ros.dependencies.third_party import *
 
 # PubSub Handlers
 from include.contextbroker.cbPublisher import CbPublisher
@@ -95,18 +94,7 @@ def loadMsgHandlers(robot_data):
             # Load specific message from robot_data
             # TODO DL maybe change this in config to ._type values? Refactor!
             msg = str(robot_data[robotID]['topics'][topic]['msg'])
-            if type(msg) is dict:
-                # TODO DL Dead Code?
-                _topic_name = robotID + ".msg." + robotID
-                module = LibLoader.loadFromFile(os.path.join(TOPIC_BASE_PATH, robotID+topic+".py"))
-                theclass = getattr(module, topic)
-            else:
-                _final_name = msg.split('.')[-1]
-                _topic_name = str(msg)
-                if _final_name in globals():
-                    theclass = globals()[_final_name] 
-                else:
-                    theclass = LibLoader.loadFromSystem(msg)
+            theclass = LibLoader.loadFromSystem(msg, robotID, topic)
             
             # Add specific message in struct to not load it again later.
             if theclass._type not in ROS_MESSAGE_CLASSES:

@@ -54,10 +54,8 @@ class CbSubscriber(object):
     # Saves the subscriptions IDs returned from ContextBroker.
     # Follwoing Structure: subscriptionIds[ROBOT_ID][TOPIC] returns a sub-Id in String
     subscriptionIds = {}
-
     CB_BASE_URL = None
     FIROS_NOTIFY_URL = None
-
     def __init__(self):
         ''' Lazy Initialization of CB_BASE_URL and FIROS_NOTIFY_URL
         '''
@@ -102,7 +100,10 @@ class CbSubscriber(object):
             response = requests.post(self.CB_BASE_URL + "/v2/subscriptions", data=jsonData, headers={'Content-Type': 'application/json'})
             self._checkResponse(response, created=True, robTop=(robotID, topic))
 
-            newSubID = response.headers['Location'] # <- get subscription-ID
+            if 'Location' in response.headers:
+                newSubID = response.headers['Location'] # <- get subscription-ID
+            else:
+                Log("WARNING",  "Firos was not able to subscribe to topic: {} for robot {}".format(topic, robotID))
 
             # Unsubscribe
             if robotID in self.subscriptionIds and topic in self.subscriptionIds[robotID]:
@@ -114,7 +115,7 @@ class CbSubscriber(object):
 
             # Wait
             time.sleep(int(C.CB_SUB_LENGTH * C.CB_SUB_REFRESH)) # sleep Length * Refresh-Rate (where 0 < Refresh-Rate < 1)
-            Log("INFO", "Refreshing Subscription for " + robotID + " and topics: " + str(topic))
+            Log("INFO", "Refreshing Subscription for " + robotID + " and topic: " + str(topic))
 
 
     def subscribeJSONGenerator(self, robotID, topic):
