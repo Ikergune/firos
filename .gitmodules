@@ -3,4 +3,4 @@
 	url = https://github.com/iml130/FiwareObjectConverter.git
 [submodule "firos/include/genpy"]
 	path = firos/include/genpy
-	url = git@github.com:ros/genpy.git
+	url = https://github.com/ros/genpy.git
