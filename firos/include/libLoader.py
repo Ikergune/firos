@@ -110,10 +110,9 @@ class LibLoader:
             if retcode == 1:
                 Log("WARNING", "Could not load message {}/{}. Maybe it references other missing messages?".format(module_name, module_msg))
             elif retcode == 0:
-                # TODO DL make Python3 compatible!
-                Log("INFO", "Message {}/{}.msg succesfully loaded.".format(module_name, module_msg))
                 module = imp.load_source(module_msg, msgsFold + module_name + "/_" + module_msg + ".py")
                 clazz = getattr(module, module_msg)
+                Log("INFO", "Message {}/{}.msg succesfully loaded.".format(module_name, module_msg))
                 return clazz 
 
 
@@ -125,6 +124,7 @@ class LibLoader:
                 type_name = rostopic.get_topic_type('/{}/{}'.format(robotID, topic), blocking=False)[0]
                 if type_name:
                     clazz = roslib.message.get_message_class(type_name)
+                    Log("INFO", "Message {}/{}.msg loaded via roslib.message!".format(module_name, module_msg))
                     return clazz
             except Exception:    
                 pass
