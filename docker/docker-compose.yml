@@ -1,0 +1,44 @@
+services: 
+  firos: 
+    build: 
+      context: ".."
+      dockerfile: docker/Dockerfile
+    container_name: firos
+    depends_on: 
+      - orion
+      - rosmaster
+    environment: 
+      - PYTHONUNBUFFERED=1
+      - "ROS_MASTER_URI=http://rosmaster:11311"
+    image: "firos:localbuild"
+    ports: 
+      - "10100:10100"
+    volumes: 
+      - "./docker-config/robots.json:/catkin_ws/src/firos/config/robots.json"
+      - "./docker-config/whitelist.json:/catkin_ws/src/firos/config/whitelist.json"
+
+  mongo: 
+    command: "--nojournal"
+    container_name: mongo
+    image: "mongo:3.4"
+
+  orion: 
+    command: "-dbhost mongo"
+    container_name: orion
+    image: fiware/orion
+    links: 
+      - mongo
+    ports: 
+      - "1026:1026"
+
+  rosmaster: 
+    command: 
+      - roscore
+    container_name: rosmaster
+    hostname: rosmaster
+    image: "ros:melodic-ros-core"
+    ports: 
+      - "11311:11311"
+
+      
+version: "3"

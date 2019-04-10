@@ -1,0 +1,14 @@
+{
+	"turtle1": {
+		"topics": {
+			"cmd_vel": {
+				"msg": "geometry_msgs.msg.Twist",
+				"type": "publisher"
+			},
+			"pose": {
+				"msg": "turtlesim.msg.Pose",
+				"type": "subscriber"
+			}
+		}
+	}
+}
