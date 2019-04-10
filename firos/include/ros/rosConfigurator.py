@@ -21,6 +21,7 @@ import socket
 import rostopic
 import rosgraph
 
+from include.logger import Log
 from include.constants import Constants as C
 
 # TODO DL previously ur'' was used instead of r''? or ''? . Working? Refactor!
@@ -178,6 +179,8 @@ def setWhiteList(additions, deletions, restore=False):
         try:
             json_path = C.PATH + "/whitelist.json"
             mem_whitelist = json.load(open(json_path))
+            if len(mem_whitelist) == 0:
+                Log("WARNING", "The 'whitelist.json' was not set. You might want to use a whitelist to avoid subscribing to every existing topic!")
         except:
             mem_whitelist = {}
     if additions:
@@ -220,6 +223,8 @@ def _getWhiteList(pubsub):
         if mem_whitelist is None:
             json_path = C.PATH + "/whitelist.json"
             data = json.load(open(json_path))
+            if len(data) == 0:
+                Log("WARNING", "The 'whitelist.json' was not set. You might want to use a whitelist to avoid subscribing to every existing topic!")
         else:
             data = mem_whitelist
 

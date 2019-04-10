@@ -177,7 +177,7 @@ def listRobots(request, action):
         TODO DL, currently a List of containing 'topics' with a list of topics is returned
         Better would be a list of robotIds with their corersponding topics and types
     '''
-    robots = getRobots(False, True)
+    robots = getRobots(False)
     data = []
     for robot_name in robots.keys():
         robot_data = {"name": robot_name, "topics": []}

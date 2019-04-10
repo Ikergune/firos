@@ -14,6 +14,7 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import sys
 import json
 import copy
 import traceback
@@ -23,27 +24,38 @@ from include.ros.rosConfigurator import RosConfigurator
 from include.constants import Constants as C
 
 
-def getRobots(refresh=False, withJson=True):
-    ## \brief Get robots managed by firos
-    # \param Refresh the robot list
-    # \param Merge the robots with the configurtation JSON
-    try:
-        robots = copy.deepcopy(RosConfigurator.systemTopics(refresh))
-        if withJson:
-            robots_json = getRobotsByJson()
-            for robot_name in robots_json:
-                robot_name = str(robot_name)
-                if robot_name not in robots:
-                    robots[robot_name] = {
-                        "topics": {}
-                    }
-                for topic_name in robots_json[robot_name]["topics"]:
-                    topic = robots_json[robot_name]["topics"][topic_name]
+def getRobots(refresh=False):
+    ''' This retrieves the current configuration from FIROS.
+        Here we load the `robots.json` and the 'whitelist.json'
 
-                    robots[robot_name]["topics"][str(topic_name)] = {
-                        "msg": str(topic["msg"]) if type(topic["msg"]) is str else topic["msg"],
-                        "type": str(topic["type"])
-                    }
+        In case the `whitelist.json` is Empty: We do get the current robots 
+        from ROS and are adding them as subscribers (by default). In a small
+        ROS-World this usually is no problem. But in an environment with many 
+        robots we might send a lot of data. 
+    '''
+    try:
+        #Retrieves the whitelist.json. If it does not exists, it returns all topics.
+        robots = copy.deepcopy(RosConfigurator.systemTopics(refresh))    
+        #Retrieves the robots.json.
+        robots_json = getRobotsByJson()
+        if len(robots_json) == 0: 
+            Log("ERROR", "The file 'robots.json' is either empty or does not exist!\n\nExiting")
+            sys.exit(1)
+        
+        # Merge robots.json into whitelist.json (overwrite if neccessary)
+        for robot_name in robots_json:
+            robot_name = str(robot_name)
+            if robot_name not in robots:
+                robots[robot_name] = {
+                    "topics": {}
+                }
+            for topic_name in robots_json[robot_name]["topics"]:
+                topic = robots_json[robot_name]["topics"][topic_name]
+
+                robots[robot_name]["topics"][str(topic_name)] = {
+                    "msg": str(topic["msg"]) if type(topic["msg"]) is str else topic["msg"],
+                    "type": str(topic["type"])
+                }
         return robots
 
     except Exception as e:
@@ -53,7 +65,8 @@ def getRobots(refresh=False, withJson=True):
 
 
 def getRobotsByJson():
-    ## \brief Get robots in the JSON file
+    ''' Load the 'robots.json'-File 
+    '''
     try:
         json_path = C.PATH + "/robots.json"
         return json.load(open(json_path))

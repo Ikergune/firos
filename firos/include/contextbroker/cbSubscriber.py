@@ -72,7 +72,7 @@ class CbSubscriber(object):
         # If not already subscribed, start a new thread which handles the subscription for each topic for an robot.
         # And only If the topic list is not empty!
         if robotID not in self.subscriptionIds and topicList:
-            Log("INFO", "Subscribing on Context-Broker to " + robotID + " and topics: " + str(topicList))
+            Log("INFO", "Subscribing on Context-Broker to " + robotID + " and topics: " + str(list(topicList)))
             self.subscriptionIds[robotID] = {}
             for topic in topicList:
                 thread.start_new_thread(self.subscribeThread, (robotID, topic)) #Start Thread via subscription         

@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
         #Topic Handler Routine:
         initPubAndSub()
-        loadMsgHandlers(confManager.getRobots(True, True))
+        loadMsgHandlers(confManager.getRobots(True))
         createConnectionListeners()
 
         Log("INFO", "\nPress Ctrl+C to Exit\n")

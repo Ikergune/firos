@@ -131,6 +131,6 @@ class LibLoader:
 
 
         ### Message could not be loaded or the regex does not match
-        Log("ERROR", "Unable to load the message: {} on this system.".format(module_msg))
+        Log("ERROR", "Unable to load the message: {} on this system.".format(msgType))
         exit()
 
