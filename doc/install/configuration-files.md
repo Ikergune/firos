@@ -1,6 +1,6 @@
 # Configuration-Files
 
-Firos needs 3 different configuration files inside the Configuration-Folder. An example Configuration-Folder can be
+FIROS needs 3 different configuration files inside the Configuration-Folder. An example Configuration-Folder can be
 found in the `config`-Folder at the base of this repository. It needs to contain the files `config.json`, `robots.json`
 and `whitelist.json` (optionally: `robotdescriptions.json`).
 
@@ -47,7 +47,7 @@ Here is the list of all possibilities for a configuration:
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------: |
 | "interface"            | Can be `"public"` or another string of one of the interfaces given by `ip link` or by `ifconfig`. If set to `"public"`, the public IP-address is set for the Map-Server (via [this](http://ip.42.pl/raw)). Otherwise the (specified) interface IP-address is used. |    x     |
 | "log_level"            | Can be either `"INFO"` (Default), `"DEBUG"`, `"WARNING"`, `"ERROR"` or `"CRITICAL"`.                                                                                                                                                                               |          |
-| "node_name"            | This sets the ROS-Node-Name for this firos instance. the default is `"firos"`.                                                                                                                                                                                     |
+| "node_name"            | This sets the ROS-Node-Name for this FIROS instance. the default is `"firos"`.                                                                                                                                                                                     |
 | "ros_subscriber_queue" | The queue-size of the `rospy.Publisher`. See more [here](http://wiki.ros.org/rospy/Overview/Publishers%20and%20Subscribers). Default is `10`                                                                                                                       |          |
 | "context_type"         | This sets the context type of an entity (the `type`-value of the base-entity). Default is `"ROBOT"` but can be changed if necessary                                                                                                                                |          |
 | "rosbridge_port"       | Changes the ROS-Port, where to listen. Default is `9090`                                                                                                                                                                                                           |          |
@@ -131,11 +131,36 @@ needed ones, which need to be displayed from/or need to obtain information on th
 }
 ```
 
+The Information given by the `robots.json` is appended/replaced to the `whitelist.json` which is described below.
+
 ---
 
 ## `whitelist.json`
 
-TODO WIP
+As the name suggests, the `whitelist.json` functions as a whitelist to let FIROS know which messages it should keep
+track of. Given an environment where already ROS-Applications are running, FIROS will automatically subscribe to all
+available topics if no `whitelist.json` is given. In a small ROS-World with few ROS-Applications, this can be desirable.
+But this can cause problems in a ROS-World, where many ROS-Applications are running. To let FIROS only subscribe to
+specific topics, the following configuration can be used:
+
+```json
+{
+    "turtle2": {
+        "publisher": ["cmd_vel"],
+        "subscriber": ["pose"]
+    }
+}
+```
+
+This only allows FIROS to subscribe/publish to `"/turtle2/pose"` and `"turtle2/cmd_vel"` plus the extra-configuration
+given in `robots.json` which in the above example would also be `"/turtle1/pose"` and `"turtle1/cmd_vel"`.
+
+**Note**, that an empty configuration of `whitelist.json` (`-> {}`) will also behave as an
+non-existent-configuration-file. Usually for normal usecases, the `whitelist.json` contains the same information as the
+`robots.json` and should be sufficient.
+
+**Note:** The FIROS only captures running ROS-Applications at the startup. All applications started after FIROS will not
+be recognized.
 
 ---
 

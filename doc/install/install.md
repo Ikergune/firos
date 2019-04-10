@@ -1,9 +1,9 @@
 # Installion From Scratch With ROS and catkin
 
 To Install Firos you first need to follow this [Installaion Instuctions](http://wiki.ros.org/ROS/Installation). ROS is
-needed for FIROS, since it imports `ROS-messages`. You also need to
-[create a catkin-workspace](http://wiki.ros.org/catkin/Tutorials/create_a_workspace) to be able to create a ROS-Node out
-of FIROS.
+needed for FIROS, since it imports `ROS-messages` and uses other specific `ROS-Executables` like `rospy` or `rostopic`.
+You need to [create a catkin-workspace](http://wiki.ros.org/catkin/Tutorials/create_a_workspace) to be able to create a
+ROS-Node out of FIROS.
 
 You might also consider to set up a [contextbroker](https://fiware-orion.readthedocs.io/en/master/), so that FIROS can
 publish and subscribe on it. If a contextbroker is not available you can quickly set one up via
@@ -24,10 +24,10 @@ catkin_make
 
 **Note**:
 
--   FIROS uses a git submodule (which is required to run properly). Newer versions of git can clone submodules via the
+-   FIROS uses git submodules (which is required to run properly). Newer versions of git can clone submodules via the
     `--recursive` option
--   Also check whether your local submodule-folder (currently in `firos/include`) contains files to be sure that
-    everything was cloned.
+-   Also check whether your local submodule-folder (currently in `firos/include/FiwareObjectConvert` amd
+    `firos/include/genpy`) contains files to be sure that everything was cloned.
 
 ## Basic Configuration of FIROS
 
@@ -86,11 +86,9 @@ or
 
 to execute FIROS with Python2
 
-**Optionally:** to execute FIROS with PYTHON3 you need to add:
+Firos should function via Python3. You can try it via:
 
-> PYTHONPATH+=:/FULL_PATH_TO_THIS_REPO/firos/include/genpy/
-
-**NOTE:** We try to omit this appending in the future, for an easier access to FIROS with python3
+> python3 firos/core.py
 
 ## Troubleshooting
 
@@ -102,151 +100,95 @@ it installed. If not use your package-manager like `apt`, `pacman`, `pip` , `...
 
 # Installation via Docker
 
-## WIP
+There exists a FIROS-Docker-Version which currently can be build locally. This installation only requires
+[Docker](https://docs.docker.com/install/).
+
+## Cloning this Project
+
+During or after the Docker-Installation you need to clone this repository via:
+
+```shell
+git clone --recursive https://github.com/iml130/firos.git
+```
+
+Please check whether the folders `firos/include/FiwareObjectConverter` and `firos/include/genpy` contains any content.
+If not, the submodules were not initialized successfully and you might need to take a look at
+[this](https://git-scm.com/docs/git-submodule)
+
+After you cloned this repository you have two options to start up FIROS:
+
+### Using `docker build`
+
+Beginning from the base of this repository, FIROS can be built via docker using:
+
+> docker build -f ./docker/Dockerfile --tag firos:localbuild .
+
+This will create an image with a pre-configured `config.json` which requires the Orion-ContextBroker. Before running
+this image, you need to specify a `robots.json`. Information on how to create the configuration-files can be found in
+[Configuration-Files](configuration-files.md) or in the [Turtlesim-Example](turtlesim-example.md). An
+example-pre-configured configuration for docker can be found in `firos/docker/docker-config`
+
+Assuming you have a network `finet` (`-> "firos-net"`): You need to start a roscore, MongoDB, the Orion-ContextBroker
+and afterwards FIROS like this:
+
+```shell
+# Starting roscore
+docker run -it --net finet --name rosmaster ros:melodic-ros-core roscore
+
+# Starting mongodb
+docker run --net finet --name mongodb mongo:3.4
+
+# Starting Orion-ContextBroker and link to mongodb
+docker run -it --rm --net finet --name orion --link mongodb -p 1026:1026 fiware/orion -dbhost mongodb
+
+# Starting firos (Set the paths for the needed Configuration-Files here!)
+docker run -it --net finet --name firos \
+    -p 10100:10100 \
+    --env ROS_MASTER_URI=http://rosmaster:11311 \
+    -v CONFIG_FILE_ROBOTS:/catkin_ws/src/firos/config/robots.json \
+    -v CONFIG_FILE_WHITELIST:/catkin_ws/src/firos/config/whitelist.json \
+    firos:localbuild
+```
+
+After this FIROS is ready to publish data and subscribe onto the local Orion-ContextBroker.
+
+### Using `docker-compose`
+
+The `docker-compose.yml` can be located inside the `docker`-folder at the base of this repository. Before executing the
+compose-file you need to configure the configurations-files, which this docker-image uses in
+`firos/docker/docker-config`. Please have a look at [Configuration-Files](configuration-files.md) or the
+[Turtlesim-Example](turtlesim-example.md). The folder contains a basic example with `turtlesim` and can be used as is.
+
+If everything is set up, execute inside the `docker`-folder:
+
+> docker-compose up
+
+This launches the Orion-Context-Broker (named `orion`), a `roscore`-Instance (named `rosmaster`) and FIROS (named
+`firos`) with its specific configuration inside `docker-config` with a netowrk (like `docker_default`). The Ports:
+`10100` and `1026` are also exposed to the host-machine.
+
+### Adding another ROS-Application into this Environment
+
+In order to add another ROS-Application into this environment you can either write another `docker-compose.yml` which
+includes the environment-variable `"ROS_MASTER_URI=http://rosmaster:11311"` with its correspoding network
+`net: "docker_default"` or call the correspoding `docker run` command:
+
+```shell
+docker run --net docker_default --name YOUR_NAME --env ROS_MASTER_URI=http://rosmaster:11311 YOUR_IMAGE:NAME_HERE
+```
 
 ---
 
 # Old Installation-Information
 
-# Cloning This Project
+Below are the old Installation and Configuration-Information of FIROS which were taken and partially appended from
+[the old FIROS](https://github.com/Ikergune/firos).
 
-This project uses a submodule. Depending on your git version you might need to do the following:
-
-Clone this project via:
-
-```sh
-git clone --recursive https://github.com/iml130/firos.git
-# If the Folder firos/include/FiwareObjectConverter is still empty do:
-git submodule update --init --recursive
-```
-
-or
-
-```sh
-git clone https://github.com/iml130/firos.git
-git submodule update --init --recursive
-```
-
-The `FiwareObejctConverter` is our own `Python-Object<->Fiware-JSON`-Converter.
-
-Also, make sure you are using the correct version of the submodule. You can read more about git submodules
-[here](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
-
-# Installing FIROS via `catkin_make`
-
-## Requirements
-
--   Ubuntu
--   Python 2.7 or greater
--   ROS Hydro or greater <http://wiki.ros.org/es/ROS/Installation>
-
-## Installation
-
-1.  Make sure you have set
-    [your working space](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment)
-2.  Open a Terminal and navigate to the ROS workspace you want to use. If you just followed the ROS environment
-    tutorial, it will be ~/catkin_ws.
-
-> cd ~/catkin_ws/src
-
-3.  Clone the FIROS git repository into your ROS workspace.
-
-> git clone --recursive git@github.com:iml130/firos.git
-
-4.  Build the FIROS package with the following commands. This will create a devel and build folder under your workspace.
-
-> cd ~/catkin_ws catkin_make
-
-5.  For convenience, you may wish to source your setup.sh script from your .bashrc so that your environment is ready as
-    soon as you log in. e.g.
-
-> echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
-
-If you don't want to edit you `.bashrc`, you can also just execute:
-
-> source ~/catkin_ws/devel/setup.bash
-
-6.  Execute "source devel/setup.bash" to allow the current command-line instance to setup the sources you have inside
-    yout `catkin_ws`
-
-FIROS is now ready to be used!
+**Note:** This Information is out-dated and only exists, because not all information has been migrated.
 
 # Configuring FIROS
 
 FIROS has several configuration files located at _src/FIROS/config_.
-
-## config.json
-
-This file contains the configuration related to FIROS launching environment. Here is a description of each parameter:
-
--   _environment_: This parameter distinguishes which configuration set inside this json should be used. FIROS will use
-    an environment's configuration based this value, but there can be as many environments as you want.
--   _server_: This contains the Port of the FirosServer (The Port, where the `GET`- and `POST`-Operations can be
-    executed)
--   _contextbroker_: Contains information related to the Context broker configuration
-    -   _address_: Context broker's (IP-) address
-    -   _port_: Context broker's port
-    -   _subscription_: Context broker's subscription information
-        -   _throttling_: The throttling in seconds. The contextbroker sends another update of the entity after the
-            `throttling`-seconds have passed
-        -   _subscription_length_: The subscription expiration time (in seconds)
-        -   _subscription_refresh_delay_: The subscription refresh delay (between 0 and 1) to re-subscribe to the
-            contextbroker -> After _subscription_length_ \* _subscription_refresh_delay_ seconds the subscription is
-            refreshed.
--   _interface_: Network configuration of the card in use
-    -   _public_: Public IP. Do not forget to redirect the proper ports in your network
-    -   _wlan0, et0, tun0_, etc: Different network interface configuration.
-    -   If you experience problems with the public interface, feel free to set the interface-name directly, like
-        _wlan0_, _enp0_, _eth0_. etc..
--   _log_level_: It represents the verbosity of the logging system for FIROS. Available options are as follows: _"NONE",
-    "INFO", "DEBUG" ,"WARNING", "ERROR"_ and _"CRITICAL"_
-
-Here is an example of a _config.json_ file for a _local_ environment:
-
-```json
-{
-    "environment": "local",
-
-    "local": {
-        "server": {
-            "port": 10100
-        },
-        "contextbroker": {
-            "address": "192.168.0.101",
-            "port": 1026,
-            "subscription": {
-                "throttling": 3,
-                "subscription_length": 300,
-                "subscription_refresh_delay": 0.9
-            }
-        },
-        "log_level": "INFO",
-        "interface": "public"
-    }
-}
-```
-
-## robotdescriptions.json
-
-Robots may have some public files so users can understand some characteristics or even use their devices. All the
-references contained in this file can be published on the Context Broker; to do so, just follow the next example:
-
-```json
-{
-    "turtle1": {
-        "descriptions": [
-            "http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch",
-            "http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
-        ]
-    },
-    "youbot": {
-        "descriptions": [
-            "http://wiki.ros.org/ROS/Tutorials/UnderstandingServicesParams",
-            "http://wiki.ros.org/ROS/Tutorials/UsingRqtconsoleRoslaunch"
-        ]
-    }
-}
-```
 
 ## whitelist.json
 
@@ -268,75 +210,6 @@ is an example:
         "subscriber": [".*move_base/result"]
     }
 }
-```
-
-## robots.json
-
-It is also possible to force some robot connections. This is done by adding the robot name, its topics and roles to the
-_robots.json_ file. The role parameter must be the same as the on in the _whitelist.json_ file and each topic must also
-contain a _type_ parameter to define its role. The next file is an example of this configuration:
-
-```json
-{
-    "robot1": {
-        "topics": {
-            "cmd_vel_mux/input/teleop": {
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            },
-            "move_base/goal": {
-                "msg": "move_base_msgs.msg.MoveBaseActionGoal",
-                "type": "publisher"
-            },
-            "move_base/result": {
-                "msg": "move_base_msgs.msg.MoveBaseActionResult",
-                "type": "subscriber"
-            }
-        }
-    },
-    "turtle1": {
-        "topics": {
-            "cmd_vel": {
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            },
-            "pose": {
-                "msg": "turtlesim.msg.Pose",
-                "type": "subscriber"
-            }
-        }
-    }
-}
-```
-
-The `type`'s Publish and Subscribe are always from Context Broker's point of view. If subscribed, the framework pushes
-ROS-Information to the Context-Broker. ROS-Messages to the robots are sent to the contextbroker by the `type` publish.
-Thus a communication betweeen robots can be established through the Context-Broker. Even Other Non-ROS-Application can
-control robots via the Context-Broker.
-
-Here is an Example-Configuration between the communication of `turtlesim` on _Machine1_ and `teleop_twist_keyboard` on
-_Machine2_:
-
-```json
-Machine1:
-{
-	"turtle1": {
-		"topics": {
-			"cmd_vel": {
-				"msg": "geometry_msgs.msg.Twist",
-				"type": "publisher"
-			}
-}
-Machine2:
-{
-	"turtle1": {
-		"topics": {
-			"cmd_vel": {
-				"msg": "geometry_msgs.msg.Twist",
-				"type": "Subscriber"
-			}
-}
-
 ```
 
 # Getting Topic Types
