@@ -8,5 +8,11 @@ you might have created throughout the usage of FIROS.
 To remove FIROS from Docker you can just execute:
 
 ```shell
-docker rmi iml/firos
+docker rmi firos:localbuild
+```
+
+or
+
+```shell
+docker rmi firos:latest
 ```

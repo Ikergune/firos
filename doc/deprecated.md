@@ -1,5 +1,13 @@
-Deprecated features are features that this MODULE stills support but that are not maintained or evolved any longer. In
-particular (WIP):
+# Deprecated Features
 
--   Feature 1
--   Feature 2
+## REST-API `whitelist` on FIROS
+
+FIROS currently has a REST-API, where someone can manipulate the whitelist of an FIROS-instance (see:
+[API](user/api.md)). We are currently not planning to expand this functionality, because the `whitelist.json` is
+definitely known prior and is overwritten by the configuration in `robots.json`.
+
+Specifically, the following methods are provided as is and are not maintained:
+
+-   `FIROS:/whitelist/write`
+-   `FIROS:/whitelist/remove`
+-   `FIROS:/whitelist/restore`

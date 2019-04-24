@@ -6,13 +6,12 @@ You can find the old FIROS API [here](http://docs.FIROS.apiary.io/#) (OLD)
 
 ## GET /robots
 
-Get robots handled by FIROS with their corresponding _topics_. Each _topic_ contains the `name`, `type`, `role` and
-`structure`:
+Get robots handled by FIROS with their corresponding _topics_. Each _topic_ contains the `name`, `type`, `pubsub`-Role
+and `structure` as follows:
 
 ```json
 [
     {
-        "name": "turtle1",
         "topics": [
             {
                 "type": "turtlesim.msg.Pose",
@@ -43,7 +42,8 @@ Get robots handled by FIROS with their corresponding _topics_. Each _topic_ cont
                 },
                 "pubsub": "publisher"
             }
-        ]
+        ],
+        "name": "turtle1"
     }
 ]
 ```
@@ -58,19 +58,19 @@ Here as an example: the content of `turtlesim` with its publishing topic `pose`:
 ```json
 {
     "id": "turtle1",
-    "type": "ROBOT",
+    "type": "MyROBOT",
     "descriptions": {
-        "type": "array",
-        "value": [
-            {
-                "type": "string",
-                "value": "http://wiki.ros.org/ROS/Tutorials/UsingRxconsoleRoslaunch"
+        "type": "object",
+        "value": {
+            "MySanatiyValue": {
+                "type": "number",
+                "value": 1
             },
-            {
+            "SomeReferenceLink": {
                 "type": "string",
                 "value": "http://wiki.ros.org/ROS/Tutorials/UnderstandingNodes"
             }
-        ],
+        },
         "metadata": {}
     },
     "pose": {
@@ -119,17 +119,12 @@ This API handles the subscription data of the context broker.
 
 ## POST /robot/connect
 
-This API makes FIROS connecting to new robots in case their names and topics match the ones allowed on the
-_whitelist.json_
+This call restores the configuration of FIROS. Disconnected robots are connected again.
 
 ## POST /robot/disconnect/NAME
 
-This API forces FIROS to disconnect from the robot specified by the _NAME_ parameter. It will also delete any connection
-and entity associated to the particular robot on the Context Broker.
-
-# Currently untested POST-Operations:
-
-These Operations might work, but are not tested currently.
+This call forces FIROS to disconnect from the robot specified by the **NAME** parameter. If Publisher, FIROS will no
+longer publish its data. If Subscriber, FIROS will not push the Information into the ROS-World
 
 ## POST /whitelist/write
 
@@ -254,5 +249,3 @@ The resulting _whitelist_ will look as follows:
 ## POST /whitelist/restore
 
 This API restores the _whitelist_ file to its initial state.
-
-Ent-to-end tests

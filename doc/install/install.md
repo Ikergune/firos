@@ -26,7 +26,7 @@ catkin_make
 
 -   FIROS uses git submodules (which is required to run properly). Newer versions of git can clone submodules via the
     `--recursive` option
--   Also check whether your local submodule-folder (currently in `firos/include/FiwareObjectConvert` amd
+-   Also check whether your local submodule-folder (currently in `firos/include/FiwareObjectConvert` and
     `firos/include/genpy`) contains files to be sure that everything was cloned.
 
 ## Basic Configuration of FIROS

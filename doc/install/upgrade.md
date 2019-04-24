@@ -34,5 +34,5 @@ as follows:
 | "throttling"          | Values like `PT0S` can be directly set in seconds   | Corresponds to `0`                   |
 | "subscription_length" | Values like `P1D` need to be converted into seconds | Corresponds to `24*60*60 ->` `86400` |
 
-We also changed them to different default values in
+We also changed them to different default values in this
 [commit](https://github.com/iml130/firos/commit/88b4b201c4a948b5d8d58e4af2a5a46146222d2d) which also can be adopted.

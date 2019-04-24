@@ -1,12 +1,15 @@
 sudo: required
 
+stages:
+  - test
+  - deploy
+
 branches:
   only:
     - master
 
 jobs:
   include:
-
     - stage: test
       name: "Unit Tests"
 
@@ -21,6 +24,7 @@ jobs:
         - true
       #  - python tests.py
 
+
     - stage: test
       name: "Documentation Tests"
       language: node_js
@@ -32,3 +36,19 @@ jobs:
       script:
         - npm run lint:md
         - npm run lint:text
+
+
+    - stage: deploy
+      name: "Docker build and push"
+      language: ruby
+      on:
+        branch: master
+
+      services:
+        - docker
+
+      script:
+        - docker build -f ./docker/Dockerfile --tag firos:latest .
+        - docker-compose build -f ./docker/docker-compose.yml
+      #  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      #  - docker push firos:latest
