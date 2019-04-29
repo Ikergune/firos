@@ -1,68 +1,29 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>firos</name>
-  <version>0.1.2</version>
-  <description><p>FIROS is a tool that helps connecting robots to the cloud. For this purpose it uses the Robot Operating System (ROS, http://www.ros.org/) and the FIWARE Context Broker (http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) as a way to publish and listen robot's data.</p>
-    <p>FIROS works as a translator between the robotics field and the cloud world, transforming ROS messages into NGSI to publish them in the cloud, and vice versa.</p></description>
+  <version>0.2.0</version>
+  <description>
+    FIROS is a tool that helps connecting robots to the cloud. For this purpose it uses the Robot Operating System (ROS, http://www.ros.org/) and the Orion-Context-Broker (http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker) as a way to publish and listen robot's data. FIROS works as a translator between the robotics field and the cloud world, transforming ROS-Messages into FIWARE-Entities to publish them in the cloud, and vice versa.
+  </description>
+  <author>Dominik Lux</author>
+  <author>Peter Detzner</author>
+  <maintainer email="dominik.lux@iml.fraunhofer.de">Dominik Lux</maintainer>
+  <maintainer email="peter.detzner@iml.fraunhofer.de">Peter Detzner</maintainer>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag -->
-  <!-- Example:  -->
-  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <author>Iñigo Gonzalez</author>
-  <author>igonzalez@ikergune.com</author>
-  <maintainer email="igonzalez@ikergune.com">Iñigo Gonzalez</maintainer>
-  <maintainer email="jjaime@ikergune.com">Jose Jaime</maintainer>
-  <maintainer email="fherranz@ikergune.com">Fernando Herranz</maintainer>
-  <maintainer email="ahernandez@ikergune.com">Angel Hernandez</maintainer>
-
-
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>MIT</license>
+  <url>https://github.com/iml130/firos</url>
 
-
-  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
-  <!-- Optional attribute type can be: website, bugtracker, or repository -->
-  <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/firos</url> -->
-
-
-  <!-- Author tags are optional, mutiple are allowed, one per tag -->
-  <!-- Authors do not have to be maintianers, but could be -->
-  <!-- Example: -->
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-
-
-  <!-- The *_depend tags are used to specify dependencies -->
-  <!-- Dependencies can be catkin packages or system dependencies -->
-  <!-- Examples: -->
-  <!-- Use build_depend for packages you need at compile time: -->
-  <!--   <build_depend>message_generation</build_depend> -->
-  <!-- Use buildtool_depend for build tool packages: -->
-  <!--   <buildtool_depend>catkin</buildtool_depend> -->
-  <!-- Use run_depend for packages you need at runtime: -->
-  <!--   <run_depend>message_runtime</run_depend> -->
-  <!-- Use test_depend for packages you need only for testing: -->
-  <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roscpp</build_depend>
+
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>message_generation</build_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>rospy</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>dynamic_reconfigure</run_depend>
-  <run_depend>message_runtime</run_depend>
 
+  <exec_depend>requests</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>dynamic_reconfigure</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
 
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- You can specify that this package is a metapackage here: -->
-    <!-- <metapackage/> -->
-
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
+  <doc_depend>mkdocs</doc_depend>
 </package>

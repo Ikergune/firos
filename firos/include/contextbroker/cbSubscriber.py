@@ -30,7 +30,6 @@ except ImportError:
     # Pyrhon 2
     import thread
 
-from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 from include.constants import Constants as C
 from include.logger import Log
 
@@ -149,19 +148,6 @@ class CbSubscriber(object):
             "throttling": C.CB_THROTTLING  
             }
         return json.dumps(struct)
-
-
-    def convertReceivedDataFromCB(self, jsonData):
-        ''' This parses the Input Back into a TypeValue-object via the 
-            Object-Converter. This method is here to uniform the Obejct-Conversions 
-            in CbPublisher and CbSubscriber
-
-            topic:    The topic, which should be converted. 
-                      the topic should have "id", "type" and "TOPIC" in it
-        '''
-        kv = self.TypeValue()
-        ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetaData=False)
-        return kv
 
 
     class TypeValue(object):

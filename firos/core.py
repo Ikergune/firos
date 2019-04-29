@@ -129,7 +129,7 @@ if __name__ == '__main__':
         Log("INFO", "\nStarting Firos...")
         Log("INFO", "---------------------------------\n")
 
-        #Topic Handler Routine:
+        # Topic Handler Routine:
         initPubAndSub()
         loadMsgHandlers(confManager.getRobots(True))
         createConnectionListeners()

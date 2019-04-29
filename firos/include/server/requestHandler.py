@@ -28,11 +28,13 @@ try:
     # Python 3
     from urllib.parse import urlparse, parse_qs
     from http.server import BaseHTTPRequestHandler
+    isPython3 = True
 
 except ImportError:
-    # Pyrhon 2
+    # Python 2
     from BaseHTTPServer import BaseHTTPRequestHandler
     from urlparse import urlparse, parse_qs
+    isPython3 = False
 
 from include.logger import Log
 from include.confManager import getRobots
@@ -40,8 +42,7 @@ from include.ros.rosConfigurator import RosConfigurator, setWhiteList
 from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, ROS_PUBLISHER, ROS_SUBSCRIBER, ROS_TOPIC_AS_DICT
 from include.contextbroker.cbSubscriber import CbSubscriber
 from include.constants import Constants as C 
-
-CloudSubscriber = CbSubscriber() # Only the Conversion method is used here TODO DL
+from include.FiwareObjectConverter.objectFiwareConverter import ObjectFiwareConverter
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -62,7 +63,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write("Firos is runnning!")
+            self.wfile.write(bytes("Firos is runnning!", "utf-8"))
         return
 
     def do_POST(self):
@@ -76,7 +77,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write("Firos is runnning!")
+            self.wfile.write(bytes("Firos is runnning!", "utf-8"))
         return
 
 
@@ -132,42 +133,12 @@ def requestFromCB(request, action):
     for topic in topics:
         if topic != 'id' and topic != 'type':
             dataStruct = buildTypeStruct(data[topic])
-            obj = CloudSubscriber.convertReceivedDataFromCB(jsonData)
+            obj = convertReceivedDataFromCB(jsonData)
             # Publish in ROS
             RosTopicHandler.publish(data['id'], topic, getattr(obj, topic), dataStruct)
 
     # Send OK!
     request.send_response(204)
-
-
-def buildTypeStruct(obj):
-    ''' This generates a struct containing a type (the actual ROS-Message-Type) and 
-        its value (either empty or more ROS-Message-Types).
-
-        This struct is used later to recursivley load needed Messages and fill them with 
-        content before they are posted back to ROS.
-
-        obj:    The received update from Context-Broker
-    '''
-    s = {}
-
-    # Searching for a point to get ROS-Message-Types from the obj, see Fiware-Object-Converter
-    if 'value' in obj and 'type' in obj and "." in obj['type'] : 
-        s['type'] = obj['type']
-        objval = obj['value'] 
-        s['value'] = {}
-
-        # For each value in Object repeat!
-        for k in objval:
-            if 'type' in objval[k] and 'value' in objval[k] and objval[k]['type'] == 'array': # Check if we got an Array-Type value
-                l = []
-                for klist in objval[k]['value']:
-                    l.append(buildTypeStruct(klist))
-                s['value'][k] = l
-            else:
-                s['value'][k] = buildTypeStruct(objval[k])
-
-    return s
 
 
 def listRobots(request, action):
@@ -196,11 +167,9 @@ def listRobots(request, action):
                 topic_data["structure"] = ROS_TOPIC_AS_DICT[topic_name]
             robot_data["topics"].append(topic_data)
         data.append(robot_data)
-    request.send_response(200)
-    request.send_header('Content-type', 'application/json')
-    setCors(request)
-    request.end_headers()
-    request.wfile.write(json.dumps(data))
+
+    # Return data and success
+    end_request(request, ('Content-Type', 'application/json'), 200, json.dumps(data))
 
 
 def onRobotData(request, action):
@@ -216,10 +185,9 @@ def onRobotData(request, action):
     # Only used to query information from Context-Broker
     cb_base_url = "http://{}:{}/v2/entities/".format(C.CONTEXTBROKER_ADRESS, C.CONTEXTBROKER_PORT)
     response = requests.get(cb_base_url + partURL)
-    request.send_response(response.status_code)
-    request.send_header('Content-Type', 'application/json')
-    request.end_headers()
-    request.wfile.write(response.text)
+
+    # Return the Information provided by the Context-Broker
+    end_request(request, ('Content-Type', 'application/json'), response.status_code, response.text)
 
 
 def onConnect(request, action):
@@ -232,9 +200,7 @@ def onConnect(request, action):
     loadMsgHandlers(RosConfigurator.systemTopics(True))
 
     # Return Success
-    request.send_response(200)
-    request.end_headers()
-    request.wfile.write("")
+    end_request(request, None, 200, "")
 
 
 def onDisConnect(request, action):
@@ -271,43 +237,28 @@ def onDisConnect(request, action):
         RosConfigurator.removeRobot(robotID)
     
     # Return success
-    request.send_response(200)
-    request.end_headers()
-    request.wfile.write("")
+    end_request(request, None, 200, "")
 
 
 
-## TODO DL Refactoring of RosConfigurator? They should work..
+### The below Operations are no longer maintained.
 def onWhitelistWrite(request, action):
-    ## \brief Handle robot info request
-    # \param client request
-    # \param action
     data = getPostParams(request)
     setWhiteList(data, None)
-    request.send_response(200)
-    request.end_headers()
-    request.wfile.write("")
+    end_request(request, None, 200, "")
 
 
 def onWhitelistRemove(request, action):
-    ## \brief Handle robot info request
-    # \param client request
-    # \param action
     data = getPostParams(request)
     setWhiteList(None, data)
-    request.send_response(200)
-    request.end_headers()
-    request.wfile.write("")
+    end_request(request, None, 200, "")
 
 
 def onWhitelistRestore(request, action):
-    ## \brief Handle robot info request
-    # \param client request
-    # \param action
     setWhiteList(None, None, True)
-    request.send_response(200)
-    request.end_headers()
-    request.wfile.write("")
+    end_request(request, None, 200, "")
+### The above Operations are no longer maintained
+
 
 
 # Mapper to the methods 
@@ -325,12 +276,59 @@ MAPPER = {
 }
 
 
-def setCors(request):
-    # \brief Set CORS headers in request
-    # \param client request
-    # TODO DL ??
-    request.send_header("Access-Control-Allow-Credentials", True)
-    request.send_header("Access-Control-Allow-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time")
-    request.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE")
-    request.send_header("Access-Control-Expose-Headers", "api-version, content-length, content-md5, content-type, date, request-id, response-time")
-    request.send_header("Access-Control-Allow-Origin", "*")
+def end_request(request, header, status, content):
+    '''
+        Ends the request via the statuscode, one header, end_headers and its content
+    '''
+    request.send_response(status)
+    if header is not None:
+        request.send_header(header[0], header[1])
+    request.end_headers()
+    if isPython3:
+        request.wfile.write(bytes(content, "utf-8"))
+    else:
+        request.wfile.write(bytes(content))
+
+
+### Back Conversion From Entity-JSON into Python-Object
+def buildTypeStruct(obj):
+    ''' This generates a struct containing a type (the actual ROS-Message-Type) and 
+        its value (either empty or more ROS-Message-Types).
+
+        This struct is used later to recursivley load needed Messages and fill them with 
+        content before they are posted back to ROS.
+
+        obj:    The received update from Context-Broker
+    '''
+    s = {}
+
+    # Searching for a point to get ROS-Message-Types from the obj, see Fiware-Object-Converter
+    if 'value' in obj and 'type' in obj and "." in obj['type'] : 
+        s['type'] = obj['type']
+        objval = obj['value'] 
+        s['value'] = {}
+
+        # For each value in Object repeat!
+        for k in objval:
+            if 'type' in objval[k] and 'value' in objval[k] and objval[k]['type'] == 'array': # Check if we got an Array-Type value
+                l = []
+                for klist in objval[k]['value']:
+                    l.append(buildTypeStruct(klist))
+                s['value'][k] = l
+            else:
+                s['value'][k] = buildTypeStruct(objval[k])
+
+    return s
+
+
+def convertReceivedDataFromCB(self, jsonData):
+    ''' This parses the Input Back into a TypeValue-object via the 
+        Object-Converter. This method is here to uniform the Obejct-Conversions 
+        in CbPublisher and CbSubscriber
+
+        topic:    The topic, which should be converted. 
+                    the topic should have "id", "type" and "TOPIC" in it
+    '''
+    kv = self.TypeValue()
+    ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetaData=False)
+    return kv
