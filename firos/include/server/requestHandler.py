@@ -61,10 +61,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             action["action"](self, action)
         else:
             end_request(self, ('Content-type', 'text/html'), 200, "Firos is running!")
-            # self.send_response(200)
-            # self.send_header('Content-type', 'text/html')
-            # self.end_headers()
-            # self.wfile.write(bytes("Firos is runnning!", "utf-8"))
         return
 
     def do_POST(self):
@@ -76,10 +72,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             action["action"](self, action)
         else:
             end_request(self, ('Content-type', 'text/html'), 200, "Firos is running!")
-            # self.send_response(200)
-            # self.send_header('Content-type', 'text/html')
-            # self.end_headers()
-            # self.wfile.write(bytes("Firos is runnning!", "utf-8"))
         return
 
 
