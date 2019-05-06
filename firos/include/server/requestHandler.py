@@ -315,7 +315,7 @@ def buildTypeStruct(obj):
     return s
 
 
-def convertReceivedDataFromCB(self, jsonData):
+def convertReceivedDataFromCB(jsonData):
     ''' This parses the Input Back into a TypeValue-object via the 
         Object-Converter. This method is here to uniform the Obejct-Conversions 
         in CbPublisher and CbSubscriber
@@ -323,6 +323,11 @@ def convertReceivedDataFromCB(self, jsonData):
         topic:    The topic, which should be converted. 
                     the topic should have "id", "type" and "TOPIC" in it
     '''
-    kv = self.TypeValue()
+    kv = TypeValue()
     ObjectFiwareConverter.fiware2Obj(jsonData, kv, setAttr=True, useMetaData=False)
+
     return kv
+
+class TypeValue(object):
+    ''' A Stub-Object to parse the received data
+    '''

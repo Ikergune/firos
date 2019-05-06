@@ -150,11 +150,6 @@ class CbSubscriber(object):
         return json.dumps(struct)
 
 
-    class TypeValue(object):
-        ''' A Stub-Object to parse the received data
-        '''
-
-
     def _checkResponse(self, response, robTop=None, subID=None, created=False):
         ''' If a not good response from ContextBroker is received, the error will be printed.
     
