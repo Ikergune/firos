@@ -12,12 +12,19 @@ publish and subscribe on it. If a contextbroker is not available you can quickly
 
 ## Cloning this Project
 
-After you have set up ROS and created a catkin-workspace you can finally clone this repository and create the FIROS-Node
-as follows:
+After you have set up ROS and created a catkin-workspace you can finally clone this repository, install its dependencies
+and create the FIROS-Node as follows:
 
 ```shell
+# Clone Repository
 cd "catkin_workspace_base_directory"/src
 git clone --recursive https://github.com/iml130/firos.git
+cd "catkin_workspace_base_directory"/src/firos
+
+# Install Dependencies
+-pip install -r requirements.txt
+
+# Make Node
 cd "catkin_workspace_base_directory"
 catkin_make
 ```
@@ -26,7 +33,7 @@ catkin_make
 
 -   FIROS uses git submodules (which is required to run properly). Newer versions of git can clone submodules via the
     `--recursive` option
--   Also check whether your local submodule-folder (currently in `firos/include/FiwareObjectConvert` and
+-   Also check whether your local submodule-folder (currently in `firos/include/FiwareObjectConverter` and
     `firos/include/genpy`) contains files to be sure that everything was cloned.
 
 ## Basic Configuration of FIROS
@@ -96,7 +103,8 @@ Firos should function via Python3. You can try it via:
 
 FIROS uses e.g. `requests` which is not a standard python package
 ([ref](http://docs.python-requests.org/en/master/dev/philosophy/#standard-library)). In this case you might already have
-it installed. If not use your package-manager like `apt`, `pacman`, `pip` , `...` to add it to your machine.
+it installed. If not use your package-manager like `apt`, `pacman`, `pip` , `...` to add it to your machine. Usually all
+needed packages are inside `requirements.txt`
 
 # Installation via Docker
 
@@ -175,91 +183,4 @@ includes the environment-variable `"ROS_MASTER_URI=http://rosmaster:11311"` with
 
 ```shell
 docker run --net docker_default --name YOUR_NAME --env ROS_MASTER_URI=http://rosmaster:11311 YOUR_IMAGE:NAME_HERE
-```
-
----
-
-# Old Installation-Information
-
-Below are the old Installation and Configuration-Information of FIROS which were taken and partially appended from
-[the old FIROS](https://github.com/Ikergune/firos).
-
-**Note:** This Information is out-dated and only exists, because not all information has been migrated.
-
-# Configuring FIROS
-
-FIROS has several configuration files located at _src/FIROS/config_.
-
-## whitelist.json
-
-Every time FIROS is launched or whenever it gets a notification about a new robot being connected, it looks the
-available _topics_ on the robot. this configuration file contains a list of allowed robots and topics to be connected to
-this particular instance of FIROS. It also defines whether the topic is a _publisher_, when FIROS transmits data to it,
-or a _subscriber_ in case FIROS should be listening to any incoming information on that topic. Names corresponding to
-both _robots_ and _topics_ can also be _regular expressions_ avoiding the '^' at the beginning and '\$' at the end. Here
-is an example:
-
-```json
-{
-    "turtle\\w+": {
-        "publisher": ["cmd_vel"],
-        "subscriber": ["pose"]
-    },
-    "robot\\w+": {
-        "publisher": ["cmd_vel.*teleop", ".*move_base/goal", ".*move_base/cancel"],
-        "subscriber": [".*move_base/result"]
-    }
-}
-```
-
-# Getting Topic Types
-
-There is also a way to request the topic type, which is useful in order to add them to the previous _robots.json_ file.
-The following example is based on the _Turtlesim_ example of ROS available here <http://wiki.ros.org/turtlesim>. Here
-are the steps to follow:
-
-1.  Launch the `rostopic list` command. This will show all the registered topics.
-2.  Now that you know the name of the topic, just execute the following command: `rostopic info TOPIC_NAME`. It will
-    result on something like this:
-
-<!-- -->
-
-` rostopic info /turtle1/cmd_vel Type: geometry_msgs/Twist
-
-        Publishers: None
-
-        Subscribers:
-            * /turtlesim (http://192.168.4.42 :45825/)`
-
-This means that the robot `turtle1` is listening to data published on `/turtle1/cmd_vel` so FIROS should be publishing
-on it. The _type_ of the `/turtle1/cmd_vel` is `geometry_msgs/Twist` what internally corresponds to the
-`geometry_msgs.msg.Twist` package
-
-Here is another example: ` rostopic info /turtle1/pose Type: turtlesim/Pose
-
-        Publishers:
-            * /turtlesim (http://192.168.4.42 :45825/)
-
-        Subscribers: None`
-
-In this case, `turtle1` is publishing data on `/turtle1/pose`, so FIROS can listen to it. As seen before, the _type_
-`turtlesim/Pose` corresponds to the internal package `turtlesim.msg.Pose`
-
-So we can deduce the slice of _robots.json_ related to `turtle1`:
-
-```json
-{
-    "turtle1": {
-        "topics": {
-            "cmd_vel": {
-                "msg": "geometry_msgs.msg.Twist",
-                "type": "publisher"
-            },
-            "pose": {
-                "msg": "turtlesim.msg.Pose",
-                "type": "subscriber"
-            }
-        }
-    }
-}
 ```

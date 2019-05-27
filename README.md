@@ -12,7 +12,7 @@ FIROS works as a translator between the robotics field and the cloud world, tran
 publish them in the cloud, and vice versa. The following figure depicts the integration of FIROS inside the FIWARE
 platform.
 
-![alt text](doc/firos.png "FIROS Integration")
+![alt text](doc/media/firos.png "FIROS Integration")
 
 FIROS is a tool that helps connecting robots to the cloud. For this purpose it uses the
 [Robot Operating System (ROS)](http://www.ros.org/) and the

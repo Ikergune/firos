@@ -41,7 +41,7 @@ Before executing any commands you need to create two configuration folders. In t
 **NOTE** `config.json`: In this case, the interface we use (which we retreived via `ip link`) is `"enp0s31f6"`. The
 Context-Broker runs locally, so this should be fine for you, as long as your Context-Broker is also locally.
 
-Inside `config_1` we add the file `robots.json` with the follwing content:
+Inside `config_1` we add the file `robots.json` with the following content:
 
 ```json
 {
@@ -170,6 +170,16 @@ You can also check out `locahost:1026/v2/entites`. There you can observe the Ent
 messages to each other. It is also observable that via `rostopic echo /turtle1/pose` the topic `pose` is still published
 through the second FIROS instance. This behaviour is intentional, since for this example we artificially created such a
 message loop.
+
+## Demonstration
+
+Below is a quick demonstration of the above described example. On the top left, `roscore`, the Orion-ContextBroker and
+Turtlesim is started. On the top-right a Web-Browser shows the content of the Orion-ConextBroker. The console on the
+bottom right shows information about the ROS-World. the other two consoles individually start FIROS. At the end:
+Turtlesim is stopped and you can observe that the two FIROS-Instances are still sending Messages to each other (see:
+[Neverending loop](#Neverending%20loop)).
+
+![Demonstration](../media/turtlesim_example.gif)
 
 ## Troubleshooting:
 

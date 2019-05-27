@@ -1,0 +1,11 @@
+digraph PubSubIllustration { 
+
+    cb [label="Orion\nContext-Broker", shape="cylinder"];
+    firos [label="FIROS", shape="box"];
+    ros [label="ROS-World", shape="ellipse"];
+
+    cb -> firos [headlabel="Retrieves Information\nwhere FIROS has\nsubscribed to" labeldistance=8  labelangle=77];
+    firos -> ros [headlabel="Publish Information\nto ROS \n(via \"publisher\")" labeldistance=8.5  labelangle=74 color="#3C8A29"];
+    ros -> firos [headlabel="Retrieves Information\nwhere FIROS has\nsubscribed to" labeldistance=9  labelangle=75];
+    firos -> cb [headlabel="Publish Information\n to the Orion \nContext-Broker\n(via \"subscriber\")" labeldistance=10.5  labelangle=84 color="#3C8A29"];
+}

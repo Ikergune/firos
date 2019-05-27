@@ -47,7 +47,7 @@ Here is the list of all possibilities for a configuration:
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------: |
 | "interface"            | Can be `"public"` or another string of one of the interfaces given by `ip link` or by `ifconfig`. If set to `"public"`, the public IP-address is set for the Map-Server (via [this](http://ip.42.pl/raw)). Otherwise the (specified) interface IP-address is used. |    x     |
 | "log_level"            | Can be either `"INFO"` (Default), `"DEBUG"`, `"WARNING"`, `"ERROR"` or `"CRITICAL"`.                                                                                                                                                                               |          |
-| "node_name"            | This sets the ROS-Node-Name for this FIROS instance. the default is `"firos"`.                                                                                                                                                                                     |
+| "node_name"            | This sets the ROS-Node-Name for this FIROS instance. The default is `"firos"`.                                                                                                                                                                                     |
 | "ros_subscriber_queue" | The queue-size of the `rospy.Publisher`. See more [here](http://wiki.ros.org/rospy/Overview/Publishers%20and%20Subscribers). Default is `10`                                                                                                                       |          |
 | "context_type"         | This sets the context type of an entity (the `type`-value of the base-entity). Default is `"ROBOT"` but can be changed if necessary                                                                                                                                |          |
 | "rosbridge_port"       | Changes the ROS-Port, where to listen. Default is `9090`                                                                                                                                                                                                           |          |
@@ -77,9 +77,9 @@ Context-Broker. If you are running a local Context-Broker, `"adress"` can also b
 
 This configuration describes which information the FIROS-instance should publish to the Context-Broker and publish into
 the ROS-World. There exist two different point of views: so we decided, that the publish-subscribe-terminology is at the
-Context-Brokers point of view. Here is an example to publish `turtlesim`s message/topic `pose`-information into the
-Context-Broker by subscribing to it. Accordingly, if the Context-Broker receives any Information about the `cmd_vel`,
-its data is published into the ROS-World:
+Context-Brokers point of view. Here is an example to publish `turtlesim`'s message/topic `Pose`-information into the
+Context-Broker by subscribing to it. Accordingly, if the Context-Broker receives any Information about the `cmd_vel`
+(`Twist`-Information), its data is published into the ROS-World:
 
 ```json
 {
@@ -102,6 +102,13 @@ This json in particular listens to the rostopic `/turtle1/pose` with the message
 corresponding python message from `turtlesim/Pose`) and sends all retreived data to the specified Context Broker. It
 publishes data into `/turtle1/cmd_vel` after receiving a notifcation of the Context-Broker from type
 `geometry_msgs/Twist`.
+
+To clarify this behaviour, please have a look at this:
+
+![Illustration](../media/pubsub-Illustration.png)
+
+The green arrows are specified by the `config.json` (and `whitelist.json`). The corresponding black arrows are derived
+from the green arrows, which happens automatically.
 
 You do not have to specify `publisher` and `subscriber` of all available topics or at all for a robot. Only specify the
 needed ones, which need to be displayed from/or need to obtain information on the Context-Broker
@@ -161,6 +168,28 @@ non-existent-configuration-file. Usually for normal usecases, the `whitelist.jso
 
 **Note:** The FIROS only captures running ROS-Applications at the startup. All applications started after FIROS will not
 be recognized.
+
+**Note:** The `whitelist.json` does not need to know the actual Message-Type. FIROS automatically looks up the
+Message-Type. However, the "Message-Implementation" still needs to be present locally at the FIROS-Instance (via the
+`msgs`-Folder, or compiled by catkin)
+
+The `whitelist.json` also supports Regular Expressions (Regex), so you can refer to more Robots and Topics in just a few
+lines.
+
+Here we address all `turtle[a-zA-Z0-9]+` and `robot[a-zA-Z0-9]+` Robots with their topics:
+
+```json
+{
+    "turtle\\w+": {
+        "publisher": ["cmd_vel"],
+        "subscriber": ["pose"]
+    },
+    "robot\\w+": {
+        "publisher": ["cmd_vel.*teleop", ".*move_base/goal", ".*move_base/cancel"],
+        "subscriber": [".*move_base/result"]
+    }
+}
+```
 
 ---
 
