@@ -1,6 +1,6 @@
 # Upgrading from [Ikergune/firos](https://github.com/Ikergune/firos)
 
-In the case you have an old version of FIROS. You need to apply the following procedure, so that you can use the newer
+In case you have an old version of FIROS. You need to apply the following procedure, so that you can use the newer
 version:
 
 ## Clearing Context-Broker's Content

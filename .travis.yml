@@ -1,8 +1,9 @@
 sudo: required
 
 stages:
-  - test
-  - deploy
+  - name: test
+  - name: deploy
+    if: (type NOT IN (pull_request)) AND branch IN (master)
 
 branches:
   only:
