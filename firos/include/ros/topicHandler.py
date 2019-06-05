@@ -150,7 +150,6 @@ def _publishToCBRoutine(data, args):
          
         t = time.time() * 1000 # Get Millis
         if (robot+topic) in LAST_PUBLISH_TIME and LAST_PUBLISH_TIME[robot+topic] >= t:
-            # Case: We did not published it yet.
             # Case: We want it to publish again, but we did not wait PUB_FREQUENCY milliseconds
             return 
 

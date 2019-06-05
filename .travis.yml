@@ -49,7 +49,7 @@ jobs:
         - docker
 
       script:
-        - docker build -f ./docker/Dockerfile --tag firos:latest .
+        - docker build -f ./docker/Dockerfile --tag fhgiml130/firos:latest .
         - docker-compose -f ./docker/docker-compose.yml build
-      #  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      #  - docker push firos:latest
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push fhgiml130/firos:latest
