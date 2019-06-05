@@ -21,7 +21,7 @@ try:
     # Python 3
     from urllib.request import urlopen
 except ImportError:
-    # Pyrhon 2
+    # Python 2
     from urllib2 import urlopen
 
 class Constants:
@@ -41,6 +41,7 @@ class Constants:
     CB_SUB_LENGTH = 300             # In Seconds!
     CB_SUB_REFRESH = 0.9            # After 90% of time is exceeded
     CONTEXT_TYPE = "ROBOT"   
+    PUB_FREQUENCY = 0               # In Milliseconds
 
     ROS_NODE_NAME = "firos"
     ROS_SUB_QUEUE_SIZE = 10 
@@ -56,7 +57,7 @@ class Constants:
     @classmethod
     def init(cls, path):
         if not cls.configured:
-            configured = True
+            cls.configured = True
             cls.PATH = path
 
             configData = cls.setConfiguration(path)
@@ -93,7 +94,11 @@ class Constants:
                 cls.MAP_SERVER_ADRESS = netifaces.ifaddresses(cls.INTERFACE)[2][0]['addr']
 
             if "rosbridge_port" in configData:
-                cls.ROSBRIDGE_PORT = configData["rosbridge_port"]
+                cls.ROSBRIDGE_PORT = int(configData["rosbridge_port"])
+
+            if "pub_frequency" in configData:
+                cls.PUB_FREQUENCY = int(configData["pub_frequency"])
+
 
 
             ### ContextBroker Section

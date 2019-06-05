@@ -23,6 +23,7 @@ __status__ = "Developement"
 import os
 import rospy
 import importlib
+import time
 
 from include.logger import Log
 from include.constants import Constants as C 
@@ -43,6 +44,10 @@ TOPIC_BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topi
 # ROS_PUBSUB[robotID][topic] --> returns  rospy Publisher/Subsriber
 ROS_PUBLISHER = {}
 ROS_SUBSCRIBER = {}
+
+# A Struct which is used to minimize the Number of publishes. Here we only
+# save time stamps of ids. LAST_PUBLISH_TIME[robotID, topic] would return a time 
+LAST_PUBLISH_TIME = dict()
 
 # Topics in ROS do only have one data-type! 
 # (There might be an Exception to this if the topic gets deregistered, this is currently ignored)
@@ -134,13 +139,23 @@ def _publishToCBRoutine(data, args):
         It just wraps it content and publishes the data via the cbPublisher.publishToCB
         Here we explicitly check at the SHUTDOWN_SIGNAL. if it is set, we stop publishing
 
+        Here we also use the PUB_FREQUENCY-variable, to limit the number of publishes, if needed
+
         data: data received from ROS
         args: additional arguments we set prior
     '''
     if not SHUTDOWN_SIGNAL:
         robot = args['robot']
         topic = args['topic'] # Retreiving additional Infos, which were set on initialization
+         
+        t = time.time() * 1000 # Get Millis
+        if (robot+topic) in LAST_PUBLISH_TIME and LAST_PUBLISH_TIME[robot+topic] >= t:
+            # Case: We did not published it yet.
+            # Case: We want it to publish again, but we did not wait PUB_FREQUENCY milliseconds
+            return 
+
         CloudPublisher.publishToCB(robot, topic, data, ROS_TOPIC_AS_DICT[topic])
+        LAST_PUBLISH_TIME[robot+topic] = t + C.PUB_FREQUENCY
 
 
 
