@@ -9,23 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-## Generate messages in the 'data/ros_msgs' folder
-add_message_files(
-  DIRECTORY 
-  data/ros_msgs
-  FILES
-  Robot_Event.msg
-  CB_Event.msg
-)
-
-## Generate services in the 'data/ros_service_info' folder
-add_service_files(
-  DIRECTORY 
-  data/ros_service_info
-  FILES
-  FIROS_Info.srv
-)
-
 ## Generate messages which firos depends on
 generate_messages(
   DEPENDENCIES

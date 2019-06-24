@@ -34,9 +34,10 @@ def getRobots(refresh=False):
         robots we might send a lot of data. 
     '''
     try:
-        #Retrieves the whitelist.json. If it does not exists, it returns all topics.
+        # Retrieves the whitelist.json. If it does not exists, it returns all topics.
         robots = copy.deepcopy(RosConfigurator.systemTopics(refresh))    
-        #Retrieves the robots.json.
+        
+        # Retrieves the robots.json.
         robots_json = getRobotsByJson()
         if len(robots_json) == 0: 
             Log("ERROR", "The file 'robots.json' is either empty or does not exist!\n\nExiting")
@@ -52,10 +53,12 @@ def getRobots(refresh=False):
             for topic_name in robots_json[robot_name]["topics"]:
                 topic = robots_json[robot_name]["topics"][topic_name]
 
+                # Overwrite or add!
                 robots[robot_name]["topics"][str(topic_name)] = {
-                    "msg": str(topic["msg"]) if type(topic["msg"]) is str else topic["msg"],
+                    "msg": str(topic["msg"]),
                     "type": str(topic["type"])
                 }
+
         return robots
 
     except Exception as e:

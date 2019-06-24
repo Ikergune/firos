@@ -28,7 +28,7 @@ import time
 from include.logger import Log
 from include.constants import Constants as C 
 from include.libLoader import LibLoader
-from include.ros.rosConfigurator import RosConfigurator
+from include import confManager
 
 # PubSub Handlers
 from include.contextbroker.cbPublisher import CbPublisher
@@ -91,6 +91,8 @@ def loadMsgHandlers(robot_data):
 
     Log("INFO", "Getting configuration data")
     Log("INFO", "Generating topic handlers:")
+
+    # Generate 
 
     for robotID in robot_data.keys(): 
         for topic in robot_data[robotID]['topics'].keys():
@@ -287,11 +289,11 @@ def createConnectionListeners():
         /ROS_NODE_NAME/connect    --> std_msgs/String
         /ROS_NODE_NAME/disconnect --> std_msgs/String
     '''
-    subscribers.append(rospy.Subscriber(C.ROS_NODE_NAME + "/disconnect", std_msgs.msg.String, robotDisconnection))
+    subscribers.append(rospy.Subscriber(C.ROS_NODE_NAME + "/disconnect", std_msgs.msg.String, _robotDisconnection))
     subscribers.append(rospy.Subscriber(C.ROS_NODE_NAME +"/connect", std_msgs.msg.String, _robotConnection))
 
 
-def robotDisconnection(data):
+def _robotDisconnection(data):
     ''' Unregisters from a given robotID by a ROBOT
 
         data: The String which was sent to firos
@@ -318,4 +320,4 @@ def _robotConnection(data):
     '''
     robot_name = data.data
     Log("INFO", "Connected robot: " + robot_name)
-    loadMsgHandlers(RosConfigurator.systemTopics(True))
+    loadMsgHandlers(confManager.getRobots(True))

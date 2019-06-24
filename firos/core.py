@@ -81,10 +81,8 @@ if __name__ == '__main__':
     from include import confManager
     from include.logger import Log, initLog
     from include.server.firosServer import FirosServer
-
+    
     from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, createConnectionListeners, initPubAndSub
-    from include.rcm.topicManager import TopicManager
-
 
     # Overwrite global variables with command line arguments (iff set)
     if results.port is not None:
@@ -109,7 +107,6 @@ if __name__ == '__main__':
     Log("INFO", "Initialized")
 
 
-    toMa = TopicManager()
 
     try:
         server = FirosServer("0.0.0.0", C.MAP_SERVER_PORT)
@@ -119,7 +116,6 @@ if __name__ == '__main__':
         def signal_handler(signal, frame):
             Log("INFO", ('\nExiting from the application'))
             RosTopicHandler.unregisterAll()
-            toMa.removeListeners()
             server.close()
             Log("INFO", ('\nExit'))
             sys.exit(0)

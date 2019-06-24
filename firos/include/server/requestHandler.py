@@ -38,7 +38,7 @@ except ImportError:
 
 from include.logger import Log
 from include.confManager import getRobots
-from include.ros.rosConfigurator import RosConfigurator, setWhiteList
+from include.ros.rosConfigurator import RosConfigurator
 from include.ros.topicHandler import RosTopicHandler, loadMsgHandlers, ROS_PUBLISHER, ROS_SUBSCRIBER, ROS_TOPIC_AS_DICT
 from include.contextbroker.cbSubscriber import CbSubscriber
 from include.constants import Constants as C 
@@ -238,18 +238,18 @@ def onDisConnect(request, action):
 ### The below Operations are no longer maintained.
 def onWhitelistWrite(request, action):
     data = getPostParams(request)
-    setWhiteList(data, None)
+    RosConfigurator.setWhiteList(data, None)
     end_request(request, None, 200, "")
 
 
 def onWhitelistRemove(request, action):
     data = getPostParams(request)
-    setWhiteList(None, data)
+    RosConfigurator.setWhiteList(None, data)
     end_request(request, None, 200, "")
 
 
 def onWhitelistRestore(request, action):
-    setWhiteList(None, None, True)
+    RosConfigurator.setWhiteList(None, None, True)
     end_request(request, None, 200, "")
 ### The above Operations are no longer maintained
 
