@@ -66,6 +66,7 @@ Dominik Lux, Peter Detzner
 FIROS-Helping Robots to be Context Aware
 ([Slideshare](https://de.slideshare.net/FI-WARE/fiware-global-summit-FIROS-helping-robots-to-be-context-aware),
 28.11.2018 FIWARE Global Summit, Malaga)
+
 FIROS-Helping Robots to be Context Aware II
 ([Slideshare](https://de.slideshare.net/FI-WARE/fiware-global-summit-firos-making-robots-context-aware),
 21.05.2019 FIWARE Global Summit, Genova)
