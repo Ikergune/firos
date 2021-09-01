@@ -119,7 +119,7 @@ Robots may have some public files so users can understand some characteristics o
 whitelist.json
 --------------
 
-Everytime FIROS is launched or whenever it gets a notification about a new robot being connected, it looks the available *topics* on the robot. this configuration file contains a list of allowed robots and topics to be connected to this particular instance of FIROS. It also defines whether the topic is a *publisher*, when FIROS transmits data to it, or a *subscriber* in case FIROS should be listening to any incoming information on that topic.
+Everytime FIROS is launched or whenever it gets a notification about a new robot being connected, it looks at the available *topics* on the robot. This configuration file contains a list of allowed robots and topics to be connected to this particular instance of FIROS. It also defines whether the topic is a *publisher*, when FIROS transmits data to it, or a *subscriber* in case FIROS should be listening to any incoming information on that topic.
 Names corresponding to both *robots* and *topics* can also be *regular expressions* avoiding the '^' at the beginning and '$' at the end. Here is an example:
 
 ``` javascript
